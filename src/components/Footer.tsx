@@ -7,7 +7,7 @@ export function Footer() {
       <div className="container-tf grid gap-12 md:grid-cols-2 lg:grid-cols-4">
         <div className="lg:col-span-1">
           
-          <img src={logo} alt="TERRA FORMING" className="h-12 w-auto" width={160} height={48} />
+          <img src={logo} alt="TERRA FORMING" className="h-12 w-auto" width={300} height={83} />
           
           <p className="mt-5 text-sm text-white/70 leading-relaxed max-w-xs">
             TERRA FORMING S.A.S. — Ingeniería, construcción e infraestructura.
