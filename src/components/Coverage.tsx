@@ -1,3 +1,4 @@
+import mapaColombiaCali from "@/assets/mapa_colombia_cali.svg";
 import { Reveal } from "./Reveal";
 import { SectionHeader } from "./SectionHeader";
 
@@ -35,49 +36,45 @@ export function Coverage() {
 
 function ColombiaMap() {
   return (
-    <div className="relative aspect-square max-w-lg mx-auto">
-      <svg viewBox="0 0 500 550" className="w-full h-full">
-        <defs>
-          <linearGradient id="mapg" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stopColor="#0E2A47" stopOpacity="0.9" />
-            <stop offset="100%" stopColor="#0E2A47" stopOpacity="0.55" />
-          </linearGradient>
-        </defs>
-        {/* Simplified Colombia silhouette */}
-        <path
-          d="M250 40 C310 45 355 80 380 130 C405 170 415 210 400 250 C420 285 440 320 425 360 C405 405 370 430 335 445 C310 480 285 510 250 510 C215 505 195 475 180 445 C150 435 120 415 105 385 C85 350 90 310 105 275 C90 240 100 195 130 165 C155 130 175 95 210 65 C225 50 235 42 250 40 Z"
-          fill="url(#mapg)"
-          stroke="#5F8D4E"
-          strokeWidth="1.2"
-          opacity="0.9"
-        />
-        {/* Cali highlight (approx left-center-south) */}
-        <g>
-          <circle cx="175" cy="360" r="30" fill="#F7941D" opacity="0.15">
-            <animate attributeName="r" values="20;40;20" dur="3s" repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0.3;0;0.3" dur="3s" repeatCount="indefinite" />
-          </circle>
-          <circle cx="175" cy="360" r="8" fill="#F7941D" />
-          <circle cx="175" cy="360" r="3" fill="#fff" />
-          <line x1="175" y1="360" x2="235" y2="330" stroke="#F7941D" strokeWidth="1" strokeDasharray="3 3" opacity="0.7" />
-          <text x="240" y="335" fill="#0E2A47" fontSize="16" fontWeight="700" fontFamily="Montserrat">Cali</text>
-          <text x="240" y="352" fill="#5F8D4E" fontSize="10" fontWeight="600" letterSpacing="1">
-            VALLE DEL CAUCA
-          </text>
+    <div className="relative w-full max-w-lg mx-auto">
+      <img src={mapaColombiaCali} alt="Mapa de Colombia" className="w-full h-auto" loading="lazy" />
+
+      <svg
+        viewBox="0 0 100 100"
+        className="pointer-events-none absolute inset-0 h-full w-full"
+        aria-hidden="true"
+      >
+        <g stroke="#5F8D4E" strokeWidth="0.5" strokeDasharray="1.6 1.8" fill="none" opacity="0.75">
+          <line x1="40" y1="64" x2="51" y2="34" />
+          <line x1="40" y1="64" x2="69" y2="63" />
+          <line x1="40" y1="64" x2="28" y2="47" />
         </g>
-        {/* Faint route lines to other regions */}
-        <g stroke="#5F8D4E" strokeWidth="1" strokeDasharray="2 5" fill="none" opacity="0.6">
-          <path d="M175 360 Q220 250 260 140" />
-          <path d="M175 360 Q260 380 340 400" />
-          <path d="M175 360 Q140 300 130 200" />
-        </g>
+
         <g fill="#5F8D4E">
-          <circle cx="260" cy="140" r="3" />
-          <circle cx="340" cy="400" r="3" />
-          <circle cx="130" cy="200" r="3" />
-          <circle cx="300" cy="250" r="3" />
+          <circle cx="51" cy="34" r="1.2" />
+          <circle cx="69" cy="63" r="1.2" />
+          <circle cx="28" cy="47" r="1.2" />
+        </g>
+
+        <g>
+          <circle cx="40" cy="64" r="5" fill="#F7941D" opacity="0.25">
+            <animate attributeName="r" values="3.2;6.2;3.2" dur="3s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.35;0.08;0.35" dur="3s" repeatCount="indefinite" />
+          </circle>
+          <circle cx="40" cy="64" r="1.7" fill="#F7941D" />
+          <circle cx="40" cy="64" r="0.65" fill="#ffffff" />
         </g>
       </svg>
+
+      <div className="absolute left-[40%] top-[64%] pointer-events-none">
+        <div className="absolute left-3 top-0.5 h-px w-20 bg-brand-orange/80" />
+        <div className="absolute left-24 -top-4 whitespace-nowrap">
+          <p className="text-base font-bold text-brand-navy leading-none">Cali</p>
+          <p className="text-[10px] font-semibold tracking-[0.14em] text-brand-green leading-none mt-1">
+            VALLE DEL CAUCA
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
