@@ -1,5 +1,5 @@
+import logo from "@/assets/logo_blanco.png";
 import { useEffect, useState } from "react";
-import logo from "@/assets/logo.png";
 
 const NAV = [
   { id: "inicio", label: "Inicio" },
