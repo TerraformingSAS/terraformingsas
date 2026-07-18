@@ -1,3 +1,4 @@
+import logoColor from "@/assets/logo.png";
 import logo from "@/assets/logo_blanco.png";
 import { useEffect, useState } from "react";
 
@@ -44,7 +45,13 @@ export function Header() {
           className="flex items-center gap-2 shrink-0"
           aria-label="TERRA FORMING inicio"
         >
-          <img src={logo} alt="TERRA FORMING" className="h-11 w-auto" width={300} height={83} />
+          <img
+            src={scrolled || open ? logoColor : logo}
+            alt="TERRA FORMING"
+            className="h-11 w-auto"
+            width={300}
+            height={83}
+          />
         </button>
 
         <nav className="hidden lg:flex items-center gap-7">
