@@ -26,7 +26,9 @@ const initial: FormState = { name: "", email: "", phone: "", company: "", type: 
 export function Contact() {
   const [form, setForm] = useState<FormState>(initial);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
-  const [status, setStatus] = useState<"idle" | "success">("idle");
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [result, setResult] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const set = <K extends keyof FormState>(k: K, v: string) => {
     setForm((f) => ({ ...f, [k]: v }));
@@ -46,12 +48,40 @@ export function Contact() {
     return Object.keys(e).length === 0;
   };
 
-  const onSubmit = (ev: React.FormEvent) => {
+  const onSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
     if (!validate()) return;
-    // TODO: conectar a correo / CRM / Supabase
-    setStatus("success");
-    setForm(initial);
+
+    setIsSubmitting(true);
+    setResult("Enviando...");
+
+    const formData = new FormData(ev.currentTarget);
+    formData.append("access_key", "bbf249ee-fab7-45d0-9bee-0c0cf71f3af4");
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setStatus("success");
+        setResult("Formulario enviado correctamente");
+        setForm(initial);
+        setErrors({});
+        ev.currentTarget.reset();
+      } else {
+        setStatus("error");
+        setResult("No se pudo enviar el formulario. Intente nuevamente.");
+      }
+    } catch {
+      setStatus("error");
+      setResult("Error de conexión. Verifique su red e intente nuevamente.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -92,6 +122,7 @@ export function Contact() {
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Nombre completo *" error={errors.name}>
                 <input
+                  name="name"
                   value={form.name}
                   onChange={(e) => set("name", e.target.value)}
                   className={inputCls(!!errors.name)}
@@ -101,6 +132,7 @@ export function Contact() {
               </Field>
               <Field label="Empresa / Entidad">
                 <input
+                  name="company"
                   value={form.company}
                   onChange={(e) => set("company", e.target.value)}
                   className={inputCls(false)}
@@ -109,6 +141,7 @@ export function Contact() {
               </Field>
               <Field label="Correo *" error={errors.email}>
                 <input
+                  name="email"
                   type="email"
                   value={form.email}
                   onChange={(e) => set("email", e.target.value)}
@@ -119,6 +152,7 @@ export function Contact() {
               </Field>
               <Field label="Teléfono *" error={errors.phone}>
                 <input
+                  name="phone"
                   type="tel"
                   value={form.phone}
                   onChange={(e) => set("phone", e.target.value)}
@@ -132,6 +166,7 @@ export function Contact() {
             <div className="mt-4">
               <Field label="Tipo de proyecto *" error={errors.type}>
                 <select
+                  name="type"
                   value={form.type}
                   onChange={(e) => set("type", e.target.value)}
                   className={inputCls(!!errors.type)}
@@ -147,6 +182,7 @@ export function Contact() {
             <div className="mt-4">
               <Field label="Cuéntenos sobre su proyecto *" error={errors.message}>
                 <textarea
+                  name="message"
                   value={form.message}
                   onChange={(e) => set("message", e.target.value)}
                   rows={5}
@@ -158,9 +194,10 @@ export function Contact() {
 
             <button
               type="submit"
+              disabled={isSubmitting}
               className="mt-6 w-full inline-flex items-center justify-center gap-2 rounded-md bg-brand-orange px-6 py-3.5 text-sm font-semibold text-white shadow-md transition-all hover:brightness-110"
             >
-              Enviar solicitud
+              {isSubmitting ? "Enviando..." : "Enviar solicitud"}
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M5 12h14M13 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -168,7 +205,13 @@ export function Contact() {
 
             {status === "success" && (
               <div role="status" className="mt-4 rounded-md border border-brand-green/40 bg-brand-green/10 p-4 text-sm text-brand-navy">
-                Gracias, hemos recibido su solicitud. Nuestro equipo le contactará pronto.
+                {result || "Gracias, hemos recibido su solicitud. Nuestro equipo le contactará pronto."}
+              </div>
+            )}
+
+            {status === "error" && (
+              <div role="status" className="mt-4 rounded-md border border-red-500/40 bg-red-50 p-4 text-sm text-red-700">
+                {result || "No se pudo enviar el formulario."}
               </div>
             )}
           </form>
