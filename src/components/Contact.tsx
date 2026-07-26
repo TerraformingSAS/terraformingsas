@@ -33,6 +33,10 @@ export function Contact() {
   const set = <K extends keyof FormState>(k: K, v: string) => {
     setForm((f) => ({ ...f, [k]: v }));
     setErrors((e) => ({ ...e, [k]: undefined }));
+    if (status !== "idle") {
+      setStatus("idle");
+      setResult("");
+    }
   };
 
   const validate = () => {
@@ -50,9 +54,14 @@ export function Contact() {
 
   const onSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
-    if (!validate()) return;
+    if (!validate()) {
+      setStatus("idle");
+      setResult("");
+      return;
+    }
 
     setIsSubmitting(true);
+    setStatus("idle");
     setResult("Enviando...");
 
     const formData = new FormData(ev.currentTarget);
@@ -64,17 +73,16 @@ export function Contact() {
         body: formData,
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => null);
 
-      if (data.success) {
+      if (response.ok && data?.success) {
         setStatus("success");
         setResult("Formulario enviado correctamente");
         setForm(initial);
         setErrors({});
-        ev.currentTarget.reset();
       } else {
         setStatus("error");
-        setResult("No se pudo enviar el formulario. Intente nuevamente.");
+        setResult(data?.message || "No se pudo enviar el formulario. Intente nuevamente.");
       }
     } catch {
       setStatus("error");
