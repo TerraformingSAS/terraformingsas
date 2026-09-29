@@ -33,7 +33,7 @@ export function CTASection() {
               Solicitar información
             </a>
             <a
-              href="https://wa.me/573112363149?text=Hola%20TERRA%20FORMING%2C%20quiero%20información%20sobre%20sus%20servicios."
+              href="https://wa.me/573214230090?text=Hola%20TERRA%20FORMING%2C%20quiero%20información%20sobre%20sus%20servicios."
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-md border border-white/40 bg-white/5 backdrop-blur px-7 py-3.5 text-sm font-semibold text-white transition-all hover:bg-white/10"

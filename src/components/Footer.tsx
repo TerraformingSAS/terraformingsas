@@ -48,7 +48,7 @@ export function Footer() {
               <a href="mailto:gerencia@terraformings.co" className="hover:text-white">gerencia@terraformings.co</a>
             </li>
             <li>
-              <a href="tel:+573112363149" className="hover:text-white">311 236 3149</a>
+              <a href="tel:+573214230090" className="hover:text-white">321 423 0090</a>
             </li>
           </ul>
         </div>

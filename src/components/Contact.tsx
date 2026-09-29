@@ -115,7 +115,7 @@ export function Contact() {
             />
             <InfoRow
               label="Teléfono"
-              value={<a href="tel:+573112363149" className="hover:text-brand-orange">311 236 3149</a>}
+              value={<a href="tel:+573214230090" className="hover:text-brand-orange">321 423 0090</a>}
               icon={<path d="M5 4h4l2 5-3 2a12 12 0 006 6l2-3 5 2v4a2 2 0 01-2 2A17 17 0 013 6a2 2 0 012-2z" />}
             />
           </div>

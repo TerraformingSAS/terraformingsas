@@ -10,7 +10,6 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import { initClarity } from "../lib/clarity";
-import { reportLovableError } from "../lib/lovable-error-reporting";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -38,9 +37,6 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
-  useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
-  }, [error]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -113,7 +109,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             addressRegion: "Valle del Cauca",
             addressCountry: "CO",
           },
-          telephone: "+57 311 236 3149",
+          telephone: "+57 3214230090",
           email: "gerencia@terraformings.co",
           areaServed: "CO",
         }),

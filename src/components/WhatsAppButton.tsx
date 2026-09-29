@@ -1,7 +1,7 @@
 export function WhatsAppButton() {
   return (
     <a
-      href="https://wa.me/573112363149?text=Hola%20TERRA%20FORMING%2C%20quiero%20información%20sobre%20sus%20servicios."
+      href="https://wa.me/573214230090?text=Hola%20TERRA%20FORMING%2C%20quiero%20información%20sobre%20sus%20servicios."
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Contactar por WhatsApp"
