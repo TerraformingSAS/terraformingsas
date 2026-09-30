@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { Reveal } from "@/components/Reveal";
+import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { BackToTop } from "@/components/BackToTop";
 import { TerraMark } from "@/components/terra/TerraMark";
@@ -22,11 +23,10 @@ import {
   WhatsAppIcon,
 } from "@/components/terra/icons";
 import heroImg from "@/assets/terra/hero-bg-gradient.png";
-import natureImg from "@/assets/terra/section-pond-deck.jpg";
+import wetlandImg from "@/assets/terra/humedal-natural.png";
 import aerialImg from "@/assets/terra/section-aerial.jpg";
 import commercialImg from "@/assets/terra/zona-comercial.png";
-import wetlandImg from "@/assets/terra/section-pond-bench.jpg";
-import footerLeavesImg from "@/assets/terra/footer-leaves.jpg";
+import cierreImg from "@/assets/terra/seccion-final.png";
 
 const WA_URL =
   "https://wa.me/573214230090?text=Hola%20TERRA%2C%20quiero%20más%20información%20sobre%20el%20proyecto.";
@@ -313,14 +313,15 @@ function TerraPage() {
             <Reveal className="order-1 lg:order-2">
               <div className="relative overflow-hidden rounded-xl">
                 <img
-                  src={natureImg}
-                  alt="Humedal y deck de madera en TERRA al atardecer"
+                  src={wetlandImg}
+                  alt="Humedal natural TERRA al atardecer con deck de madera"
                   className="w-full h-[420px] sm:h-[520px] object-cover"
                   loading="lazy"
                   width={1579}
                   height={996}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/55 via-transparent to-transparent" />
+                {/* Navy fade only under the caption card on the photo */}
+                <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-brand-navy/70 via-brand-navy/25 to-transparent" />
                 <div className="absolute inset-x-4 bottom-4 sm:inset-x-6 sm:bottom-6">
                   <div className="inline-flex items-center gap-3 rounded-lg bg-brand-navy/90 px-4 py-3 text-white shadow-lg backdrop-blur">
                     <WetlandIcon className="text-brand-orange shrink-0" />
@@ -439,13 +440,12 @@ function TerraPage() {
               <div className="relative overflow-hidden rounded-xl">
                 <img
                   src={wetlandImg}
-                  alt="Vista del humedal desde el deck en TERRA"
+                  alt="Humedal natural TERRA con árboles rosados y deck"
                   className="w-full h-[420px] sm:h-[520px] object-cover object-center"
                   loading="lazy"
-                  width={460}
-                  height={200}
+                  width={1579}
+                  height={996}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/35 via-transparent to-transparent" />
               </div>
             </Reveal>
             <Reveal delay={120}>
@@ -492,22 +492,22 @@ function TerraPage() {
           </div>
         </section>
 
-        <section id="contacto" className="relative overflow-hidden text-white py-20 sm:py-24">
+        {/* Closing band — TERRA wordmark baked into the left of the image; copy/CTA on the navy right */}
+        <section id="contacto" className="relative overflow-hidden text-white py-20 sm:py-24 min-h-[420px] flex items-center">
           <img
-            src={footerLeavesImg}
+            src={cierreImg}
             alt=""
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-cover object-left"
             loading="lazy"
-            width={1600}
-            height={800}
+            width={1921}
+            height={819}
             aria-hidden
           />
-          <div className="absolute inset-0 bg-brand-navy/88" />
-          <div className="absolute inset-0 bg-gradient-to-t from-brand-navy via-brand-navy/70 to-brand-navy/50" />
-          <div className="relative container-tf">
+          <div className="relative container-tf w-full">
             <Reveal>
-              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-10">
-                <TerraMark />
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-end gap-10">
+                {/* Spacer keeps the baked-in TERRA mark on the left uncovered */}
+                <div className="hidden lg:block lg:flex-1 min-h-[120px]" aria-hidden />
                 <div className="max-w-xl lg:text-right">
                   <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold leading-tight">
                     Sé parte de un lugar donde todo empieza mejor.
@@ -526,7 +526,7 @@ function TerraPage() {
               </div>
             </Reveal>
 
-            <div className="mt-16 grid gap-8 sm:grid-cols-3 max-w-3xl mx-auto">
+            <div className="mt-14 grid gap-8 sm:grid-cols-3 max-w-3xl ml-auto">
               {[
                 { icon: <WetlandIcon />, label: "Vive la naturaleza" },
                 { icon: <MeetIcon />, label: "Construye comunidad" },
@@ -540,16 +540,10 @@ function TerraPage() {
                 </div>
               ))}
             </div>
-
-            <div className="mt-14 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/55">
-              <p>© 2026 TERRA — Un proyecto de TERRA FORMING S.A.S.</p>
-              <Link to="/" className="hover:text-white transition-colors">
-                Volver a terraformings.co
-              </Link>
-            </div>
           </div>
         </section>
       </main>
+      <Footer />
       <WhatsAppButton />
       <BackToTop />
     </div>
