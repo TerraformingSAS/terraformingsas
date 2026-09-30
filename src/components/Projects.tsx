@@ -1,19 +1,25 @@
+import { Link } from "@tanstack/react-router";
 import { Reveal } from "./Reveal";
 import { SectionHeader } from "./SectionHeader";
 import vial from "@/assets/cap-vial.jpg";
 import acueducto from "@/assets/cap-acueducto.jpg";
 import urbanismo from "@/assets/cap-urbanismo.jpg";
 import tierras from "@/assets/cap-tierras.jpg";
-import parcelacion from "@/assets/cap-parcelacion.jpg";
 import espacio from "@/assets/cap-espacio.jpg";
+import terraCard from "@/assets/terra/card-banner.jpg";
 
 const CAPS = [
-  { t: "Infraestructura vial", img: vial },
-  { t: "Acueductos y alcantarillados", img: acueducto },
-  { t: "Urbanismo", img: urbanismo },
-  { t: "Movimiento de tierras", img: tierras },
-  { t: "Parcelación y desarrollo rural", img: parcelacion },
-  { t: "Espacio público", img: espacio },
+  {
+    t: "Terra",
+    img: terraCard,
+    eyebrow: "Proyecto",
+    href: "/terra" as const,
+  },
+  { t: "Infraestructura vial", img: vial, eyebrow: "Línea de trabajo" },
+  { t: "Acueductos y alcantarillados", img: acueducto, eyebrow: "Línea de trabajo" },
+  { t: "Urbanismo", img: urbanismo, eyebrow: "Línea de trabajo" },
+  { t: "Movimiento de tierras", img: tierras, eyebrow: "Línea de trabajo" },
+  { t: "Espacio público", img: espacio, eyebrow: "Línea de trabajo" },
 ];
 
 export function Projects() {
@@ -29,28 +35,40 @@ export function Projects() {
           />
         </Reveal>
 
-        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {CAPS.map((c, i) => (
-            <Reveal key={c.t} delay={i * 70}>
-              <div className="group relative overflow-hidden rounded-xl bg-brand-navy aspect-[4/3]">
+        <div className="mt-14 grid gap-3 grid-cols-2 sm:grid-cols-3 xl:grid-cols-6">
+          {CAPS.map((c, i) => {
+            const card = (
+              <div className="group relative overflow-hidden rounded-lg bg-brand-navy aspect-[4/5] sm:aspect-[3/4]">
                 <img
                   src={c.img}
                   alt={c.t}
                   loading="lazy"
-                  width={1200}
-                  height={900}
+                  width={800}
+                  height={1000}
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-brand-navy via-brand-navy/30 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-6">
-                  <div className="text-[10px] font-semibold tracking-[0.22em] uppercase text-brand-orange">
-                    Línea de trabajo
+                <div className="absolute inset-0 bg-gradient-to-t from-brand-navy via-brand-navy/35 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4">
+                  <div className="text-[9px] sm:text-[10px] font-semibold tracking-[0.18em] uppercase text-brand-orange">
+                    {c.eyebrow}
                   </div>
-                  <h3 className="mt-2 text-xl font-semibold text-white">{c.t}</h3>
+                  <h3 className="mt-1 text-sm sm:text-base font-semibold text-white leading-snug">{c.t}</h3>
                 </div>
               </div>
-            </Reveal>
-          ))}
+            );
+
+            return (
+              <Reveal key={c.t} delay={i * 50}>
+                {"href" in c && c.href ? (
+                  <Link to={c.href} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange rounded-lg">
+                    {card}
+                  </Link>
+                ) : (
+                  card
+                )}
+              </Reveal>
+            );
+          })}
         </div>
 
         <div className="mt-14 flex justify-center">
