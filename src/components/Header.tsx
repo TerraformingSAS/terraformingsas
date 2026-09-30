@@ -1,5 +1,6 @@
 import logoColor from "@/assets/logo.png";
 import logo from "@/assets/logo_blanco.png";
+import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
 const NAV = [
@@ -69,12 +70,12 @@ export function Header() {
         </nav>
 
         <div className="hidden lg:block">
-          <button
-            onClick={() => go("contacto")}
+          <Link
+            to="/terra"
             className="inline-flex items-center rounded-md bg-brand-orange px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:brightness-110 hover:shadow-md"
           >
             Solicitar propuesta
-          </button>
+          </Link>
         </div>
 
         <button
@@ -111,12 +112,13 @@ export function Header() {
                 {n.label}
               </button>
             ))}
-            <button
-              onClick={() => go("contacto")}
-              className="mt-2 rounded-md bg-brand-orange px-5 py-3 text-sm font-semibold text-white"
+            <Link
+              to="/terra"
+              onClick={() => setOpen(false)}
+              className="mt-2 rounded-md bg-brand-orange px-5 py-3 text-sm font-semibold text-white text-center"
             >
               Solicitar propuesta
-            </button>
+            </Link>
           </div>
         </div>
       )}
