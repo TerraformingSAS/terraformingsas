@@ -23,9 +23,9 @@ import {
   WhatsAppIcon,
 } from "@/components/terra/icons";
 import heroImg from "@/assets/terra/hero.jpg";
-import natureImg from "@/assets/terra/section-pond-deck.png";
-import aerialImg from "@/assets/terra/section-aerial.png";
-import wetlandImg from "@/assets/terra/section-pond-bench.png";
+import natureImg from "@/assets/terra/section-pond-deck.jpg";
+import aerialImg from "@/assets/terra/section-aerial.jpg";
+import wetlandImg from "@/assets/terra/section-pond-bench.jpg";
 import footerLeavesImg from "@/assets/terra/footer-leaves.jpg";
 
 const WA_URL =
