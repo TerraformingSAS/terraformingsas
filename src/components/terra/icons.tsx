@@ -151,8 +151,8 @@ export function StoreIcon(props: IconProps) {
 export function HectareIcon(props: IconProps) {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" {...props}>
-      <path d="M4 20V8l8-5 8 5v12" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M9 20v-6h6v6" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M3 7l9-4 9 4v10l-9 4-9-4V7z" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 3v18M3 7l9 4 9-4" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
