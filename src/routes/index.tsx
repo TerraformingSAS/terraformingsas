@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { About } from "@/components/About";
 import { BackToTop } from "@/components/BackToTop";
 import { Contact } from "@/components/Contact";
@@ -11,13 +12,24 @@ import { Projects } from "@/components/Projects";
 import { Sectors } from "@/components/Sectors";
 import { Services } from "@/components/Services";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouterState } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
 function Index() {
+  const hash = useRouterState({ select: (s) => s.location.hash });
+
+  useEffect(() => {
+    const id = hash?.replace(/^#/, "");
+    if (!id) return;
+    const timer = window.setTimeout(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
+    return () => window.clearTimeout(timer);
+  }, [hash]);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
