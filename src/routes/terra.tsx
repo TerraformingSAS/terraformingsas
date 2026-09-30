@@ -1,7 +1,5 @@
-import { useEffect } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { Header } from "@/components/Header";
-import { Hero } from "@/components/Hero";
 import { Reveal } from "@/components/Reveal";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { BackToTop } from "@/components/BackToTop";
@@ -24,6 +22,7 @@ import {
   WetlandIcon,
   WhatsAppIcon,
 } from "@/components/terra/icons";
+import heroImg from "@/assets/terra/hero.jpg";
 import natureImg from "@/assets/terra/section-pond-deck.png";
 import aerialImg from "@/assets/terra/section-aerial.png";
 import wetlandImg from "@/assets/terra/section-pond-bench.png";
@@ -33,7 +32,7 @@ const WA_URL =
   "https://wa.me/573214230090?text=Hola%20TERRA%2C%20quiero%20más%20información%20sobre%20el%20proyecto.";
 const TEL_HREF = "tel:+573214230090";
 
-const INTRO_STATS = [
+const HERO_STATS = [
   { icon: <HectareIcon className="text-brand-orange" />, label: "20 hectáreas", sub: "de un gran futuro" },
   {
     icon: <HomeIcon className="text-brand-orange" />,
@@ -102,23 +101,32 @@ export const Route = createFileRoute("/terra")({
 function TerraPage() {
   return (
     <div className="min-h-screen bg-white text-brand-navy">
+      {/* Same site header as home: Terraforming logo + TERRA CTA */}
       <Header />
       <main>
-        <Hero />
+        {/* 1. Terra mockup hero (not the home Hero) */}
+        <section id="inicio" className="relative min-h-screen w-full overflow-hidden">
+          <img
+            src={heroImg}
+            alt="Vista aérea del desarrollo TERRA al atardecer"
+            className="absolute inset-0 h-full w-full object-cover"
+            width={1920}
+            height={1118}
+            fetchPriority="high"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0E2A47]/88 via-[#0E2A47]/65 to-[#0E2A47]/35" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0E2A47]/90 via-[#0E2A47]/25 to-transparent" />
 
-        {/* TERRA project intro — below shared site hero */}
-        <section id="proyecto" className="relative overflow-hidden bg-brand-navy text-white py-16 sm:py-20">
-          <div className="absolute inset-0 bg-gradient-to-br from-brand-navy via-[#0E2A47] to-[#163A5C]" />
-          <div className="relative container-tf">
+          <div className="relative container-tf flex min-h-screen flex-col justify-end pt-28 pb-16 text-white">
             <Reveal>
               <div className="max-w-3xl">
                 <div className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.22em] uppercase text-brand-orange">
                   <span className="h-px w-8 bg-brand-orange" />
                   Un proyecto único
                 </div>
-                <h2 className="mt-4 font-display text-3xl sm:text-4xl md:text-5xl font-bold leading-[1.05] tracking-tight">
+                <h1 className="mt-4 font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-tight">
                   Lotes para un <span className="text-brand-orange">mejor mañana</span>
-                </h2>
+                </h1>
                 <p className="mt-5 max-w-xl text-base sm:text-lg text-white/85 leading-relaxed">
                   Naturaleza, comunidad y oportunidades en un solo lugar.
                 </p>
@@ -126,7 +134,7 @@ function TerraPage() {
             </Reveal>
 
             <div className="mt-10 grid gap-3 sm:grid-cols-3 max-w-3xl">
-              {INTRO_STATS.map((s, i) => (
+              {HERO_STATS.map((s, i) => (
                 <Reveal key={s.label} delay={80 + i * 70}>
                   <div className="rounded-lg border border-white/15 bg-white/10 backdrop-blur-md px-5 py-4">
                     <div className="flex items-center gap-3">
@@ -156,8 +164,8 @@ function TerraPage() {
           </div>
         </section>
 
-        {/* Naturaleza y bienestar — pond/deck sunset */}
-        <section className="py-20 sm:py-28 bg-white">
+        {/* 2. Naturaleza y bienestar — pond/deck sunset */}
+        <section id="proyecto" className="py-20 sm:py-28 bg-white">
           <div className="container-tf grid gap-10 lg:grid-cols-2 lg:gap-14 items-center">
             <Reveal delay={80} className="order-2 lg:order-1">
               <div>
@@ -202,7 +210,7 @@ function TerraPage() {
           </div>
         </section>
 
-        {/* Four-icon feature row */}
+        {/* 3. Four-icon feature row */}
         <section id="ubicacion" className="py-16 sm:py-20 bg-brand-gray">
           <div className="container-tf">
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -221,7 +229,7 @@ function TerraPage() {
           </div>
         </section>
 
-        {/* Zona comercial — aerial masterplan */}
+        {/* 4. Zona comercial — aerial + navy gradients */}
         <section id="lotes" className="relative min-h-[70vh] flex items-end overflow-hidden">
           <img
             src={aerialImg}
@@ -261,7 +269,7 @@ function TerraPage() {
           </div>
         </section>
 
-        {/* Lotes residenciales — aerial masterplan */}
+        {/* 5. Lotes residenciales — aerial + navy gradients */}
         <section className="relative min-h-[70vh] flex items-end overflow-hidden">
           <img
             src={aerialImg}
@@ -301,7 +309,7 @@ function TerraPage() {
           </div>
         </section>
 
-        {/* Humedal — pond from bench/deck */}
+        {/* 6. Humedal — pond from bench/deck */}
         <section id="beneficios" className="py-20 sm:py-28 bg-white">
           <div className="container-tf grid gap-10 lg:grid-cols-2 lg:gap-14 items-center">
             <Reveal>
@@ -335,7 +343,7 @@ function TerraPage() {
           </div>
         </section>
 
-        {/* Amenities grid */}
+        {/* 7. Amenities grid */}
         <section className="py-20 sm:py-28 bg-brand-gray">
           <div className="container-tf">
             <Reveal>
@@ -362,8 +370,8 @@ function TerraPage() {
           </div>
         </section>
 
-        {/* Dark footer CTA with leaves */}
-        <section id="contacto-terra" className="relative overflow-hidden text-white py-20 sm:py-24">
+        {/* 8. Dark footer CTA with leaves */}
+        <section id="contacto" className="relative overflow-hidden text-white py-20 sm:py-24">
           <img
             src={footerLeavesImg}
             alt=""
