@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Reveal } from "@/components/Reveal";
+import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { BackToTop } from "@/components/BackToTop";
-import { TerraMark } from "@/components/terra/TerraMark";
 import {
   ArrowIcon,
   BikeIcon,
@@ -30,15 +29,6 @@ import cierreImg from "@/assets/terra/seccion-final.png";
 
 const WA_URL =
   "https://wa.me/573214230090?text=Hola%20TERRA%2C%20quiero%20más%20información%20sobre%20el%20proyecto.";
-
-const NAV = [
-  { id: "inicio", label: "Inicio" },
-  { id: "proyecto", label: "Proyecto" },
-  { id: "ubicacion", label: "Ubicación" },
-  { id: "beneficios", label: "Beneficios" },
-  { id: "lotes", label: "Lotes" },
-  { id: "contacto", label: "Contacto" },
-];
 
 const HERO_STATS = [
   {
@@ -124,114 +114,13 @@ export const Route = createFileRoute("/terra")({
   component: TerraPage,
 });
 
-function scrollToId(id: string) {
-  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-/** Single top bar for /terra — TERRA branding from the reference mockup (not the home Header). */
-function TerraHeroNav() {
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
-
-  const go = (id: string) => {
-    setOpen(false);
-    scrollToId(id);
-  };
-
-  return (
-    <header className="absolute inset-x-0 top-0 z-40">
-      <div className="container-tf flex items-center justify-between gap-4 py-5 sm:py-6">
-        <button onClick={() => go("inicio")} className="shrink-0 text-left" aria-label="TERRA inicio">
-          <TerraMark />
-        </button>
-
-        <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
-          {NAV.map((n) => (
-            <button
-              key={n.id}
-              onClick={() => go(n.id)}
-              className="text-sm font-medium tracking-wide text-white/95 transition-colors hover:text-brand-orange"
-            >
-              {n.label}
-            </button>
-          ))}
-        </nav>
-
-        <div className="hidden lg:block shrink-0">
-          <a
-            href={WA_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-full bg-brand-orange px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:brightness-110"
-          >
-            Quiero más información
-            <ArrowIcon />
-          </a>
-        </div>
-
-        <button
-          onClick={() => setOpen((o) => !o)}
-          className="lg:hidden inline-flex items-center justify-center h-10 w-10 rounded-md text-white"
-          aria-label="Abrir menú"
-          aria-expanded={open}
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            {open ? (
-              <path d="M6 6l12 12M6 18L18 6" strokeLinecap="round" />
-            ) : (
-              <>
-                <path d="M4 7h16" strokeLinecap="round" />
-                <path d="M4 12h16" strokeLinecap="round" />
-                <path d="M4 17h16" strokeLinecap="round" />
-              </>
-            )}
-          </svg>
-        </button>
-      </div>
-
-      {open && (
-        <div className="lg:hidden border-t border-white/10 bg-brand-navy/95 backdrop-blur">
-          <div className="container-tf py-4 flex flex-col gap-1">
-            {NAV.map((n) => (
-              <button
-                key={n.id}
-                onClick={() => go(n.id)}
-                className="text-left py-3 px-2 text-white font-medium rounded hover:bg-white/5"
-              >
-                {n.label}
-              </button>
-            ))}
-            <a
-              href={WA_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-2 rounded-full bg-brand-orange px-5 py-3 text-sm font-semibold text-white text-center"
-            >
-              Quiero más información →
-            </a>
-            <Link to="/" className="mt-1 py-3 px-2 text-sm text-white/70 hover:text-white">
-              ← Volver a TERRA FORMING
-            </Link>
-          </div>
-        </div>
-      )}
-    </header>
-  );
-}
-
 function TerraPage() {
   return (
     <div className="min-h-screen bg-white text-brand-navy">
+      {/* Same site header as home: Terraforming logo + nav + TERRA CTA */}
+      <Header />
       <main>
-        {/* Hero — reference mockup; gradient baked into photo (no CSS overlay) */}
+        {/* Terra hero content (below shared header); gradient baked into photo */}
         <section id="inicio" className="relative min-h-screen w-full overflow-hidden">
           <img
             src={heroImg}
@@ -242,9 +131,7 @@ function TerraPage() {
             fetchPriority="high"
           />
 
-          <TerraHeroNav />
-
-          <div className="relative container-tf flex min-h-screen flex-col justify-end pt-36 pb-14 sm:pb-16 text-white">
+          <div className="relative container-tf flex min-h-screen flex-col justify-end pt-28 pb-14 sm:pb-16 text-white">
             <Reveal>
               <div className="max-w-2xl">
                 <div className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.22em] uppercase text-white">
