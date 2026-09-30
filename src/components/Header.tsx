@@ -1,6 +1,6 @@
 import logoColor from "@/assets/logo.png";
 import logo from "@/assets/logo_blanco.png";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
 const NAV = [
@@ -17,6 +17,9 @@ const NAV = [
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const onHome = pathname === "/";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -28,11 +31,14 @@ export function Header() {
   const go = (id: string) => {
     setOpen(false);
     const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (onHome && el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    void navigate({ to: "/", hash: id });
   };
 
   return (
-    
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
         scrolled || open
@@ -74,7 +80,7 @@ export function Header() {
             to="/terra"
             className="inline-flex items-center rounded-md bg-brand-orange px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:brightness-110 hover:shadow-md"
           >
-            Solicitar propuesta
+            TERRA
           </Link>
         </div>
 
@@ -117,7 +123,7 @@ export function Header() {
               onClick={() => setOpen(false)}
               className="mt-2 rounded-md bg-brand-orange px-5 py-3 text-sm font-semibold text-white text-center"
             >
-              Solicitar propuesta
+              TERRA
             </Link>
           </div>
         </div>

@@ -1,8 +1,18 @@
 import heroImg from "@/assets/hero.jpg";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 
 export function Hero() {
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const onHome = pathname === "/";
+
   const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    const el = document.getElementById(id);
+    if (onHome && el) {
+      el.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+    void navigate({ to: "/", hash: id });
   };
 
   return (

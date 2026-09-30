@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
+import { Header } from "@/components/Header";
 import { Reveal } from "@/components/Reveal";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { BackToTop } from "@/components/BackToTop";
 import { TerraMark } from "@/components/terra/TerraMark";
 import {
   ArrowIcon,
@@ -21,24 +23,14 @@ import {
   WhatsAppIcon,
 } from "@/components/terra/icons";
 import heroImg from "@/assets/terra/hero.jpg";
-import wetlandImg from "@/assets/terra/wetland.jpg";
-import natureImg from "@/assets/terra/nature-wellness.jpg";
-import commercialImg from "@/assets/terra/commercial.jpg";
-import residentialImg from "@/assets/terra/residential.jpg";
+import natureImg from "@/assets/terra/section-pond-deck.png";
+import aerialImg from "@/assets/terra/section-aerial.png";
+import wetlandImg from "@/assets/terra/section-pond-bench.png";
 import footerLeavesImg from "@/assets/terra/footer-leaves.jpg";
 
 const WA_URL =
   "https://wa.me/573214230090?text=Hola%20TERRA%2C%20quiero%20más%20información%20sobre%20el%20proyecto.";
 const TEL_HREF = "tel:+573214230090";
-
-const NAV = [
-  { id: "inicio", label: "Inicio" },
-  { id: "proyecto", label: "Proyecto" },
-  { id: "ubicacion", label: "Ubicación" },
-  { id: "beneficios", label: "Beneficios" },
-  { id: "lotes", label: "Lotes" },
-  { id: "contacto", label: "Contacto" },
-];
 
 const HERO_STATS = [
   { icon: <HectareIcon className="text-brand-orange" />, label: "20 hectáreas", sub: "de un gran futuro" },
@@ -106,119 +98,13 @@ export const Route = createFileRoute("/terra")({
   component: TerraPage,
 });
 
-function scrollToId(id: string) {
-  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-function TerraNav() {
-  const [scrolled, setScrolled] = useState(false);
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  const go = (id: string) => {
-    setOpen(false);
-    scrollToId(id);
-  };
-
-  return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-        scrolled || open
-          ? "bg-brand-navy/95 backdrop-blur border-b border-white/10 shadow-sm"
-          : "bg-transparent"
-      }`}
-    >
-      <div className="container-tf flex items-center justify-between h-18 py-3">
-        <button onClick={() => go("inicio")} className="shrink-0" aria-label="TERRA inicio">
-          <TerraMark />
-        </button>
-
-        <nav className="hidden lg:flex items-center gap-7">
-          {NAV.map((n) => (
-            <button
-              key={n.id}
-              onClick={() => go(n.id)}
-              className="text-sm font-medium tracking-wide text-white/90 transition-colors hover:text-brand-orange"
-            >
-              {n.label}
-            </button>
-          ))}
-        </nav>
-
-        <div className="hidden lg:block">
-          <a
-            href={WA_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-md bg-brand-orange px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:brightness-110 hover:shadow-md"
-          >
-            Quiero más información
-            <ArrowIcon />
-          </a>
-        </div>
-
-        <button
-          onClick={() => setOpen((o) => !o)}
-          className="lg:hidden inline-flex items-center justify-center h-10 w-10 rounded-md text-white"
-          aria-label="Abrir menú"
-          aria-expanded={open}
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            {open ? (
-              <path d="M6 6l12 12M6 18L18 6" strokeLinecap="round" />
-            ) : (
-              <>
-                <path d="M4 7h16" strokeLinecap="round" />
-                <path d="M4 12h16" strokeLinecap="round" />
-                <path d="M4 17h16" strokeLinecap="round" />
-              </>
-            )}
-          </svg>
-        </button>
-      </div>
-
-      {open && (
-        <div className="lg:hidden border-t border-white/10 bg-brand-navy">
-          <div className="container-tf py-4 flex flex-col gap-1">
-            {NAV.map((n) => (
-              <button
-                key={n.id}
-                onClick={() => go(n.id)}
-                className="text-left py-3 px-2 text-white font-medium rounded hover:bg-white/5"
-              >
-                {n.label}
-              </button>
-            ))}
-            <a
-              href={WA_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-2 rounded-md bg-brand-orange px-5 py-3 text-sm font-semibold text-white text-center"
-            >
-              Quiero más información →
-            </a>
-            <Link to="/" className="mt-1 py-3 px-2 text-sm text-white/70 hover:text-white">
-              ← Volver a TERRA FORMING
-            </Link>
-          </div>
-        </div>
-      )}
-    </header>
-  );
-}
-
 function TerraPage() {
   return (
     <div className="min-h-screen bg-white text-brand-navy">
-      <TerraNav />
+      {/* Same site header as home: Terraforming logo + TERRA CTA */}
+      <Header />
       <main>
-        {/* 1. Hero */}
+        {/* 1. Terra mockup hero (not the home Hero) */}
         <section id="inicio" className="relative min-h-screen w-full overflow-hidden">
           <img
             src={heroImg}
@@ -278,7 +164,7 @@ function TerraPage() {
           </div>
         </section>
 
-        {/* 2. Naturaleza y bienestar */}
+        {/* 2. Naturaleza y bienestar — pond/deck sunset */}
         <section id="proyecto" className="py-20 sm:py-28 bg-white">
           <div className="container-tf grid gap-10 lg:grid-cols-2 lg:gap-14 items-center">
             <Reveal delay={80} className="order-2 lg:order-1">
@@ -301,12 +187,13 @@ function TerraPage() {
               <div className="relative overflow-hidden rounded-xl">
                 <img
                   src={natureImg}
-                  alt="Humedal natural en TERRA"
+                  alt="Humedal y deck de madera en TERRA al atardecer"
                   className="w-full h-[420px] sm:h-[520px] object-cover"
                   loading="lazy"
-                  width={1600}
-                  height={900}
+                  width={1579}
+                  height={996}
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/55 via-transparent to-transparent" />
                 <div className="absolute inset-x-4 bottom-4 sm:inset-x-6 sm:bottom-6">
                   <div className="inline-flex items-center gap-3 rounded-lg bg-brand-navy/90 px-4 py-3 text-white shadow-lg backdrop-blur">
                     <WetlandIcon className="text-brand-orange shrink-0" />
@@ -342,17 +229,18 @@ function TerraPage() {
           </div>
         </section>
 
-        {/* 4. Commercial zone full-bleed */}
+        {/* 4. Zona comercial — aerial + navy gradients */}
         <section id="lotes" className="relative min-h-[70vh] flex items-end overflow-hidden">
           <img
-            src={commercialImg}
-            alt="Zona comercial TERRA"
+            src={aerialImg}
+            alt="Vista aérea del masterplan TERRA al atardecer"
             className="absolute inset-0 h-full w-full object-cover object-center"
             loading="lazy"
-            width={1920}
-            height={900}
+            width={1550}
+            height={1015}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-brand-navy via-brand-navy/70 to-brand-navy/20" />
+          <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/50 via-transparent to-transparent" />
           <div className="relative container-tf py-16 sm:py-20 text-white">
             <Reveal>
               <div className="max-w-xl">
@@ -381,17 +269,18 @@ function TerraPage() {
           </div>
         </section>
 
-        {/* 5. Residential lots full-bleed */}
+        {/* 5. Lotes residenciales — aerial + navy gradients */}
         <section className="relative min-h-[70vh] flex items-end overflow-hidden">
           <img
-            src={residentialImg}
-            alt="Lotes residenciales TERRA"
-            className="absolute inset-0 h-full w-full object-cover object-center"
+            src={aerialImg}
+            alt="Vista aérea de lotes residenciales TERRA"
+            className="absolute inset-0 h-full w-full object-cover object-[center_70%]"
             loading="lazy"
-            width={1920}
-            height={900}
+            width={1550}
+            height={1015}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-brand-navy via-brand-navy/65 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/45 via-transparent to-transparent" />
           <div className="relative container-tf py-16 sm:py-20 text-white">
             <Reveal>
               <div className="max-w-xl">
@@ -420,19 +309,20 @@ function TerraPage() {
           </div>
         </section>
 
-        {/* 6. Wetland feature reversed */}
+        {/* 6. Humedal — pond from bench/deck */}
         <section id="beneficios" className="py-20 sm:py-28 bg-white">
           <div className="container-tf grid gap-10 lg:grid-cols-2 lg:gap-14 items-center">
             <Reveal>
               <div className="relative overflow-hidden rounded-xl">
                 <img
                   src={wetlandImg}
-                  alt="Humedal natural del proyecto TERRA"
-                  className="w-full h-[420px] sm:h-[520px] object-cover"
+                  alt="Vista del humedal desde el deck en TERRA"
+                  className="w-full h-[420px] sm:h-[520px] object-cover object-center"
                   loading="lazy"
-                  width={1600}
-                  height={900}
+                  width={460}
+                  height={200}
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/35 via-transparent to-transparent" />
               </div>
             </Reveal>
             <Reveal delay={120}>
@@ -492,6 +382,7 @@ function TerraPage() {
             aria-hidden
           />
           <div className="absolute inset-0 bg-brand-navy/88" />
+          <div className="absolute inset-0 bg-gradient-to-t from-brand-navy via-brand-navy/70 to-brand-navy/50" />
           <div className="relative container-tf">
             <Reveal>
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-10">
@@ -538,6 +429,8 @@ function TerraPage() {
           </div>
         </section>
       </main>
+      <WhatsAppButton />
+      <BackToTop />
     </div>
   );
 }
