@@ -24,6 +24,7 @@ import {
 import heroImg from "@/assets/terra/hero-bg-gradient.png";
 import natureImg from "@/assets/terra/section-pond-deck.jpg";
 import aerialImg from "@/assets/terra/section-aerial.jpg";
+import commercialImg from "@/assets/terra/zona-comercial.png";
 import wetlandImg from "@/assets/terra/section-pond-bench.jpg";
 import footerLeavesImg from "@/assets/terra/footer-leaves.jpg";
 
@@ -356,12 +357,12 @@ function TerraPage() {
 
         <section id="lotes" className="relative min-h-[70vh] flex items-end overflow-hidden">
           <img
-            src={aerialImg}
-            alt="Vista aérea del masterplan TERRA al atardecer"
+            src={commercialImg}
+            alt="Zona comercial TERRA al atardecer"
             className="absolute inset-0 h-full w-full object-cover object-center"
             loading="lazy"
-            width={1550}
-            height={1015}
+            width={2017}
+            height={780}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-brand-navy via-brand-navy/70 to-brand-navy/20" />
           <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/50 via-transparent to-transparent" />
