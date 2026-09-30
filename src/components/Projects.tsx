@@ -6,7 +6,7 @@ import acueducto from "@/assets/cap-acueducto.jpg";
 import urbanismo from "@/assets/cap-urbanismo.jpg";
 import tierras from "@/assets/cap-tierras.jpg";
 import espacio from "@/assets/cap-espacio.jpg";
-import terraCard from "@/assets/terra/card-banner.jpg";
+import terraCard from "@/assets/terra/card-banner.png";
 
 const CAPS = [
   {
@@ -37,15 +37,18 @@ export function Projects() {
 
         <div className="mt-14 grid gap-3 grid-cols-2 sm:grid-cols-3 xl:grid-cols-6">
           {CAPS.map((c, i) => {
+            const isTerra = c.t === "Terra";
             const card = (
               <div className="group relative overflow-hidden rounded-lg bg-brand-navy aspect-[4/5] sm:aspect-[3/4]">
                 <img
                   src={c.img}
                   alt={c.t}
                   loading="lazy"
-                  width={800}
-                  height={1000}
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  width={isTerra ? 2172 : 800}
+                  height={isTerra ? 724 : 1000}
+                  className={`absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 ${
+                    isTerra ? "object-center" : ""
+                  }`}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-brand-navy via-brand-navy/35 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4">

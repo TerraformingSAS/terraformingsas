@@ -25,6 +25,7 @@ import wetlandImg from "@/assets/terra/wetland.jpg";
 import natureImg from "@/assets/terra/nature-wellness.jpg";
 import commercialImg from "@/assets/terra/commercial.jpg";
 import residentialImg from "@/assets/terra/residential.jpg";
+import footerLeavesImg from "@/assets/terra/footer-leaves.jpg";
 
 const WA_URL =
   "https://wa.me/573214230090?text=Hola%20TERRA%2C%20quiero%20más%20información%20sobre%20el%20proyecto.";
@@ -40,16 +41,16 @@ const NAV = [
 ];
 
 const HERO_STATS = [
-  { icon: <HectareIcon className="text-brand-orange" />, label: "20 hectáreas", sub: "de desarrollo" },
+  { icon: <HectareIcon className="text-brand-orange" />, label: "20 hectáreas", sub: "de un gran futuro" },
   {
     icon: <HomeIcon className="text-brand-orange" />,
     label: "Lotes residenciales",
-    sub: "100–120 m²",
+    sub: "desde 100–120 m²",
   },
   {
     icon: <StoreIcon className="text-brand-orange" />,
     label: "Lotes comerciales",
-    sub: "desde 70 m²",
+    sub: "desde 70 m² con expansión",
   },
 ];
 
@@ -57,32 +58,32 @@ const FEATURES = [
   {
     icon: <WetlandIcon />,
     title: "Humedal natural",
-    desc: "Un ecosistema vivo que aporta frescura, biodiversidad y tranquilidad.",
+    desc: "Como corazón del proyecto: vida, frescura y biodiversidad.",
   },
   {
     icon: <GreenZonesIcon />,
-    title: "Zonas verdes",
-    desc: "Espacios abiertos pensados para el disfrute diario de toda la familia.",
+    title: "Amplias zonas verdes",
+    desc: "Espacios comunes abiertos para el disfrute diario.",
   },
   {
     icon: <SafeIcon />,
-    title: "Entorno seguro",
-    desc: "Comunidad planificada con control y tranquilidad para invertir y vivir.",
+    title: "Un entorno seguro",
+    desc: "Comunidad planificada para vivir e invertir con tranquilidad.",
   },
   {
     icon: <ValueIcon />,
-    title: "Valorización",
-    desc: "Un proyecto con proyección de crecimiento y plusvalía a futuro.",
+    title: "Alta valorización",
+    desc: "Proyección de crecimiento y plusvalía a futuro.",
   },
 ];
 
 const AMENITIES = [
-  { icon: <ParkIcon />, title: "Parques", desc: "Áreas verdes para el descanso y el juego." },
-  { icon: <TrailIcon />, title: "Senderos", desc: "Caminos para conectar con la naturaleza." },
+  { icon: <ParkIcon />, title: "Parques y zonas verdes", desc: "Áreas verdes para el descanso y el juego." },
+  { icon: <TrailIcon />, title: "Senderos peatonales", desc: "Caminos para conectar con la naturaleza." },
   { icon: <BikeIcon />, title: "Ciclovías", desc: "Movilidad activa dentro del proyecto." },
-  { icon: <WetlandIcon />, title: "Humedal", desc: "Reserva natural como corazón del lugar." },
+  { icon: <WetlandIcon />, title: "Humedal natural", desc: "Reserva natural como corazón del lugar." },
   { icon: <RecIcon />, title: "Zonas recreativas", desc: "Espacios para deporte y ocio." },
-  { icon: <MeetIcon />, title: "Zonas de encuentro", desc: "Lugares para compartir en comunidad." },
+  { icon: <MeetIcon />, title: "Espacios de encuentro", desc: "Lugares para compartir en comunidad." },
   { icon: <PetIcon />, title: "Pet friendly", desc: "Ambientes pensados también para mascotas." },
 ];
 
@@ -280,42 +281,42 @@ function TerraPage() {
         {/* 2. Naturaleza y bienestar */}
         <section id="proyecto" className="py-20 sm:py-28 bg-white">
           <div className="container-tf grid gap-10 lg:grid-cols-2 lg:gap-14 items-center">
-            <Reveal>
+            <Reveal delay={80} className="order-2 lg:order-1">
+              <div>
+                <div className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.22em] uppercase text-brand-orange">
+                  <span className="h-px w-8 bg-brand-orange" />
+                  Un lugar donde todo conecta
+                </div>
+                <h2 className="mt-4 font-display text-3xl sm:text-4xl font-bold leading-tight text-brand-navy">
+                  Naturaleza y bienestar real
+                </h2>
+                <p className="mt-5 text-brand-dark/80 leading-relaxed max-w-xl">
+                  TERRA integra un entorno natural excepcional con espacios para vivir, invertir
+                  y crecer. El paisaje, el humedal y la comunidad se encuentran en un solo
+                  proyecto pensado para el largo plazo.
+                </p>
+              </div>
+            </Reveal>
+            <Reveal className="order-1 lg:order-2">
               <div className="relative overflow-hidden rounded-xl">
                 <img
                   src={natureImg}
-                  alt="Naturaleza y bienestar en TERRA"
+                  alt="Humedal natural en TERRA"
                   className="w-full h-[420px] sm:h-[520px] object-cover"
                   loading="lazy"
                   width={1600}
-                  height={1066}
+                  height={900}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/40 to-transparent" />
-              </div>
-            </Reveal>
-            <Reveal delay={120}>
-              <div className="relative">
-                <div className="rounded-xl bg-brand-navy text-white p-8 sm:p-10 shadow-xl">
-                  <div className="text-[11px] font-semibold tracking-[0.22em] uppercase text-brand-orange">
-                    Naturaleza y bienestar real
+                <div className="absolute inset-x-4 bottom-4 sm:inset-x-6 sm:bottom-6">
+                  <div className="inline-flex items-center gap-3 rounded-lg bg-brand-navy/90 px-4 py-3 text-white shadow-lg backdrop-blur">
+                    <WetlandIcon className="text-brand-orange shrink-0" />
+                    <div>
+                      <div className="text-[10px] font-semibold tracking-[0.18em] uppercase text-brand-orange">
+                        Humedal natural
+                      </div>
+                      <p className="text-sm text-white/90">Un ecosistema que te conecta con la vida.</p>
+                    </div>
                   </div>
-                  <h2 className="mt-4 font-display text-3xl sm:text-4xl font-bold leading-tight">
-                    Un humedal natural como corazón del proyecto
-                  </h2>
-                  <p className="mt-5 text-white/80 leading-relaxed">
-                    TERRA integra un humedal que aporta frescura, biodiversidad y un entorno
-                    único para vivir e invertir. Aquí la naturaleza no es un accesorio: es el
-                    centro de la experiencia.
-                  </p>
-                  <a
-                    href={WA_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-brand-orange hover:brightness-110"
-                  >
-                    Conocer más del proyecto
-                    <ArrowIcon />
-                  </a>
                 </div>
               </div>
             </Reveal>
@@ -325,21 +326,11 @@ function TerraPage() {
         {/* 3. Four-icon feature row */}
         <section id="ubicacion" className="py-16 sm:py-20 bg-brand-gray">
           <div className="container-tf">
-            <Reveal>
-              <div className="max-w-2xl mx-auto text-center mb-12">
-                <div className="text-[11px] font-semibold tracking-[0.22em] uppercase text-brand-orange">
-                  Beneficios del entorno
-                </div>
-                <h2 className="mt-3 font-display text-3xl sm:text-4xl font-bold text-brand-navy">
-                  Diseñado para vivir mejor
-                </h2>
-              </div>
-            </Reveal>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {FEATURES.map((f, i) => (
                 <Reveal key={f.title} delay={i * 70}>
                   <div className="text-center px-4 py-6">
-                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-navy text-brand-orange">
+                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-brand-navy/15 bg-white text-brand-navy">
                       {f.icon}
                     </div>
                     <h3 className="mt-5 text-lg font-semibold text-brand-navy">{f.title}</h3>
@@ -356,25 +347,35 @@ function TerraPage() {
           <img
             src={commercialImg}
             alt="Zona comercial TERRA"
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-cover object-center"
             loading="lazy"
             width={1920}
-            height={1049}
+            height={900}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-brand-navy via-brand-navy/55 to-brand-navy/15" />
+          <div className="absolute inset-0 bg-gradient-to-r from-brand-navy via-brand-navy/70 to-brand-navy/20" />
           <div className="relative container-tf py-16 sm:py-20 text-white">
             <Reveal>
               <div className="max-w-xl">
-                <div className="text-[11px] font-semibold tracking-[0.22em] uppercase text-brand-orange">
+                <div className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.22em] uppercase text-brand-orange">
+                  <span className="h-px w-8 bg-brand-orange" />
                   Zona comercial
                 </div>
                 <h2 className="mt-3 font-display text-3xl sm:text-5xl font-bold leading-tight">
-                  Lotes comerciales desde 70 m²
+                  Espacios que impulsan <span className="text-brand-orange">tu crecimiento</span>
                 </h2>
                 <p className="mt-4 text-white/85 leading-relaxed">
-                  Espacios pensados para emprender y servir a la comunidad, con alta
-                  visibilidad y proyección de valorización.
+                  Lotes comerciales desde 70 m² con posibilidad de expansión, ideales para
+                  negocios, servicios y experiencias que complementan la vida del proyecto.
                 </p>
+                <div className="mt-8 inline-flex items-center gap-3 rounded-lg bg-brand-navy/80 border border-white/10 px-4 py-3 backdrop-blur">
+                  <StoreIcon className="text-brand-orange" />
+                  <div>
+                    <div className="text-[10px] font-semibold tracking-[0.18em] uppercase text-brand-orange">
+                      Zona comercial
+                    </div>
+                    <p className="text-sm text-white/90">Ubicación estratégica con parqueaderos y alto flujo.</p>
+                  </div>
+                </div>
               </div>
             </Reveal>
           </div>
@@ -385,25 +386,35 @@ function TerraPage() {
           <img
             src={residentialImg}
             alt="Lotes residenciales TERRA"
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-cover object-center"
             loading="lazy"
             width={1920}
-            height={1280}
+            height={900}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-brand-navy via-brand-navy/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-brand-navy via-brand-navy/65 to-transparent" />
           <div className="relative container-tf py-16 sm:py-20 text-white">
             <Reveal>
-              <div className="max-w-xl ml-auto text-right">
-                <div className="text-[11px] font-semibold tracking-[0.22em] uppercase text-brand-orange">
+              <div className="max-w-xl">
+                <div className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.22em] uppercase text-brand-orange">
+                  <span className="h-px w-8 bg-brand-orange" />
                   Lotes residenciales
                 </div>
                 <h2 className="mt-3 font-display text-3xl sm:text-5xl font-bold leading-tight">
-                  Tu hogar entre 100 y 120 m²
+                  Espacio para construir <span className="text-brand-orange">tu historia</span>
                 </h2>
                 <p className="mt-4 text-white/85 leading-relaxed">
-                  Lotes ideales para construir el hogar que imaginas, en un entorno natural
-                  y una comunidad en crecimiento.
+                  Lotes desde 100–120 m² en un entorno natural, con todas las comodidades y la
+                  tranquilidad que tu familia merece.
                 </p>
+                <div className="mt-8 inline-flex items-center gap-3 rounded-lg bg-brand-navy/80 border border-white/10 px-4 py-3 backdrop-blur">
+                  <HomeIcon className="text-brand-orange" />
+                  <div>
+                    <div className="text-[10px] font-semibold tracking-[0.18em] uppercase text-brand-orange">
+                      Lotes residenciales
+                    </div>
+                    <p className="text-sm text-white/90">Diseña el futuro que imaginas.</p>
+                  </div>
+                </div>
               </div>
             </Reveal>
           </div>
@@ -412,7 +423,7 @@ function TerraPage() {
         {/* 6. Wetland feature reversed */}
         <section id="beneficios" className="py-20 sm:py-28 bg-white">
           <div className="container-tf grid gap-10 lg:grid-cols-2 lg:gap-14 items-center">
-            <Reveal className="lg:order-2">
+            <Reveal>
               <div className="relative overflow-hidden rounded-xl">
                 <img
                   src={wetlandImg}
@@ -420,22 +431,22 @@ function TerraPage() {
                   className="w-full h-[420px] sm:h-[520px] object-cover"
                   loading="lazy"
                   width={1600}
-                  height={1201}
+                  height={900}
                 />
               </div>
             </Reveal>
-            <Reveal delay={120} className="lg:order-1">
-              <div className="rounded-xl bg-brand-navy text-white p-8 sm:p-10 shadow-xl">
-                <div className="text-[11px] font-semibold tracking-[0.22em] uppercase text-brand-orange">
-                  Humedal TERRA
+            <Reveal delay={120}>
+              <div>
+                <div className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.22em] uppercase text-brand-orange">
+                  <span className="h-px w-8 bg-brand-orange" />
+                  Humedal natural
                 </div>
-                <h2 className="mt-4 font-display text-3xl sm:text-4xl font-bold leading-tight">
-                  Biodiversidad que eleva tu calidad de vida
+                <h2 className="mt-4 font-display text-3xl sm:text-4xl font-bold leading-tight text-brand-navy">
+                  Un ecosistema que te conecta
                 </h2>
-                <p className="mt-5 text-white/80 leading-relaxed">
-                  El humedal es un activo ambiental del proyecto: refresca el entorno,
-                  atrae vida silvestre y ofrece un paisaje que pocos desarrollos pueden
-                  ofrecer. Invertir en TERRA es invertir en un lugar con identidad.
+                <p className="mt-5 text-brand-dark/80 leading-relaxed">
+                  Nuestro humedal es el corazón de TERRA: un espacio de vida, biodiversidad y
+                  bienestar que crea un entorno único y sostenible.
                 </p>
               </div>
             </Reveal>
@@ -446,29 +457,22 @@ function TerraPage() {
         <section className="py-20 sm:py-28 bg-brand-gray">
           <div className="container-tf">
             <Reveal>
-              <div className="max-w-2xl mb-12">
-                <div className="text-[11px] font-semibold tracking-[0.22em] uppercase text-brand-orange">
-                  Amenidades
-                </div>
-                <h2 className="mt-3 font-display text-3xl sm:text-4xl font-bold text-brand-navy">
-                  Todo lo que necesitas, cerca de ti
+              <div className="mb-12 flex items-center justify-center gap-4 text-center">
+                <span className="hidden sm:block h-px w-16 bg-brand-orange" />
+                <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-brand-navy tracking-wide uppercase">
+                  Amenidades pensadas para ti
                 </h2>
-                <p className="mt-4 text-brand-dark/75 leading-relaxed">
-                  Siete espacios pensados para el bienestar, la movilidad y la vida en comunidad.
-                </p>
+                <span className="hidden sm:block h-px w-16 bg-brand-orange" />
               </div>
             </Reveal>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid gap-5 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
               {AMENITIES.map((a, i) => (
                 <Reveal key={a.title} delay={i * 50}>
-                  <div className="flex gap-4 rounded-xl bg-white p-5 border border-border/80 transition-shadow hover:shadow-md">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-brand-navy text-brand-orange">
+                  <div className="flex flex-col items-center text-center px-2 py-4">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-brand-navy text-brand-navy bg-white">
                       {a.icon}
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-brand-navy">{a.title}</h3>
-                      <p className="mt-1 text-sm text-brand-dark/70 leading-relaxed">{a.desc}</p>
-                    </div>
+                    <h3 className="mt-4 text-sm font-semibold text-brand-navy leading-snug">{a.title}</h3>
                   </div>
                 </Reveal>
               ))}
@@ -476,55 +480,52 @@ function TerraPage() {
           </div>
         </section>
 
-        {/* 8. Dark navy footer CTA */}
-        <section id="contacto" className="bg-brand-navy text-white py-20 sm:py-24">
-          <div className="container-tf text-center">
+        {/* 8. Dark footer CTA with leaves */}
+        <section id="contacto" className="relative overflow-hidden text-white py-20 sm:py-24">
+          <img
+            src={footerLeavesImg}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover"
+            loading="lazy"
+            width={1600}
+            height={800}
+            aria-hidden
+          />
+          <div className="absolute inset-0 bg-brand-navy/88" />
+          <div className="relative container-tf">
             <Reveal>
-              <div className="flex justify-center">
-                <TerraMark className="items-center text-center" />
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-10">
+                <TerraMark />
+                <div className="max-w-xl lg:text-right">
+                  <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold leading-tight">
+                    Sé parte de un lugar donde todo empieza mejor.
+                  </h2>
+                  <a
+                    href={WA_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-7 inline-flex items-center gap-3 rounded-md bg-[#25D366] px-7 py-3.5 text-sm font-semibold text-white shadow-lg transition-all hover:brightness-110 hover:-translate-y-0.5"
+                  >
+                    <WhatsAppIcon />
+                    +57 321 423 0090 Escríbenos por WhatsApp
+                    <ArrowIcon />
+                  </a>
+                </div>
               </div>
-              <h2 className="mt-8 font-display text-3xl sm:text-4xl md:text-5xl font-bold leading-tight max-w-2xl mx-auto">
-                ¿Listo para ser parte de TERRA?
-              </h2>
-              <p className="mt-4 text-white/75 max-w-lg mx-auto">
-                Escríbenos y te compartimos disponibilidad, planos y formas de inversión.
-              </p>
-              <a
-                href={WA_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-9 inline-flex items-center gap-3 rounded-md bg-[#25D366] px-7 py-3.5 text-sm font-semibold text-white shadow-lg transition-all hover:brightness-110 hover:-translate-y-0.5"
-              >
-                <WhatsAppIcon />
-                +57 321 423 0090 Escríbenos por WhatsApp
-                <ArrowIcon />
-              </a>
             </Reveal>
 
             <div className="mt-16 grid gap-8 sm:grid-cols-3 max-w-3xl mx-auto">
               {[
-                { icon: <PhoneIcon />, label: "Llámanos", value: "321 423 0090", href: TEL_HREF },
-                { icon: <WhatsAppIcon />, label: "WhatsApp", value: "+57 321 423 0090", href: WA_URL },
-                {
-                  icon: <HomeIcon />,
-                  label: "Proyecto",
-                  value: "TERRA — lotes",
-                  href: "#inicio",
-                },
+                { icon: <WetlandIcon />, label: "Vive la naturaleza" },
+                { icon: <MeetIcon />, label: "Construye comunidad" },
+                { icon: <ValueIcon />, label: "Invierte en tu futuro" },
               ].map((item) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  target={item.href.startsWith("http") ? "_blank" : undefined}
-                  rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                  className="flex flex-col items-center gap-2 text-white/80 hover:text-white transition-colors"
-                >
-                  <span className="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 text-brand-orange">
+                <div key={item.label} className="flex flex-col items-center gap-3 text-white/85">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 text-white">
                     {item.icon}
                   </span>
-                  <span className="text-[11px] tracking-[0.18em] uppercase text-white/50">{item.label}</span>
-                  <span className="text-sm font-medium">{item.value}</span>
-                </a>
+                  <span className="text-sm font-medium text-center">{item.label}</span>
+                </div>
               ))}
             </div>
 
