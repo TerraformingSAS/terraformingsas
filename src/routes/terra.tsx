@@ -1,5 +1,5 @@
+import { useEffect, useState } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Header } from "@/components/Header";
 import { Reveal } from "@/components/Reveal";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { BackToTop } from "@/components/BackToTop";
@@ -13,7 +13,6 @@ import {
   MeetIcon,
   ParkIcon,
   PetIcon,
-  PhoneIcon,
   RecIcon,
   SafeIcon,
   StoreIcon,
@@ -22,7 +21,7 @@ import {
   WetlandIcon,
   WhatsAppIcon,
 } from "@/components/terra/icons";
-import heroImg from "@/assets/terra/hero.jpg";
+import heroImg from "@/assets/terra/hero-bg-gradient.png";
 import natureImg from "@/assets/terra/section-pond-deck.jpg";
 import aerialImg from "@/assets/terra/section-aerial.jpg";
 import wetlandImg from "@/assets/terra/section-pond-bench.jpg";
@@ -30,19 +29,45 @@ import footerLeavesImg from "@/assets/terra/footer-leaves.jpg";
 
 const WA_URL =
   "https://wa.me/573214230090?text=Hola%20TERRA%2C%20quiero%20más%20información%20sobre%20el%20proyecto.";
-const TEL_HREF = "tel:+573214230090";
+
+const NAV = [
+  { id: "inicio", label: "Inicio" },
+  { id: "proyecto", label: "Proyecto" },
+  { id: "ubicacion", label: "Ubicación" },
+  { id: "beneficios", label: "Beneficios" },
+  { id: "lotes", label: "Lotes" },
+  { id: "contacto", label: "Contacto" },
+];
 
 const HERO_STATS = [
-  { icon: <HectareIcon className="text-brand-orange" />, label: "20 hectáreas", sub: "de un gran futuro" },
   {
-    icon: <HomeIcon className="text-brand-orange" />,
-    label: "Lotes residenciales",
-    sub: "desde 100–120 m²",
+    icon: <HectareIcon className="text-white shrink-0" />,
+    primary: (
+      <>
+        <span className="text-2xl sm:text-3xl font-extrabold tracking-tight">20</span>{" "}
+        <span className="font-bold tracking-wide uppercase">Hectáreas</span>
+      </>
+    ),
+    rest: " de un gran futuro.",
   },
   {
-    icon: <StoreIcon className="text-brand-orange" />,
-    label: "Lotes comerciales",
-    sub: "desde 70 m² con expansión",
+    icon: <HomeIcon className="text-white shrink-0" />,
+    primary: (
+      <>
+        Lotes residenciales desde <span className="font-bold">100 – 120 m²</span>.
+      </>
+    ),
+    rest: "",
+  },
+  {
+    icon: <StoreIcon className="text-white shrink-0" />,
+    primary: (
+      <>
+        Lotes comerciales desde <span className="font-bold">70 m²</span> con posibilidad de
+        expansión.
+      </>
+    ),
+    rest: "",
   },
 ];
 
@@ -70,13 +95,13 @@ const FEATURES = [
 ];
 
 const AMENITIES = [
-  { icon: <ParkIcon />, title: "Parques y zonas verdes", desc: "Áreas verdes para el descanso y el juego." },
-  { icon: <TrailIcon />, title: "Senderos peatonales", desc: "Caminos para conectar con la naturaleza." },
-  { icon: <BikeIcon />, title: "Ciclovías", desc: "Movilidad activa dentro del proyecto." },
-  { icon: <WetlandIcon />, title: "Humedal natural", desc: "Reserva natural como corazón del lugar." },
-  { icon: <RecIcon />, title: "Zonas recreativas", desc: "Espacios para deporte y ocio." },
-  { icon: <MeetIcon />, title: "Espacios de encuentro", desc: "Lugares para compartir en comunidad." },
-  { icon: <PetIcon />, title: "Pet friendly", desc: "Ambientes pensados también para mascotas." },
+  { icon: <ParkIcon />, title: "Parques y zonas verdes" },
+  { icon: <TrailIcon />, title: "Senderos peatonales" },
+  { icon: <BikeIcon />, title: "Ciclovías" },
+  { icon: <WetlandIcon />, title: "Humedal natural" },
+  { icon: <RecIcon />, title: "Zonas recreativas" },
+  { icon: <MeetIcon />, title: "Espacios de encuentro" },
+  { icon: <PetIcon />, title: "Pet friendly" },
 ];
 
 export const Route = createFileRoute("/terra")({
@@ -98,64 +123,165 @@ export const Route = createFileRoute("/terra")({
   component: TerraPage,
 });
 
+function scrollToId(id: string) {
+  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+/** Single top bar for /terra — TERRA branding from the reference mockup (not the home Header). */
+function TerraHeroNav() {
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
+  const go = (id: string) => {
+    setOpen(false);
+    scrollToId(id);
+  };
+
+  return (
+    <header className="absolute inset-x-0 top-0 z-40">
+      <div className="container-tf flex items-center justify-between gap-4 py-5 sm:py-6">
+        <button onClick={() => go("inicio")} className="shrink-0 text-left" aria-label="TERRA inicio">
+          <TerraMark />
+        </button>
+
+        <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
+          {NAV.map((n) => (
+            <button
+              key={n.id}
+              onClick={() => go(n.id)}
+              className="text-sm font-medium tracking-wide text-white/95 transition-colors hover:text-brand-orange"
+            >
+              {n.label}
+            </button>
+          ))}
+        </nav>
+
+        <div className="hidden lg:block shrink-0">
+          <a
+            href={WA_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-full bg-brand-orange px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:brightness-110"
+          >
+            Quiero más información
+            <ArrowIcon />
+          </a>
+        </div>
+
+        <button
+          onClick={() => setOpen((o) => !o)}
+          className="lg:hidden inline-flex items-center justify-center h-10 w-10 rounded-md text-white"
+          aria-label="Abrir menú"
+          aria-expanded={open}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            {open ? (
+              <path d="M6 6l12 12M6 18L18 6" strokeLinecap="round" />
+            ) : (
+              <>
+                <path d="M4 7h16" strokeLinecap="round" />
+                <path d="M4 12h16" strokeLinecap="round" />
+                <path d="M4 17h16" strokeLinecap="round" />
+              </>
+            )}
+          </svg>
+        </button>
+      </div>
+
+      {open && (
+        <div className="lg:hidden border-t border-white/10 bg-brand-navy/95 backdrop-blur">
+          <div className="container-tf py-4 flex flex-col gap-1">
+            {NAV.map((n) => (
+              <button
+                key={n.id}
+                onClick={() => go(n.id)}
+                className="text-left py-3 px-2 text-white font-medium rounded hover:bg-white/5"
+              >
+                {n.label}
+              </button>
+            ))}
+            <a
+              href={WA_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 rounded-full bg-brand-orange px-5 py-3 text-sm font-semibold text-white text-center"
+            >
+              Quiero más información →
+            </a>
+            <Link to="/" className="mt-1 py-3 px-2 text-sm text-white/70 hover:text-white">
+              ← Volver a TERRA FORMING
+            </Link>
+          </div>
+        </div>
+      )}
+    </header>
+  );
+}
+
 function TerraPage() {
   return (
     <div className="min-h-screen bg-white text-brand-navy">
-      {/* Same site header as home: Terraforming logo + TERRA CTA */}
-      <Header />
       <main>
-        {/* 1. Terra mockup hero (not the home Hero) */}
+        {/* Hero — reference mockup; gradient baked into photo (no CSS overlay) */}
         <section id="inicio" className="relative min-h-screen w-full overflow-hidden">
           <img
             src={heroImg}
             alt="Vista aérea del desarrollo TERRA al atardecer"
-            className="absolute inset-0 h-full w-full object-cover"
-            width={1920}
-            height={1118}
+            className="absolute inset-0 h-full w-full object-cover object-center"
+            width={1550}
+            height={1015}
             fetchPriority="high"
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-[#0E2A47]/88 via-[#0E2A47]/65 to-[#0E2A47]/35" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0E2A47]/90 via-[#0E2A47]/25 to-transparent" />
 
-          <div className="relative container-tf flex min-h-screen flex-col justify-end pt-28 pb-16 text-white">
+          <TerraHeroNav />
+
+          <div className="relative container-tf flex min-h-screen flex-col justify-end pt-36 pb-14 sm:pb-16 text-white">
             <Reveal>
-              <div className="max-w-3xl">
-                <div className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.22em] uppercase text-brand-orange">
+              <div className="max-w-2xl">
+                <div className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.22em] uppercase text-white">
                   <span className="h-px w-8 bg-brand-orange" />
-                  Un proyecto único
+                  <span className="text-white/95">Un proyecto único</span>
                 </div>
-                <h1 className="mt-4 font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-tight">
+                <h1 className="mt-4 font-display text-4xl sm:text-5xl md:text-6xl lg:text-[4.25rem] font-bold leading-[1.05] tracking-tight">
                   Lotes para un <span className="text-brand-orange">mejor mañana</span>
                 </h1>
-                <p className="mt-5 max-w-xl text-base sm:text-lg text-white/85 leading-relaxed">
+                <p className="mt-5 max-w-xl text-base sm:text-lg text-white/90 leading-relaxed">
                   Naturaleza, comunidad y oportunidades en un solo lugar.
                 </p>
               </div>
             </Reveal>
 
-            <div className="mt-10 grid gap-3 sm:grid-cols-3 max-w-3xl">
+            <div className="mt-10 grid gap-6 sm:grid-cols-3 max-w-4xl">
               {HERO_STATS.map((s, i) => (
-                <Reveal key={s.label} delay={80 + i * 70}>
-                  <div className="rounded-lg border border-white/15 bg-white/10 backdrop-blur-md px-5 py-4">
-                    <div className="flex items-center gap-3">
-                      {s.icon}
-                      <div>
-                        <div className="text-sm font-semibold text-white">{s.label}</div>
-                        <div className="text-xs text-white/70">{s.sub}</div>
-                      </div>
-                    </div>
+                <Reveal key={i} delay={80 + i * 70}>
+                  <div className="flex items-start gap-3 text-sm sm:text-[15px] text-white/95 leading-snug">
+                    {s.icon}
+                    <p>
+                      {s.primary}
+                      {s.rest}
+                    </p>
                   </div>
                 </Reveal>
               ))}
             </div>
 
             <Reveal delay={280}>
-              <div className="mt-8">
+              <div className="mt-9">
                 <a
-                  href={TEL_HREF}
-                  className="inline-flex items-center gap-2 rounded-md bg-brand-orange px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand-orange/25 transition-all hover:brightness-110 hover:-translate-y-0.5"
+                  href={WA_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2.5 rounded-md bg-brand-orange px-6 sm:px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-white shadow-lg shadow-brand-orange/25 transition-all hover:brightness-110 hover:-translate-y-0.5"
                 >
-                  <PhoneIcon />
+                  <WhatsAppIcon />
                   Quiero más información
                   <ArrowIcon />
                 </a>
@@ -164,7 +290,7 @@ function TerraPage() {
           </div>
         </section>
 
-        {/* 2. Naturaleza y bienestar — pond/deck sunset */}
+        {/* Naturaleza y bienestar */}
         <section id="proyecto" className="py-20 sm:py-28 bg-white">
           <div className="container-tf grid gap-10 lg:grid-cols-2 lg:gap-14 items-center">
             <Reveal delay={80} className="order-2 lg:order-1">
@@ -210,7 +336,6 @@ function TerraPage() {
           </div>
         </section>
 
-        {/* 3. Four-icon feature row */}
         <section id="ubicacion" className="py-16 sm:py-20 bg-brand-gray">
           <div className="container-tf">
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -229,7 +354,6 @@ function TerraPage() {
           </div>
         </section>
 
-        {/* 4. Zona comercial — aerial + navy gradients */}
         <section id="lotes" className="relative min-h-[70vh] flex items-end overflow-hidden">
           <img
             src={aerialImg}
@@ -269,7 +393,6 @@ function TerraPage() {
           </div>
         </section>
 
-        {/* 5. Lotes residenciales — aerial + navy gradients */}
         <section className="relative min-h-[70vh] flex items-end overflow-hidden">
           <img
             src={aerialImg}
@@ -309,7 +432,6 @@ function TerraPage() {
           </div>
         </section>
 
-        {/* 6. Humedal — pond from bench/deck */}
         <section id="beneficios" className="py-20 sm:py-28 bg-white">
           <div className="container-tf grid gap-10 lg:grid-cols-2 lg:gap-14 items-center">
             <Reveal>
@@ -343,7 +465,6 @@ function TerraPage() {
           </div>
         </section>
 
-        {/* 7. Amenities grid */}
         <section className="py-20 sm:py-28 bg-brand-gray">
           <div className="container-tf">
             <Reveal>
@@ -370,7 +491,6 @@ function TerraPage() {
           </div>
         </section>
 
-        {/* 8. Dark footer CTA with leaves */}
         <section id="contacto" className="relative overflow-hidden text-white py-20 sm:py-24">
           <img
             src={footerLeavesImg}
