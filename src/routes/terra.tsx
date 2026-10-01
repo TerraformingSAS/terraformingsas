@@ -43,21 +43,12 @@ const HERO_STATS = [
   },
   {
     icon: <HomeIcon className="text-white shrink-0" />,
-    primary: (
-      <>
-        Lotes residenciales desde <span className="font-bold">100 – 120 m²</span>.
-      </>
-    ),
+    primary: <span className="font-bold">Lotes residenciales</span>,
     rest: "",
   },
   {
     icon: <StoreIcon className="text-white shrink-0" />,
-    primary: (
-      <>
-        Lotes comerciales desde <span className="font-bold">70 m²</span> con posibilidad de
-        expansión.
-      </>
-    ),
+    primary: <span className="font-bold">Lotes comerciales</span>,
     rest: "",
   },
 ];
@@ -265,8 +256,8 @@ function TerraPage() {
                   Espacios que impulsan <span className="text-brand-orange">tu crecimiento</span>
                 </h2>
                 <p className="mt-4 text-white/85 leading-relaxed">
-                  Lotes comerciales desde 70 m² con posibilidad de expansión, ideales para
-                  negocios, servicios y experiencias que complementan la vida del proyecto.
+                  Lotes comerciales ideales para negocios, servicios y experiencias que
+                  complementan la vida del proyecto.
                 </p>
                 <div className="mt-8 inline-flex items-center gap-3 rounded-lg bg-brand-navy/80 border border-white/10 px-4 py-3 backdrop-blur">
                   <StoreIcon className="text-brand-orange" />
@@ -304,7 +295,7 @@ function TerraPage() {
                   Espacio para construir <span className="text-brand-orange">tu historia</span>
                 </h2>
                 <p className="mt-4 text-white/85 leading-relaxed">
-                  Lotes desde 100–120 m² en un entorno natural, con todas las comodidades y la
+                  Lotes residenciales en un entorno natural, con todas las comodidades y la
                   tranquilidad que tu familia merece.
                 </p>
                 <div className="mt-8 inline-flex items-center gap-3 rounded-lg bg-brand-navy/80 border border-white/10 px-4 py-3 backdrop-blur">
