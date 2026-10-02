@@ -1,9 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Reveal } from "@/components/Reveal";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
+import heroImg from "@/assets/terra/hero-bg-gradient.png";
+import wetlandImg from "@/assets/terra/humedal-natural.png";
+import cierreImg from "@/assets/terra/seccion-final.png";
+import aerialImg from "@/assets/terra/section-aerial.jpg";
+import commercialImg from "@/assets/terra/zona-comercial.png";
 import { BackToTop } from "@/components/BackToTop";
+import { Footer } from "@/components/Footer";
+import { Header } from "@/components/Header";
+import { Reveal } from "@/components/Reveal";
 import {
   ArrowIcon,
   BikeIcon,
@@ -21,11 +24,8 @@ import {
   WetlandIcon,
   WhatsAppIcon,
 } from "@/components/terra/icons";
-import heroImg from "@/assets/terra/hero-bg-gradient.png";
-import wetlandImg from "@/assets/terra/humedal-natural.png";
-import aerialImg from "@/assets/terra/section-aerial.jpg";
-import commercialImg from "@/assets/terra/zona-comercial.png";
-import cierreImg from "@/assets/terra/seccion-final.png";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { createFileRoute } from "@tanstack/react-router";
 
 const WA_URL =
   "https://wa.me/573214230090?text=Hola%20TERRA%2C%20quiero%20más%20información%20sobre%20el%20proyecto.";
@@ -48,7 +48,7 @@ const HERO_STATS = [
   },
   {
     icon: <StoreIcon className="text-white shrink-0" />,
-    primary: <span className="font-bold">Lotes comerciales</span>,
+    primary: <span className="font-bold">Locales comerciales</span>,
     rest: "",
   },
 ];
@@ -93,7 +93,7 @@ export const Route = createFileRoute("/terra")({
       {
         name: "description",
         content:
-          "TERRA: lotes residenciales y comerciales en un proyecto con humedal natural, zonas verdes y oportunidades de valorización.",
+          "TERRA: lotes residenciales y locales comerciales en un proyecto con humedal natural, zonas verdes y oportunidades de valorización.",
       },
       { property: "og:title", content: "TERRA | Naturaleza que te pertenece" },
       {
@@ -256,7 +256,7 @@ function TerraPage() {
                   Espacios que impulsan <span className="text-brand-orange">tu crecimiento</span>
                 </h2>
                 <p className="mt-4 text-white/85 leading-relaxed">
-                  Lotes comerciales ideales para negocios, servicios y experiencias que
+                  Locales comerciales ideales para negocios, servicios y experiencias que
                   complementan la vida del proyecto.
                 </p>
                 <div className="mt-8 inline-flex items-center gap-3 rounded-lg bg-brand-navy/80 border border-white/10 px-4 py-3 backdrop-blur">
