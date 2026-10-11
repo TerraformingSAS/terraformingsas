@@ -7,10 +7,12 @@ import {
     createRootRouteWithContext,
     useRouter,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { type ReactNode } from "react";
 
-import { initClarity } from "../lib/clarity";
 import appCss from "../styles.css?url";
+
+const GA_MEASUREMENT_ID = "G-T419MSNEWJ";
+const CLARITY_PROJECT_ID = "yvum2tlvam";
 
 function NotFoundComponent() {
   return (
@@ -84,6 +86,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "es_CO" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "msvalidate.01", content: "5005A2F3ADC005DDE81061D92DF93D1F" },
     ],
     links: [
       {
@@ -96,6 +99,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" },
     ],
     scripts: [
+      {
+        src: `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`,
+        async: true,
+      },
+      {
+        children: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_MEASUREMENT_ID}');`,
+      },
+      {
+        children: `(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","${CLARITY_PROJECT_ID}");`,
+      },
       {
         type: "application/ld+json",
         children: JSON.stringify({
@@ -138,10 +151,6 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-
-  useEffect(() => {
-    initClarity();
-  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
