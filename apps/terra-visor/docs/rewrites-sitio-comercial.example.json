@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    {"source": "/terra/estado", "destination": "VISOR_ORIGIN/terra/estado"},
+    {"source": "/terra/estado/:path*", "destination": "VISOR_ORIGIN/terra/estado/:path*"},
+    {"source": "/api/terra-estado", "destination": "VISOR_ORIGIN/api/terra-estado"}
+  ]
+}

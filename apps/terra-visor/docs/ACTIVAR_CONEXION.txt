@@ -1,0 +1,63 @@
+TERRA — ACTIVAR LECTURA DEL EXCEL DE SHAREPOINT
+
+Este proyecto está preparado para leer TERRA_Control_Lotes.xlsx desde el sitio
+Portal Cliente Terra. El sitio, la biblioteca, el archivo y la aplicación ya
+están identificados en el código del servidor. No necesitas volver a buscarlos.
+El permiso read del sitio fue confirmado en Microsoft Graph.
+
+1. SUBIR LOS ARCHIVOS AL REPOSITORIO DEL VISOR
+Descarga y descomprime TERRA_Visor_Vercel_SharePoint.zip.
+Abre https://github.com/TerraformingSAS/terra-public-DV
+En Add file > Upload files, sube el contenido descomprimido a la raíz.
+Deben quedar api, lib, public, scripts, test, docs, package.json,
+pnpm-lock.yaml y vercel.json directamente en la raíz, no en otra carpeta.
+Guarda con Commit changes. No subas el Excel ni ningún archivo con secretos.
+Este repositorio es del visor independiente; no reemplaza el sitio comercial.
+
+2. CREAR EL PROYECTO INDEPENDIENTE EN VERCEL
+En https://vercel.com/new importa TerraformingSAS/terra-public-DV.
+Nombre sugerido: terra-disponibilidad.
+Framework Preset: Other. Root Directory: raíz del repositorio.
+El archivo vercel.json define la compilación y la salida dist.
+No asignes el dominio www.terraformings.co a este nuevo proyecto.
+Conserva inicialmente la dirección propia que Vercel asigne al visor.
+
+3. INTRODUCIR LA CREDENCIAL
+Antes de Deploy, abre Environment Variables y añade:
+Name: MS_CLIENT_SECRET
+Value: el Valor del secreto que creaste en TERRA Disponibilidad.
+Es el Valor, no el Secret ID. Introdúcelo directamente en Vercel.
+Si el proyecto ya está creado, usa Settings > Environment Variables,
+selecciona Production y vuelve a desplegar después de guardarlo.
+No necesitas configurar otras variables: los cuatro identificadores ya están
+incluidos en lib/sharepoint-config.json, un archivo que solo usa el servidor.
+Si tu organización cambia esos identificadores, puedes sustituirlos mediante
+las variables opcionales de .env.example.
+
+4. PROBAR LA LECTURA REAL
+Cuando termine el despliegue, abre el dominio asignado por Vercel.
+La raíz abre /terra/estado automáticamente.
+Para comprobar la respuesta del servidor, abre en ese mismo dominio:
+/api/terra-estado
+Debe devolver actualizado, consultado y una lista lotes de 104 registros.
+No debe mostrar clientes, precios ni observaciones del Excel.
+La fecha actualizado corresponde al guardado del archivo en SharePoint.
+Si devuelve error de consulta, revisa primero el Valor y la caducidad del
+secreto, el consentimiento de Sites.Selected y la asignación read al sitio.
+No compartas tokens ni el secreto al solicitar soporte.
+
+5. COMPROBAR UN CAMBIO
+Abre el Excel maestro en SharePoint. Cambia temporalmente Estado de un lote
+Disponible a Reservado, guarda y espera a que termine la sincronización.
+El visor consulta cada 60 segundos y el servidor conserva una lectura hasta
+30 segundos; permite hasta unos 90 segundos más la sincronización.
+Comprueba su color y ficha. Devuelve el estado al valor correcto y guarda.
+No hay que desplegar de nuevo por cada cambio de estado.
+
+ESTADO DE ESTA ENTREGA
+La conexión de servidor está implementada y configurada con los identificadores
+reales. Se probaron autenticación y descarga simuladas, lectura del Excel local,
+los 104 vínculos y la exclusión de datos privados. La autenticación real con el
+secreto aún debe probarse en Vercel: el secreto no está en este paquete.
+La vista previa usada para revisar el diseño leía el Excel local; no era una
+prueba de la conexión remota de Microsoft.
