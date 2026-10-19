@@ -36,7 +36,9 @@ for (const [name, hash] of Object.entries(expected)) {
     console.log("[TERRA] Verificado: " + name);
     continue;
   }
-  const response = await fetch(origin + "/" + name, {
+  // La pagina HTML se publica como ruta, no como /terra/estado/index.html.
+  const remotePath = name === "index.html" ? "/terra/estado" : "/terra/estado/" + name;
+  const response = await fetch("https://terraformingsas-terra-visor.vercel.app" + remotePath, {
     signal: AbortSignal.timeout(20000)
   });
   if (!response.ok) {
