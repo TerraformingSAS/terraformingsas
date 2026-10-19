@@ -1,6 +1,9 @@
-name: Verificar integracion visor TERRA
+name: Validar integración TERRA
 
 on:
+  push:
+    branches:
+      - feature/terra-visor-integrado
   pull_request:
     branches:
       - main
@@ -18,9 +21,41 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-      - name: Verificar archivos y rutas del visor
-        run: npm run terra:verify
-      - name: Instalar dependencias del sitio
+      - name: Resolver el bloqueo npm sin modificar el repositorio
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+      - name: Instalar dependencias y preparar pruebas
         run: npm ci --no-audit --no-fund
-      - name: Compilar sitio completo
+      - name: Verificar archivos del ZIP y ruta de API local
+        run: npm run terra:verify
+      - name: Probar lectura XLSX y conexión Graph simulada
+        run: npm run terra:test
+      - name: Compilar sitio comercial y API TanStack Start
         run: npm run build
+
+  actualizar-lockfiles:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/feature/terra-visor-integrado'
+    needs: validar
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: oven-sh/setup-bun@v2
+      - name: Resolver dependencias npm
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+      - name: Actualizar dependencia en bun.lock
+        run: bun install --lockfile-only
+      - name: Guardar bloqueos de dependencias en la rama de revisión
+        shell: bash
+        run: |
+          git diff --check
+          git add package-lock.json bun.lock
+          if git diff --cached --quiet; then
+            echo "Los archivos de bloqueo ya estan actualizados"
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "Actualizar npm y Bun para la API de TERRA"
+          git push origin HEAD:feature/terra-visor-integrado

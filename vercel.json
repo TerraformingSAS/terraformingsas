@@ -7,10 +7,6 @@
     {
       "source": "/terra/estado/",
       "destination": "/terra/estado/index.html"
-    },
-    {
-      "source": "/api/terra-estado",
-      "destination": "https://terraformingsas-terra-visor.vercel.app/api/terra-estado"
     }
   ]
 }
