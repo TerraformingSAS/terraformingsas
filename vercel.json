@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/terra/estado",
+      "destination": "/terra/estado/index.html"
+    },
+    {
+      "source": "/terra/estado/",
+      "destination": "/terra/estado/index.html"
+    }
+  ]
+}

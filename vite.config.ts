@@ -33,7 +33,7 @@ export default defineConfig(({ command }) => ({
       },
       server: { entry: "server" },
     }),
-    command === "build" ? nitro({ defaultPreset: "cloudflare-module" }) : null,
+    command === "build" ? nitro() : null,
     react(),
   ],
 }));
