@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Web3FormsCaptcha } from "./Web3FormsCaptcha";
+import { sendWeb3Forms } from "@/lib/web3forms";
 import { Reveal } from "./Reveal";
 import { SectionHeader } from "./SectionHeader";
 
@@ -29,6 +31,8 @@ export function Contact() {
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [result, setResult] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaResetKey, setCaptchaResetKey] = useState(0);
 
   const set = <K extends keyof FormState>(k: K, v: string) => {
     setForm((f) => ({ ...f, [k]: v }));
@@ -60,34 +64,29 @@ export function Contact() {
       return;
     }
 
+    if (!captchaToken) {
+      setStatus("error");
+      setResult("Completa la verificación de seguridad antes de enviar.");
+      return;
+    }
+
     setIsSubmitting(true);
     setStatus("idle");
     setResult("Enviando...");
 
     const formData = new FormData(ev.currentTarget);
-    formData.append("access_key", "bbf249ee-fab7-45d0-9bee-0c0cf71f3af4");
-
     try {
-      const response = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json().catch(() => null);
-
-      if (response.ok && data?.success) {
-        setStatus("success");
-        setResult("Formulario enviado correctamente");
-        setForm(initial);
-        setErrors({});
-      } else {
-        setStatus("error");
-        setResult(data?.message || "No se pudo enviar el formulario. Intente nuevamente.");
-      }
-    } catch {
+      await sendWeb3Forms(formData, captchaToken);
+      setStatus("success");
+      setResult("Formulario enviado correctamente");
+      setForm(initial);
+      setErrors({});
+    } catch (error) {
       setStatus("error");
-      setResult("Error de conexión. Verifique su red e intente nuevamente.");
+      setResult(error instanceof Error ? error.message : "No se pudo enviar el formulario.");
     } finally {
+      setCaptchaToken("");
+      setCaptchaResetKey((key) => key + 1);
       setIsSubmitting(false);
     }
   };
@@ -198,6 +197,10 @@ export function Contact() {
                   maxLength={1000}
                 />
               </Field>
+            </div>
+
+            <div className="mt-6">
+              <Web3FormsCaptcha onTokenChange={setCaptchaToken} resetKey={captchaResetKey} />
             </div>
 
             <button

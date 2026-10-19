@@ -25,6 +25,7 @@ import {
   WhatsAppIcon,
 } from "@/components/terra/icons";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { TerraLeadForm } from "@/components/terra/TerraLeadForm";
 import { createFileRoute } from "@tanstack/react-router";
 
 const WA_URL =
@@ -122,7 +123,8 @@ function TerraPage() {
             fetchPriority="high"
           />
 
-          <div className="relative container-tf flex min-h-screen flex-col justify-end pt-28 pb-14 sm:pb-16 text-white">
+          <div className="relative container-tf grid min-h-screen items-center gap-10 pt-32 pb-14 text-white lg:grid-cols-[minmax(0,1fr)_minmax(360px,460px)] lg:gap-12">
+            <div className="min-w-0">
             <Reveal>
               <div className="max-w-2xl">
                 <div className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.22em] uppercase text-white">
@@ -165,6 +167,10 @@ function TerraPage() {
                   <ArrowIcon />
                 </a>
               </div>
+            </Reveal>
+            </div>
+            <Reveal delay={200} className="w-full max-w-[460px] justify-self-center lg:justify-self-end">
+              <TerraLeadForm />
             </Reveal>
           </div>
         </section>
