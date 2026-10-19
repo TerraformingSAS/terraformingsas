@@ -31,6 +31,8 @@ jobs:
         run: npm run terra:test
       - name: Compilar sitio comercial y API TanStack Start
         run: npm run build
+      - name: Probar el servidor compilado, la API y los recursos estáticos
+        run: node scripts/smoke-terra-server.mjs
 
   actualizar-lockfiles:
     if: github.event_name == 'push' && github.ref == 'refs/heads/feature/terra-visor-integrado'
