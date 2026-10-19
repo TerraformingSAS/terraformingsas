@@ -1,0 +1,26 @@
+name: Verificar integracion visor TERRA
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Verificar archivos y rutas del visor
+        run: npm run terra:verify
+      - name: Instalar dependencias del sitio
+        run: npm ci --no-audit --no-fund
+      - name: Compilar sitio completo
+        run: npm run build

@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "terra:sync": "node scripts/import-terra-visor.mjs"
+    "terra:verify": "node scripts/verify-terra-visor.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
