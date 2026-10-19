@@ -1,0 +1,35 @@
+name: Comprobar empaquetado TERRA en Vercel
+
+on:
+  push:
+    branches:
+      - fix/terra-api-dependencias-vercel
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validar-vercel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Instalar dependencias bloqueadas
+        run: npm ci --no-audit --no-fund
+      - name: Comprobar datos TERRA y Excel
+        run: |
+          npm run terra:verify
+          npm run terra:test
+      - name: Compilar con destino Vercel
+        env:
+          NITRO_PRESET: vercel
+        run: npm run build
+      - name: Inspeccionar funciones y dependencias empaquetadas
+        run: node scripts/inspect-terra-vercel-bundle.mjs

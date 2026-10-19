@@ -16,6 +16,11 @@ export default defineConfig(({ command }) => ({
       "@tanstack/query-core",
     ],
   },
+  // Evita que las dependencias de lectura XLSX queden como require() externos
+  // dentro de las funciones SSR desplegadas en Vercel.
+  ssr: {
+    noExternal: ["fflate", "fast-xml-parser"],
+  },
   server: {
     host: "::",
     port: 8080,
@@ -33,7 +38,9 @@ export default defineConfig(({ command }) => ({
       },
       server: { entry: "server" },
     }),
-    command === "build" ? nitro() : null,
+    command === "build"
+      ? nitro({ noExternals: ["fflate", "fast-xml-parser"] })
+      : null,
     react(),
   ],
 }));
