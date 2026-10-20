@@ -6,8 +6,8 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const folder = join(root, "public", "terra", "estado");
 const files = {
-  "index.html": "7f0a44fd53f37475ed685144335909125b0dcc893f1e7011360115a19026c49e",
-  "estilos.css": "8221ac4fc0246a97ffe7ed0e9a506d7b055ddf5144004676c112707d8d82f0c2",
+  "index.html": "27eda23f2dd886417c58855671ee239bbfb935a33795b30f8d74a741c9b15e9e",
+  "estilos.css": "70a52b26ee1d8b7007c2671b19b47a392cec038cd94e73ba6e50d8273d6dc4a0",
   "header.js": "633deb77c2e2356dc4942eb4c023574fd843becc4c91c9ad4f5c9c832e646001",
   "app.js": "8e45d29540666f247d1d86b3bbb3f2e271df5a1c6d149c0421474121f5add9a3",
   "logo-terraforming.png": "6ec6eab54659f8d5c89291f7ed2d0c15842adedb69047e9435a3012f9dc681d5",
@@ -70,6 +70,25 @@ if (!js.includes('quote.href=whatsappQuoteUrl(lot.id)') ||
     !js.includes('encodeURIComponent(message)') ||
     !js.includes("const WHATSAPP_PHONE='573214230090'")) {
   throw new Error("El enlace de WhatsApp no está asociado dinámicamente al lote seleccionado.");
+}
+const corporateFooter = await readFile(join(root, "src", "components", "Footer.tsx"), "utf8");
+for (const content of [html, corporateFooter]) {
+  for (const required of [
+    "Calle 10 # 4 - 40, Oficina 1001",
+    "Edificio Bolsa de Occidente, San Pedro",
+    "Cali, Valle del Cauca, Colombia",
+    'mailto:gerencia@terraformings.co',
+    'mailto:mercadeo@terraformings.co',
+  ]) {
+    if (!content.includes(required)) {
+      throw new Error("Falta información corporativa en uno de los pies de página: " + required);
+    }
+  }
+}
+if (!css.includes('justify-content:flex-end;margin-top:12px') ||
+    !html.includes('class="selection-actions"') ||
+    !html.includes('id="cotizar-lote"')) {
+  throw new Error("El botón Cotízame debe aparecer abajo a la derecha del flotante.");
 }
 if (!html.includes("Imagina tu próximo comienzo en TERRA.")) {
   throw new Error("El texto comercial del plano no se actualizó.");
