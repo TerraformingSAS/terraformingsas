@@ -61,7 +61,12 @@ try {
   await assertStatus("/terra/estado/ubicacion-etapa-i.webp", 200);
   await assertStatus("/", 200);
   await assertStatus("/terra", 200);
-  console.log("Smoke test completo: servidor, API sin secretos y sitio comercial.");
+  const privacyResponse = await assertStatus("/politica-de-privacidad", 200);
+  const privacyHtml = await privacyResponse.text();
+  if (!privacyHtml.includes("Política de tratamiento de datos personales y privacidad")) {
+    throw Error("La página de política de datos no muestra su contenido.");
+  }
+  console.log("Smoke test completo: servidor, política de privacidad, API y sitio comercial.");
 } catch (error) {
   console.error(output.slice(-5000));
   console.error(error);

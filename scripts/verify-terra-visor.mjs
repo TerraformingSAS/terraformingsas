@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { runInNewContext } from "node:vm";
 import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -141,4 +142,57 @@ if (!js.includes("const canQuote=lot.estado==='Disponible'") ||
 if (!html.includes("Imagina tu próximo comienzo en TERRA.")) {
   throw new Error("El texto comercial del plano no se actualizó.");
 }
+
+const from = js.indexOf("function highlight(lot){");
+const until = js.indexOf("\nfunction setBlock(", from);
+if (from < 0 || until < 0) throw new Error("No se puede analizar la selección de lotes.");
+const quoteAttrs = new Map();
+const quoteButton = {
+  href: undefined,
+  tabIndex: -1,
+  setAttribute: (name, value) => quoteAttrs.set(name, String(value)),
+  removeAttribute: (name) => {
+    quoteAttrs.delete(name);
+    if (name === "href") quoteButton.href = undefined;
+  },
+};
+const elements = new Map([["#cotizar-lote", quoteButton]]);
+const getElement = (selector) => {
+  if (!elements.has(selector)) elements.set(selector, {});
+  return elements.get(selector);
+};
+const highlightTest = runInNewContext(js.slice(from, until) + "\nhighlight", {
+  chosen: "",
+  document: { querySelectorAll: () => [] },
+  $: getElement,
+  number: (value) => String(value),
+  whatsappQuoteUrl: (id) => "https://wa.me/573214230090?text=" + encodeURIComponent(id),
+});
+const sampleLot = (id, estado) => ({
+  id,
+  estado,
+  medidas: { lado_a_m: 10, lado_b_m: 20, area_m2: 200 },
+});
+highlightTest(sampleLot("A-01", "Disponible"));
+if (!quoteButton.href?.includes("A-01") ||
+    quoteAttrs.get("aria-disabled") !== "false" ||
+    quoteButton.tabIndex !== 0) {
+  throw new Error("El lote disponible debe permitir cotizar.");
+}
+for (const estado of ["Reservado", "Vendido", "En negociación", "No disponible"]) {
+  highlightTest(sampleLot("B-02", estado));
+  if (quoteButton.href !== undefined ||
+      quoteAttrs.get("aria-disabled") !== "true" ||
+      quoteButton.tabIndex !== -1) {
+    throw new Error("El lote con estado " + estado + " no debe permitir cotizar.");
+  }
+}
+highlightTest(sampleLot("C-03", "Disponible"));
+if (!quoteButton.href?.includes("C-03") ||
+    quoteAttrs.get("aria-disabled") !== "false" ||
+    quoteButton.tabIndex !== 0) {
+  throw new Error("Un lote que vuelve a estar disponible debe permitir cotizar.");
+}
+console.log("OK: Cotízame solo está habilitado para lotes disponibles.");
+
 console.log("El visor conserva sus rutas estáticas y la API, y valida los cambios autorizados.");
