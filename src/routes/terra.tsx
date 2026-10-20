@@ -166,13 +166,6 @@ function TerraPage() {
                   Quiero más información
                   <ArrowIcon />
                 </a>
-                <a
-                  href="/terra/estado"
-                  className="inline-flex min-h-12 items-center gap-2.5 rounded-md border border-white/80 bg-white/95 px-6 sm:px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-brand-navy shadow-lg transition-all hover:-translate-y-0.5 hover:bg-white"
-                >
-                  Separa tu lote
-                  <ArrowIcon />
-                </a>
               </div>
             </Reveal>
             </div>

@@ -43,8 +43,8 @@ if (!headerJs.includes('aria-expanded') || !headerJs.includes('window.scrollY > 
   throw new Error("El menú móvil y la transición del encabezado deben seguir activos.");
 }
 const terraPage = await readFile(join(root, "src", "routes", "terra.tsx"), "utf8");
-if (!terraPage.includes('href="/terra/estado"') || !terraPage.includes('Separa tu lote')) {
-  throw new Error("Falta el enlace comercial a la consulta de lotes desde /terra.");
+if (terraPage.includes('Separa tu lote') || !terraPage.includes('Quiero más información')) {
+  throw new Error("El hero de /terra debe conservar solo el botón de información.");
 }
 if (!js.includes("fetch('/api/terra-estado'")) {
   throw new Error("La ruta de consulta a SharePoint es diferente a la esperada");
