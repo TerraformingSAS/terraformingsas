@@ -329,3 +329,24 @@ footer.site-footer #fecha{max-width:none;text-align:right;overflow-wrap:anywhere
   footer.site-footer{grid-template-columns:minmax(0,1fr);gap:15px;padding:23px 0 20px}
   footer.site-footer #fecha{grid-column:auto;text-align:left}
 }
+
+
+/* La cotización se habilita únicamente si el estado del lote es Disponible. */
+.quote-whatsapp[aria-disabled="true"],
+.quote-whatsapp[aria-disabled="true"]:hover{
+  background:#a7b3bd;
+  color:#fff;
+  opacity:.88;
+  box-shadow:none;
+  cursor:not-allowed;
+  pointer-events:none;
+  transform:none;
+}
+.site-footer__privacy-link{
+  display:inline-block;
+  margin-top:9px;
+  color:var(--ink);
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+.site-footer__privacy-link:hover{color:var(--orange)}
