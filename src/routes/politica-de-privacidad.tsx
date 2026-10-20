@@ -54,6 +54,11 @@ function PrivacyPolicyPage() {
               a <a className="underline underline-offset-4 hover:text-brand-orange" href="mailto:mercadeo@terraformings.co">mercadeo@terraformings.co</a>,
               o comunicarte al teléfono +57 321 423 0090.
             </p>
+            <p className={paragraph}>
+              El área encargada de la atención de peticiones, consultas y reclamos, y ante la
+              cual el titular puede ejercer sus derechos a conocer, actualizar, rectificar
+              y suprimir sus datos y revocar la autorización, es el área de Mercadeo.
+            </p>
           </section>
 
           <section aria-labelledby="privacidad-alcance">
@@ -110,8 +115,9 @@ function PrivacyPolicyPage() {
               informada antes de tratar los datos. El titular puede decidir si proporciona
               información opcional. La autorización podrá acreditarse por los medios
               admitidos legalmente, incluido el registro del formulario correspondiente.
-              El tratamiento sin autorización solo tendrá lugar en los casos permitidos por
-              la legislación aplicable.
+              Conservaremos copia o registro de la autorización otorgada por el titular como
+              prueba del tratamiento autorizado. El tratamiento sin autorización solo tendrá
+              lugar en los casos permitidos por la legislación aplicable.
             </p>
           </section>
 
@@ -126,12 +132,15 @@ function PrivacyPolicyPage() {
               navegador, aunque algunas funciones pueden verse afectadas.
             </p>
             <p className={paragraph}>
-              Cuando terceros presten servicios tecnológicos que impliquen acceso o
-              tratamiento de datos personales, dicho tratamiento deberá sujetarse a las
-              obligaciones legales y de confidencialidad aplicables. Estos servicios pueden
-              procesar información mediante infraestructura fuera de Colombia, de acuerdo
-              con la regulación vigente. Los enlaces a WhatsApp remiten a una plataforma
-              externa que dispone de sus propias condiciones y políticas de privacidad.
+              Cuando terceros presten servicios tecnológicos que impliquen acceso o tratamiento
+              de datos personales, dicho tratamiento se sujetará a las obligaciones legales
+              y de confidencialidad aplicables, mediante los contratos de transmisión de datos
+              personales que correspondan. Estos servicios pueden procesar información mediante
+              infraestructura ubicada fuera de Colombia; cuando ello implique una transferencia
+              internacional de datos a terceros países, esta se realizará observando las
+              condiciones y garantías que exige la Ley 1581 de 2012 y sus normas reglamentarias.
+              Los enlaces a WhatsApp remiten a una plataforma externa que dispone de sus
+              propias condiciones y políticas de privacidad.
             </p>
           </section>
 
@@ -157,11 +166,22 @@ function PrivacyPolicyPage() {
             </p>
             <p className={paragraph}>
               Las consultas se atenderán, por regla general, dentro de los diez (10) días
-              hábiles siguientes a su recepción; cuando resulte necesario, podrá informarse
-              una prórroga de hasta cinco (5) días hábiles adicionales. Los reclamos se
-              tramitarán en un plazo de quince (15) días hábiles, con la ampliación
-              legalmente prevista de hasta ocho (8) días hábiles cuando corresponda.
-              También aplicarán los procedimientos de subsanación establecidos por la ley.
+              hábiles siguientes a su recepción. Cuando no fuere posible atender la consulta
+              dentro de dicho término, se informará al interesado los motivos de la demora y
+              la fecha en que se atenderá su consulta, la cual en ningún caso superará los
+              cinco (5) días hábiles siguientes al vencimiento del primer plazo.
+            </p>
+            <p className={paragraph}>
+              Los reclamos se tramitarán en un plazo de quince (15) días hábiles contados a
+              partir del día siguiente a la fecha de su recibo. Cuando no fuere posible atender
+              el reclamo dentro de dicho término, se informará al interesado los motivos de
+              la demora y la fecha en que se atenderá su reclamo, la cual en ningún caso
+              superará los ocho (8) días hábiles siguientes al vencimiento del primer plazo.
+              Si el reclamo resulta incompleto, se requerirá al interesado dentro de los cinco
+              (5) días siguientes a su recepción para que subsane las fallas; transcurridos
+              dos (2) meses desde la fecha del requerimiento sin que presente la información
+              solicitada, se entenderá que ha desistido del reclamo. También aplicarán los
+              demás procedimientos de subsanación establecidos por la ley.
             </p>
           </section>
 
@@ -177,8 +197,19 @@ function PrivacyPolicyPage() {
             </p>
           </section>
 
+          <section aria-labelledby="privacidad-base-de-datos">
+            <h2 id="privacidad-base-de-datos" className={heading}>10. Vigencia de la base de datos</h2>
+            <p className={paragraph}>
+              El período de vigencia de la base de datos corresponde al tiempo durante el cual
+              resulte necesario tratar los datos para cumplir las finalidades informadas en
+              esta política y las obligaciones legales o contractuales aplicables: mientras
+              se mantenga la relación comercial o el interés del titular y hasta por 10 años
+              adicionales para el cumplimiento de obligaciones legales.
+            </p>
+          </section>
+
           <section aria-labelledby="privacidad-menores">
-            <h2 id="privacidad-menores" className={heading}>10. Datos de menores de edad</h2>
+            <h2 id="privacidad-menores" className={heading}>11. Datos de menores de edad</h2>
             <p className={paragraph}>
               Nuestros formularios comerciales no están dirigidos a niños, niñas o adolescentes.
               Si excepcionalmente fuera necesario tratar sus datos personales, se observará
@@ -188,12 +219,13 @@ function PrivacyPolicyPage() {
           </section>
 
           <section aria-labelledby="privacidad-vigencia">
-            <h2 id="privacidad-vigencia" className={heading}>11. Vigencia y modificaciones</h2>
+            <h2 id="privacidad-vigencia" className={heading}>12. Vigencia y modificaciones</h2>
             <p className={paragraph}>
-              Esta política se publica el 20 de octubre de 2026. Podrá actualizarse cuando
-              cambien nuestras prácticas de tratamiento o las disposiciones aplicables.
-              Las modificaciones relevantes se informarán mediante este sitio web y,
-              cuando corresponda, por los demás medios que exija la ley.
+              Esta política se publica el 20 de octubre de 2026 y entra en vigencia a partir
+              de esa fecha. Podrá actualizarse cuando cambien nuestras prácticas de tratamiento
+              o las disposiciones aplicables. Las modificaciones sustanciales se comunicarán
+              oportunamente a los titulares antes de su implementación, mediante este sitio
+              web y, cuando corresponda, por los demás medios que exija la ley.
             </p>
           </section>
         </article>
