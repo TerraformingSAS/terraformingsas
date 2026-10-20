@@ -6,10 +6,10 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const folder = join(root, "public", "terra", "estado");
 const files = {
-  "index.html": "c4bad9e68a2b71fb3cf8acf72912226bec6934dc6027a59afba27f2df422db5b",
-  "estilos.css": "7b6e2673151916899da979994f92b92db9c3ae02700fc0e4b206bfea489e263e",
+  "index.html": "7f0a44fd53f37475ed685144335909125b0dcc893f1e7011360115a19026c49e",
+  "estilos.css": "8221ac4fc0246a97ffe7ed0e9a506d7b055ddf5144004676c112707d8d82f0c2",
   "header.js": "633deb77c2e2356dc4942eb4c023574fd843becc4c91c9ad4f5c9c832e646001",
-  "app.js": "37bb607982b3c1abe63919d120b4b75f615e2ffb95b84234412b45fa43ac9641",
+  "app.js": "8e45d29540666f247d1d86b3bbb3f2e271df5a1c6d149c0421474121f5add9a3",
   "logo-terraforming.png": "6ec6eab54659f8d5c89291f7ed2d0c15842adedb69047e9435a3012f9dc681d5",
   "ubicacion-etapa-i.webp": "ba5f191e96dd8d834a1753726cd4d031bca8e2c6fd89c32120e4b752e3cee493"
 };
@@ -24,6 +24,7 @@ for (const [name, expected] of Object.entries(files)) {
 }
 
 const html = await readFile(join(folder, "index.html"), "utf8");
+const css = await readFile(join(folder, "estilos.css"), "utf8");
 for (const name of Object.keys(files).filter(n => n !== "index.html")) {
   if (!html.includes("/terra/estado/" + name)) {
     throw new Error("El HTML no incluye el recurso esperado: " + name);
@@ -56,6 +57,19 @@ for (const id of ["mas", "menos", "ajustar"]) {
   if (!js.includes("$('#" + id + "').addEventListener('click'")) {
     throw new Error("Falta el botón de control de zoom: " + id);
   }
+}
+if (!html.includes('id="cotizar-lote"') ||
+    !html.includes('class="quote-whatsapp"') ||
+    !html.includes('Cotízame') ||
+    !html.includes('target="_blank"') ||
+    !css.includes('.quote-whatsapp{') ||
+    !css.includes('border-radius:999px')) {
+  throw new Error("Falta el botón verde y redondeado de WhatsApp en el flotante.");
+}
+if (!js.includes('quote.href=whatsappQuoteUrl(lot.id)') ||
+    !js.includes('encodeURIComponent(message)') ||
+    !js.includes("const WHATSAPP_PHONE='573214230090'")) {
+  throw new Error("El enlace de WhatsApp no está asociado dinámicamente al lote seleccionado.");
 }
 if (!html.includes("Imagina tu próximo comienzo en TERRA.")) {
   throw new Error("El texto comercial del plano no se actualizó.");

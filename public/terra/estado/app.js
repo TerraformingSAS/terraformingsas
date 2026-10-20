@@ -1,12 +1,17 @@
 'use strict';
 const $=s=>document.querySelector(s),NS='http://www.w3.org/2000/svg';
 const COLORS={'Disponible':'#66b48a','Reservado':'#ebcb6a','En negociación':'#86b9da','Vendido':'#db8179','No disponible':'#b4b9b4'};
+const WHATSAPP_PHONE='573214230090';
+function whatsappQuoteUrl(lotId){
+ const message=`Hola, me gustaría cotizar el lote ${lotId} de TERRA Etapa I. ¿Podrían compartirme el precio, la disponibilidad y las condiciones de compra?`;
+ return `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
+}
 let lots=[],block='',chosen='',drag=null;const svg=$('#plano');
 function node(tag,attrs,text){const el=document.createElementNS(NS,tag);for(const[k,v]of Object.entries(attrs))el.setAttribute(k,v);if(text!=null)el.textContent=text;return el;}
 function box(items,pad=12){const pts=items.flatMap(p=>p.puntos),xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);return [Math.min(...xs)-pad,Math.min(...ys)-pad,Math.max(...xs)-Math.min(...xs)+2*pad,Math.max(...ys)-Math.min(...ys)+2*pad];}
 function fit(items){if(!items.length)return;svg.setAttribute('viewBox',box(items,18).join(' '));}
 function number(value){return Number(value).toLocaleString('es-CO',{maximumFractionDigits:2});}
-function highlight(lot){chosen=lot.id;document.querySelectorAll('#formas polygon').forEach(p=>p.classList.toggle('selected',p.id==='lote-'+lot.id));$('#lote-activo').textContent=lot.id;$('#estado-activo').textContent=lot.estado;const m=lot.medidas;$('#dimensiones-activas').textContent=m?`${number(m.lado_a_m)} × ${number(m.lado_b_m)} m`:'Por confirmar';$('#area-activa').textContent=m?`${number(m.area_m2)} m²`:'Por confirmar';$('#nota-medidas').textContent='Medidas y área según el Excel.';$('#seleccion').hidden=false;}
+function highlight(lot){chosen=lot.id;document.querySelectorAll('#formas polygon').forEach(p=>p.classList.toggle('selected',p.id==='lote-'+lot.id));$('#lote-activo').textContent=lot.id;$('#estado-activo').textContent=lot.estado;const m=lot.medidas;$('#dimensiones-activas').textContent=m?`${number(m.lado_a_m)} × ${number(m.lado_b_m)} m`:'Por confirmar';$('#area-activa').textContent=m?`${number(m.area_m2)} m²`:'Por confirmar';$('#nota-medidas').textContent='Medidas y área según el Excel.';const quote=$('#cotizar-lote');quote.href=whatsappQuoteUrl(lot.id);quote.setAttribute('aria-label',`Cotizar el lote ${lot.id} por WhatsApp`);$('#seleccion').hidden=false;}
 function setBlock(value){block=value;$('#buscar').value='';document.querySelectorAll('[data-block]').forEach(b=>{b.classList.toggle('active',b.dataset.block===value);b.setAttribute('aria-pressed',String(b.dataset.block===value));});const visible=lots.filter(p=>!block||p.manzana===block);document.querySelectorAll('#formas polygon,#etiquetas text').forEach(el=>el.classList.toggle('dim',!!block&&el.dataset.block!==block));fit(visible);$('#seleccion').hidden=true;}
 function zoom(factor){const b=svg.viewBox.baseVal,w=b.width*factor;if(w<35||w>1800)return;svg.setAttribute('viewBox',[b.x+b.width*(1-factor)/2,b.y+b.height*(1-factor)/2,w,b.height*factor].join(' '));}
 $('#mas').addEventListener('click',()=>zoom(.8));$('#menos').addEventListener('click',()=>zoom(1.25));$('#ajustar').addEventListener('click',()=>fit(lots.filter(p=>!block||p.manzana===block)));
