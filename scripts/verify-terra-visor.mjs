@@ -24,6 +24,7 @@ for (const [name, expected] of Object.entries(files)) {
 }
 
 const html = await readFile(join(folder, "index.html"), "utf8");
+const css = await readFile(join(folder, "estilos.css"), "utf8");
 for (const name of Object.keys(files).filter(n => n !== "index.html")) {
   if (!html.includes("/terra/estado/" + name)) {
     throw new Error("El HTML no incluye el recurso esperado: " + name);
