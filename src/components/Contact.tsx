@@ -126,6 +126,13 @@ export function Contact() {
             className="rounded-2xl bg-brand-gray p-6 sm:p-8 border border-border"
             noValidate
           >
+            <input type="hidden" name="origen" value="Página principal" />
+            <input
+              type="hidden"
+              name="subject"
+              value="Terraforming | Nuevo contacto desde la página principal"
+            />
+            <input type="hidden" name="from_name" value="Formulario web Terraforming" />
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Nombre completo *" error={errors.name}>
                 <input
