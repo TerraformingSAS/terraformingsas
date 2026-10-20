@@ -43,6 +43,30 @@ if (!html.includes('/terra/estado/logo-color.png') ||
 if (!headerJs.includes('aria-expanded') || !headerJs.includes('window.scrollY > 40')) {
   throw new Error("El menú móvil y la transición del encabezado deben seguir activos.");
 }
+const generalForm = await readFile(join(root, "src", "components", "Contact.tsx"), "utf8");
+const presaleForm = await readFile(join(root, "src", "components", "terra", "TerraLeadForm.tsx"), "utf8");
+for (const required of [
+  'name="origen" value="Página principal"',
+  'value="Terraforming | Nuevo contacto desde la página principal"',
+  'new FormData(ev.currentTarget)',
+  'name="from_name"',
+]) {
+  if (!generalForm.includes(required)) {
+    throw new Error("El formulario principal no identifica su origen en Web3Forms: " + required);
+  }
+}
+for (const required of [
+  'data.set("origen", "Preventa TERRA")',
+  'data.set("subject", "TERRA | Nuevo interesado en preventa")',
+  'data.set("referido_por", values.referido_por.trim() || "No informado")',
+  'name="referido_por" type="text"',
+  '¿Quién te contó de nosotros?',
+  'maxLength={100}',
+]) {
+  if (!presaleForm.includes(required)) {
+    throw new Error("El formulario de preventa no incluye los datos esperados: " + required);
+  }
+}
 const terraPage = await readFile(join(root, "src", "routes", "terra.tsx"), "utf8");
 if (terraPage.includes('Separa tu lote') || !terraPage.includes('Quiero más información')) {
   throw new Error("El hero de /terra debe conservar solo el botón de información.");

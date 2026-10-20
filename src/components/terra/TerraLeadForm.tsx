@@ -8,6 +8,7 @@ type Lead = {
   correo: string;
   tipo_documento: string;
   numero_documento: string;
+  referido_por: string;
 };
 
 const initial: Lead = {
@@ -16,6 +17,7 @@ const initial: Lead = {
   correo: "",
   tipo_documento: "",
   numero_documento: "",
+  referido_por: "",
 };
 
 const baseInput =
@@ -69,14 +71,15 @@ export function TerraLeadForm() {
     setSent(false);
 
     const data = new FormData();
-    data.set("subject", "TERRA - Nueva solicitud de información");
-    data.set("from_name", "Formulario TERRA");
-    data.set("origen", "Landing TERRA /terra");
+    data.set("subject", "TERRA | Nuevo interesado en preventa");
+    data.set("from_name", "Formulario de preventa TERRA");
+    data.set("origen", "Preventa TERRA");
     data.set("nombre", nombre);
     data.set("whatsapp", whatsapp);
     data.set("email", correo);
     data.set("tipo_documento", values.tipo_documento);
     data.set("numero_documento", numero);
+    data.set("referido_por", values.referido_por.trim() || "No informado");
     data.set("autorizacion_tratamiento_datos", "Sí, autorización expresa");
     data.set("texto_autorizacion", "Autorizo a TERRA FORMING S.A.S. a tratar mis datos personales para atender mi solicitud de información sobre TERRA y contactarme por los medios suministrados.");
 
@@ -144,6 +147,15 @@ export function TerraLeadForm() {
               value={values.numero_documento} onChange={(event) => set("numero_documento", event.target.value)}
               required minLength={4} maxLength={20} pattern="[a-zA-Z0-9-]{4,20}" />
           </div>
+        </div>
+        <div>
+          <label htmlFor="terra-referido-por" className="mb-1.5 block text-xs font-semibold text-brand-navy">
+            ¿Quién te contó de nosotros? <span className="font-normal text-brand-dark/65">(opcional)</span>
+          </label>
+          <input id="terra-referido-por" name="referido_por" type="text" autoComplete="off"
+            className={baseInput} placeholder="Nombre de quien te refirió"
+            value={values.referido_por} onChange={(event) => set("referido_por", event.target.value)}
+            maxLength={100} />
         </div>
         <label className="flex items-start gap-3 py-2 text-xs leading-relaxed text-brand-dark">
           <input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)}
