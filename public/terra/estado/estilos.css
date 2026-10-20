@@ -286,3 +286,12 @@ main { max-width: 1240px; padding: 30px 20px 20px; }
   .hero__button { min-height: 40px; padding: 9px 16px; }
   main { padding: 26px 16px 18px; }
 }
+
+
+/* Cotización por WhatsApp, discreta y alineada abajo a la izquierda de la ficha. */
+.selection-actions{display:flex;align-items:center;justify-content:flex-start;margin-top:12px}
+.quote-whatsapp{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:max-content;min-height:41px;padding:9px 17px 9px 13px;border:0;border-radius:999px;background:#128c58;color:#fff;text-decoration:none;font:700 12px/1.25 Inter,system-ui,sans-serif;box-shadow:0 4px 14px rgba(18,140,88,.20);transition:background-color .18s ease,box-shadow .18s ease,transform .18s ease}
+.quote-whatsapp svg{display:block;flex:0 0 auto;width:21px;height:21px}
+.quote-whatsapp:hover{background:#0d764a;color:#fff;box-shadow:0 6px 18px rgba(18,140,88,.28);transform:translateY(-1px)}
+.quote-whatsapp:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
+@media(max-width:760px){.selection-actions{margin-top:10px}.quote-whatsapp{min-height:41px;padding:9px 16px 9px 12px}}
