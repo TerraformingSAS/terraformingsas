@@ -18,7 +18,7 @@ for (const [name, expected] of Object.entries(files)) {
   const content = await readFile(join(folder, name));
   const actual = createHash("sha256").update(content).digest("hex");
   if (expected !== actual) {
-    throw new Error("El archivo del visor no coincide con la versión validada: " + name);
+    throw new Error("El archivo del visor no coincide con la versión validada: " + name + " (esperado " + expected + ", actual " + actual + ")");
   }
   console.log("OK:", name, "(" + content.length + " bytes)");
 }
