@@ -155,15 +155,22 @@ function TerraPage() {
             </div>
 
             <Reveal delay={280}>
-              <div className="mt-9">
+              <div className="mt-9 flex flex-wrap items-center gap-3 sm:gap-4">
                 <a
                   href={WA_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2.5 rounded-md bg-brand-orange px-6 sm:px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-white shadow-lg shadow-brand-orange/25 transition-all hover:brightness-110 hover:-translate-y-0.5"
+                  className="inline-flex min-h-12 items-center gap-2.5 rounded-md bg-brand-orange px-6 sm:px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-white shadow-lg shadow-brand-orange/25 transition-all hover:brightness-110 hover:-translate-y-0.5"
                 >
                   <WhatsAppIcon />
                   Quiero más información
+                  <ArrowIcon />
+                </a>
+                <a
+                  href="/terra/estado"
+                  className="inline-flex min-h-12 items-center gap-2.5 rounded-md border border-white/80 bg-white/95 px-6 sm:px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-brand-navy shadow-lg transition-all hover:-translate-y-0.5 hover:bg-white"
+                >
+                  Separa tu lote
                   <ArrowIcon />
                 </a>
               </div>
