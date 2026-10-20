@@ -116,6 +116,30 @@ if (!css.includes('justify-content:flex-end;margin-top:12px') ||
   throw new Error("El botón Cotízame debe aparecer abajo a la derecha del flotante.");
 }
 const privacyRoute = await readFile(join(root, "src", "routes", "politica-de-privacidad.tsx"), "utf8");
+const requiredPolicyText = [
+  "El área encargada de la atención de peticiones",
+  "es el área de Mercadeo.",
+  "Conservaremos copia o registro de la autorización",
+  "mediante los contratos de transmisión de datos",
+  "infraestructura ubicada fuera de Colombia",
+  "Los reclamos se tramitarán en un plazo de quince (15) días hábiles contados",
+  "dos (2) meses desde la fecha del requerimiento",
+  "10. Vigencia de la base de datos",
+  "hasta por 10 años",
+  "11. Datos de menores de edad",
+  "12. Vigencia y modificaciones",
+  "se comunicarán",
+  "antes de su implementación",
+];
+for (const fragment of requiredPolicyText) {
+  if (!privacyRoute.includes(fragment)) {
+    throw new Error("Falta texto de la política de privacidad: " + fragment);
+  }
+}
+const numberedSections = [...privacyRoute.matchAll(/<h2 id="privacidad-[^"]+" className=\\{heading\\}>(\\d+)\\./g)].map(m => Number(m[1]));
+if (numberedSections.length !== 12 || numberedSections.some((number, index) => number !== index + 1)) {
+  throw new Error("La política debe tener 12 secciones ordenadas.");
+}
 const headerComponent = await readFile(join(root, "src", "components", "Header.tsx"), "utf8");
 const rootRoute = await readFile(join(root, "src", "routes", "__root.tsx"), "utf8");
 const sitemapRoute = await readFile(join(root, "src", "routes", "sitemap[.]xml.ts"), "utf8");
