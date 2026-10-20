@@ -14,12 +14,13 @@ const NAV = [
   { id: "contacto", label: "Contacto" },
 ];
 
-export function Header() {
+export function Header({ solid = false }: { solid?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const onHome = pathname === "/";
+  const showSolid = solid || scrolled || open;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -41,7 +42,7 @@ export function Header() {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-        scrolled || open
+        showSolid
           ? "bg-white/95 backdrop-blur border-b border-border shadow-sm"
           : "bg-transparent"
       }`}
@@ -53,7 +54,7 @@ export function Header() {
           aria-label="TERRA FORMING inicio"
         >
           <img
-            src={scrolled || open ? logoColor : logo}
+            src={showSolid ? logoColor : logo}
             alt="TERRA FORMING"
             className="h-11 w-auto"
             width={300}
@@ -67,7 +68,7 @@ export function Header() {
               key={n.id}
               onClick={() => go(n.id)}
               className={`text-sm font-medium tracking-wide transition-colors hover:text-brand-orange ${
-                scrolled ? "text-brand-navy" : "text-white"
+                showSolid ? "text-brand-navy" : "text-white"
               }`}
             >
               {n.label}
@@ -87,7 +88,7 @@ export function Header() {
         <button
           onClick={() => setOpen((o) => !o)}
           className={`lg:hidden inline-flex items-center justify-center h-10 w-10 rounded-md ${
-            scrolled || open ? "text-brand-navy" : "text-white"
+            showSolid ? "text-brand-navy" : "text-white"
           }`}
           aria-label="Abrir menú"
           aria-expanded={open}

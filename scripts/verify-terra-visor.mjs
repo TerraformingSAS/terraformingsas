@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { runInNewContext } from "node:vm";
 import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -6,10 +7,10 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const folder = join(root, "public", "terra", "estado");
 const files = {
-  "index.html": "27eda23f2dd886417c58855671ee239bbfb935a33795b30f8d74a741c9b15e9e",
-  "estilos.css": "70a52b26ee1d8b7007c2671b19b47a392cec038cd94e73ba6e50d8273d6dc4a0",
+  "index.html": "88c8709b1e727d93b39468c67db04f7db1f0d50ac67b5c227646c131c3ed83c9",
+  "estilos.css": "b5d36162347865dc8629b696df610f1c2c18ece337d1323c1010b87f63e1ec40",
   "header.js": "633deb77c2e2356dc4942eb4c023574fd843becc4c91c9ad4f5c9c832e646001",
-  "app.js": "8e45d29540666f247d1d86b3bbb3f2e271df5a1c6d149c0421474121f5add9a3",
+  "app.js": "46374559d1a973608391ba3433e41afa1471a31451823a74e4c3368790255780",
   "logo-terraforming.png": "6ec6eab54659f8d5c89291f7ed2d0c15842adedb69047e9435a3012f9dc681d5",
   "ubicacion-etapa-i.webp": "ba5f191e96dd8d834a1753726cd4d031bca8e2c6fd89c32120e4b752e3cee493"
 };
@@ -114,7 +115,84 @@ if (!css.includes('justify-content:flex-end;margin-top:12px') ||
     !html.includes('id="cotizar-lote"')) {
   throw new Error("El botón Cotízame debe aparecer abajo a la derecha del flotante.");
 }
+const privacyRoute = await readFile(join(root, "src", "routes", "politica-de-privacidad.tsx"), "utf8");
+const headerComponent = await readFile(join(root, "src", "components", "Header.tsx"), "utf8");
+const rootRoute = await readFile(join(root, "src", "routes", "__root.tsx"), "utf8");
+const sitemapRoute = await readFile(join(root, "src", "routes", "sitemap[.]xml.ts"), "utf8");
+if (!privacyRoute.includes('createFileRoute("/politica-de-privacidad")') ||
+    !privacyRoute.includes("<Header solid />") ||
+    !privacyRoute.includes("<Footer />") ||
+    privacyRoute.includes("<img") || privacyRoute.includes("<form")) {
+  throw new Error("La política debe tener ruta propia, encabezado y pie corporativos, con contenido textual.");
+}
+if (!corporateFooter.includes('href="/politica-de-privacidad"') ||
+    !html.includes('href="/politica-de-privacidad"') ||
+    !headerComponent.includes("solid || scrolled || open") ||
+    !rootRoute.includes('<html lang="es">') ||
+    !sitemapRoute.includes("/politica-de-privacidad")) {
+  throw new Error("La política debe ser accesible desde todos los pies de página.");
+}
+if (!js.includes("const canQuote=lot.estado==='Disponible'") ||
+    !js.includes("quote.removeAttribute('href')") ||
+    !js.includes("quote.setAttribute('aria-disabled',String(!canQuote))") ||
+    !css.includes('.quote-whatsapp[aria-disabled="true"]') ||
+    !html.includes('aria-disabled="true" tabindex="-1"')) {
+  throw new Error("Cotízame solo puede abrir WhatsApp para lotes disponibles.");
+}
 if (!html.includes("Imagina tu próximo comienzo en TERRA.")) {
   throw new Error("El texto comercial del plano no se actualizó.");
 }
+
+const from = js.indexOf("function highlight(lot){");
+const until = js.indexOf("\nfunction setBlock(", from);
+if (from < 0 || until < 0) throw new Error("No se puede analizar la selección de lotes.");
+const quoteAttrs = new Map();
+const quoteButton = {
+  href: undefined,
+  tabIndex: -1,
+  setAttribute: (name, value) => quoteAttrs.set(name, String(value)),
+  removeAttribute: (name) => {
+    quoteAttrs.delete(name);
+    if (name === "href") quoteButton.href = undefined;
+  },
+};
+const elements = new Map([["#cotizar-lote", quoteButton]]);
+const getElement = (selector) => {
+  if (!elements.has(selector)) elements.set(selector, {});
+  return elements.get(selector);
+};
+const highlightTest = runInNewContext(js.slice(from, until) + "\nhighlight", {
+  chosen: "",
+  document: { querySelectorAll: () => [] },
+  $: getElement,
+  number: (value) => String(value),
+  whatsappQuoteUrl: (id) => "https://wa.me/573214230090?text=" + encodeURIComponent(id),
+});
+const sampleLot = (id, estado) => ({
+  id,
+  estado,
+  medidas: { lado_a_m: 10, lado_b_m: 20, area_m2: 200 },
+});
+highlightTest(sampleLot("A-01", "Disponible"));
+if (!quoteButton.href?.includes("A-01") ||
+    quoteAttrs.get("aria-disabled") !== "false" ||
+    quoteButton.tabIndex !== 0) {
+  throw new Error("El lote disponible debe permitir cotizar.");
+}
+for (const estado of ["Reservado", "Vendido", "En negociación", "No disponible"]) {
+  highlightTest(sampleLot("B-02", estado));
+  if (quoteButton.href !== undefined ||
+      quoteAttrs.get("aria-disabled") !== "true" ||
+      quoteButton.tabIndex !== -1) {
+    throw new Error("El lote con estado " + estado + " no debe permitir cotizar.");
+  }
+}
+highlightTest(sampleLot("C-03", "Disponible"));
+if (!quoteButton.href?.includes("C-03") ||
+    quoteAttrs.get("aria-disabled") !== "false" ||
+    quoteButton.tabIndex !== 0) {
+  throw new Error("Un lote que vuelve a estar disponible debe permitir cotizar.");
+}
+console.log("OK: Cotízame solo está habilitado para lotes disponibles.");
+
 console.log("El visor conserva sus rutas estáticas y la API, y valida los cambios autorizados.");

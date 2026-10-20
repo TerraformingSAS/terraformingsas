@@ -1,7 +1,7 @@
 import logo from "@/assets/logo_blanco.png";
+import { Link } from "@tanstack/react-router";
 
 export function Footer() {
-  const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   return (
     <footer className="bg-brand-navy text-white pt-20 pb-8">
       <div className="container-tf grid gap-12 md:grid-cols-2 lg:grid-cols-4">
@@ -20,9 +20,9 @@ export function Footer() {
           <ul className="mt-5 space-y-2.5 text-sm text-white/75">
             {[["nosotros","Nosotros"],["servicios","Servicios"],["sectores","Sectores"],["diferenciales","Diferenciales"],["proyectos","Proyectos"],["cobertura","Cobertura"],["contacto","Contacto"]].map(([id, l]) => (
               <li key={id}>
-                <button onClick={() => go(id)} className="hover:text-brand-orange transition-colors text-left">
+                <Link to="/" hash={id} className="hover:text-brand-orange transition-colors text-left">
                   {l}
-                </button>
+                </Link>
               </li>
             ))}
           </ul>
@@ -66,8 +66,8 @@ export function Footer() {
       <div className="container-tf mt-14 pt-6 border-t border-white/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs text-white/60">
         <p>© 2026 TERRA FORMING S.A.S. Todos los derechos reservados.</p>
         <div className="flex flex-wrap gap-x-5 gap-y-2">
-          <a href="#" className="hover:text-white">Política de privacidad</a>
-          <a href="#" className="hover:text-white">Tratamiento de datos</a>
+          <a href="/politica-de-privacidad" className="hover:text-white">Política de privacidad</a>
+          <a href="/politica-de-privacidad" className="hover:text-white">Tratamiento de datos</a>
         </div>
       </div>
     </footer>
