@@ -43,9 +43,18 @@ export function Footer() {
         <div>
           <h4 className="text-sm font-semibold tracking-widest uppercase text-brand-orange">Contacto</h4>
           <ul className="mt-5 space-y-3 text-sm text-white/75">
-            <li>Cali, Valle del Cauca, Colombia</li>
             <li>
-              <a href="mailto:gerencia@terraformings.co" className="hover:text-white">gerencia@terraformings.co</a>
+              <address className="not-italic leading-relaxed">
+                <span className="block">Calle 10 # 4 - 40, Oficina 1001</span>
+                <span className="block">Edificio Bolsa de Occidente, San Pedro</span>
+                <span className="block">Cali, Valle del Cauca, Colombia</span>
+              </address>
+            </li>
+            <li>
+              <a href="mailto:gerencia@terraformings.co" className="hover:text-white transition-colors break-all">gerencia@terraformings.co</a>
+            </li>
+            <li>
+              <a href="mailto:mercadeo@terraformings.co" className="hover:text-white transition-colors break-all">mercadeo@terraformings.co</a>
             </li>
             <li>
               <a href="tel:+573214230090" className="hover:text-white">321 423 0090</a>
