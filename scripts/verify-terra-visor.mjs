@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const folder = join(root, "public", "terra", "estado");
 const files = {
-  "index.html": "2a1905b8c0c0ffc0264ae339c4826bef2337d70c90ada03df91970b45f38edae",
+  "index.html": "7f0a44fd53f37475ed685144335909125b0dcc893f1e7011360115a19026c49e",
   "estilos.css": "8221ac4fc0246a97ffe7ed0e9a506d7b055ddf5144004676c112707d8d82f0c2",
   "header.js": "633deb77c2e2356dc4942eb4c023574fd843becc4c91c9ad4f5c9c832e646001",
   "app.js": "8e45d29540666f247d1d86b3bbb3f2e271df5a1c6d149c0421474121f5add9a3",
