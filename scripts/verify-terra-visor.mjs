@@ -136,7 +136,7 @@ for (const fragment of requiredPolicyText) {
     throw new Error("Falta texto de la política de privacidad: " + fragment);
   }
 }
-const numberedSections = [...privacyRoute.matchAll(/<h2 id="privacidad-[^"]+" className=\\{heading\\}>(\\d+)\\./g)].map(m => Number(m[1]));
+const numberedSections = [...privacyRoute.matchAll(/<h2[^>]*>([0-9]+)[.] /g)].map(m => Number(m[1]));
 if (numberedSections.length !== 12 || numberedSections.some((number, index) => number !== index + 1)) {
   throw new Error("La política debe tener 12 secciones ordenadas.");
 }
