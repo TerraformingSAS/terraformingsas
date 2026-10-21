@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const folder = join(root, "public", "terra", "estado");
 const files = {
-  "index.html": "f5e3d0ffe0ec2c1c5d046eb41ccd416b1794b563e3b9780485093f7eb04f4630",
+  "index.html": "591a8c36dc18d7b1345d56601104061a75c33909e24ca72c52a9827d8d4b0f38",
   "estilos.css": "a4dd1bcbb2ecc3b0799935b6bfa9c19f162effa9303b20e316157b9bb0f992bd",
   "header.js": "633deb77c2e2356dc4942eb4c023574fd843becc4c91c9ad4f5c9c832e646001",
   "app.js": "4384fa7ef3fe31a9235d568a7fb14be3cfc291b8622d1f8f5937855440f62f40",
@@ -188,6 +188,10 @@ if (!js.includes("const canQuote=lot.estado==='Disponible'") ||
     !css.includes('.quote-whatsapp[aria-disabled="true"]') ||
     !html.includes('aria-disabled="true" tabindex="-1"')) {
   throw new Error("Cotízame solo puede abrir WhatsApp para lotes disponibles.");
+}
+if (!html.includes("<strong>lotes urbanizados parcelables</strong>") ||
+    !html.includes("<strong>se entregará con vías pavimentadas</strong>")) {
+  throw new Error("Faltan las condiciones comerciales de entrega junto al plano.");
 }
 if (!html.includes("Imagina tu próximo comienzo en TERRA.")) {
   throw new Error("El texto comercial del plano no se actualizó.");
