@@ -22,11 +22,17 @@ svg.addEventListener('pointerdown',e=>{if(e.target.closest('polygon'))return;dra
 svg.addEventListener('pointermove',e=>{if(!drag)return;const m=svg.getScreenCTM();svg.viewBox.baseVal.x=drag.left-(e.clientX-drag.x)/m.a;svg.viewBox.baseVal.y=drag.top-(e.clientY-drag.y)/m.d;});
 svg.addEventListener('pointerup',()=>drag=null);svg.addEventListener('pointercancel',()=>drag=null);
 for(const[state,color]of Object.entries(COLORS)){const el=document.createElement('span'),dot=document.createElement('i');dot.style.background=color;el.append(dot,document.createTextNode(state));$('#leyenda').append(el);}
+function trackLotInteraction(lot){
+ if(typeof window.clarity!=='function')return;
+ window.clarity('event','terra_lote_seleccionado');
+ window.clarity('set','terra_manzana',lot.manzana);
+ window.clarity('set','terra_lote',lot.id);
+}
 function draw(data){
  if(!Array.isArray(data.lotes)||data.lotes.length!==104)throw Error('Datos inválidos');
  const previous=chosen;lots=data.lotes;
  for(const group of ['#formas','#etiquetas','#titulos'])$(group).replaceChildren();
- for(const p of lots){const polygon=node('polygon',{id:'lote-'+p.id,points:p.puntos.map(v=>v.join(',')).join(' '),fill:COLORS[p.estado],'data-block':p.manzana,tabindex:'0',role:'button','aria-label':`Lote ${p.id}, ${p.estado}`});polygon.append(node('title',{},`Lote ${p.id} · ${p.estado} · ${number(p.medidas.area_m2)} m²`));polygon.addEventListener('click',()=>highlight(p));polygon.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();highlight(p);}});$('#formas').append(polygon);$('#etiquetas').append(node('text',{x:p.centro[0],y:p.centro[1],'data-block':p.manzana},p.id));}
+ for(const p of lots){const polygon=node('polygon',{id:'lote-'+p.id,points:p.puntos.map(v=>v.join(',')).join(' '),fill:COLORS[p.estado],'data-block':p.manzana,tabindex:'0',role:'button','aria-label':`Lote ${p.id}, ${p.estado}`});polygon.append(node('title',{},`Lote ${p.id} · ${p.estado} · ${number(p.medidas.area_m2)} m²`));polygon.addEventListener('click',()=>{trackLotInteraction(p);highlight(p);});polygon.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();trackLotInteraction(p);highlight(p);}});$('#formas').append(polygon);$('#etiquetas').append(node('text',{x:p.centro[0],y:p.centro[1],'data-block':p.manzana},p.id));}
  for(const b of 'ABCDEF'){const bounds=box(lots.filter(p=>p.manzana===b),0);$('#titulos').append(node('text',{x:bounds[0]+2,y:bounds[1]-7},'Manzana '+b));}
  document.querySelectorAll('#formas polygon,#etiquetas text').forEach(el=>el.classList.toggle('dim',!!block&&el.dataset.block!==block));
  if(previous){const lot=lots.find(l=>l.id===previous);if(lot)highlight(lot);}

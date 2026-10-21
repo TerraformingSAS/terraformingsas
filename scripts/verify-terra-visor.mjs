@@ -7,10 +7,10 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const folder = join(root, "public", "terra", "estado");
 const files = {
-  "index.html": "591a8c36dc18d7b1345d56601104061a75c33909e24ca72c52a9827d8d4b0f38",
+  "index.html": "da31160db8d93cb9ef04d837316bec6e5100bc7a0260f0c607539eee5e236c4c",
   "estilos.css": "a4dd1bcbb2ecc3b0799935b6bfa9c19f162effa9303b20e316157b9bb0f992bd",
   "header.js": "633deb77c2e2356dc4942eb4c023574fd843becc4c91c9ad4f5c9c832e646001",
-  "app.js": "4384fa7ef3fe31a9235d568a7fb14be3cfc291b8622d1f8f5937855440f62f40",
+  "app.js": "1241a45a591aa713d681242b0d6fe59ab6c1dd426d7ff43ab7ed052e40adbafe",
   "logo-terraforming.png": "6ec6eab54659f8d5c89291f7ed2d0c15842adedb69047e9435a3012f9dc681d5",
   "ubicacion-etapa-i.webp": "ba5f191e96dd8d834a1753726cd4d031bca8e2c6fd89c32120e4b752e3cee493"
 };
@@ -33,6 +33,40 @@ for (const name of Object.keys(files).filter(n => n !== "index.html")) {
 }
 const js = await readFile(join(folder, "app.js"), "utf8");
 const headerJs = await readFile(join(folder, "header.js"), "utf8");
+const rootApp = await readFile(join(root, "src", "routes", "__root.tsx"), "utf8");
+const projectId = rootApp.match(/const CLARITY_PROJECT_ID = "([^"]+)"/)?.[1];
+const clarityTracking = html.match(/https:\/\/www\.clarity\.ms\/tag\//g) ?? [];
+if (!projectId || projectId !== "yvum2tlvam" ||
+    !html.includes('(window,document,"clarity","script","' + projectId + '")') ||
+    clarityTracking.length !== 1 ||
+    html.indexOf('https://www.clarity.ms/tag/') > html.indexOf("</head>")) {
+  throw new Error("El visor debe instalar Clarity en el head usando el mismo proyecto que el sitio.");
+}
+if (!js.includes("window.clarity('event','terra_lote_seleccionado')") ||
+    !js.includes("window.clarity('set','terra_lote',lot.id)") ||
+    !js.includes("window.clarity('set','terra_manzana',lot.manzana)") ||
+    !js.includes("trackLotInteraction(p);highlight(p)")) {
+  throw new Error("La selección del lote no registra eventos de Clarity.");
+}
+const startClarity = js.indexOf("function trackLotInteraction(lot){");
+const endClarity = js.indexOf("\nfunction draw(data){", startClarity);
+if (startClarity === -1 || endClarity === -1) {
+  throw new Error("No se encontró la función de seguimiento de lotes.");
+}
+const clarityCalls = [];
+const trackWithClarity = runInNewContext(js.slice(startClarity, endClarity) + "\ntrackLotInteraction", {
+  window: { clarity: (...args) => clarityCalls.push(args) },
+});
+trackWithClarity({ id: "B-04", manzana: "B" });
+if (clarityCalls.length !== 3 ||
+    clarityCalls[0].join(":") !== "event:terra_lote_seleccionado" ||
+    clarityCalls[1].join(":") !== "set:terra_manzana:B" ||
+    clarityCalls[2].join(":") !== "set:terra_lote:B-04") {
+  throw new Error("El evento Clarity no identifica correctamente el lote.");
+}
+const trackWithoutClarity = runInNewContext(js.slice(startClarity, endClarity) + "\ntrackLotInteraction", { window: {} });
+trackWithoutClarity({ id: "C-01", manzana: "C" });
+
 await readFile(join(folder, "logo-color.png"));
 if (!html.includes('/terra/estado/logo-color.png') ||
     !html.includes('id="site-header"') ||

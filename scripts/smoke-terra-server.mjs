@@ -54,7 +54,12 @@ try {
     throw Error("La API respondió 503 sin el mensaje controlado del ZIP.");
   }
   await assertStatus("/api/terra-estado", 405, { method: "POST" });
-  await assertStatus("/terra/estado/index.html", 200);
+  const viewerHtmlResponse = await assertStatus("/terra/estado/index.html", 200);
+  const viewerHtml = await viewerHtmlResponse.text();
+  if (!viewerHtml.includes('https://www.clarity.ms/tag/') ||
+      !viewerHtml.includes('yvum2tlvam')) {
+    throw Error("La página de lotes no incluye el código de Clarity.");
+  }
   await assertStatus("/terra/estado/estilos.css", 200);
   await assertStatus("/terra/estado/app.js", 200);
   await assertStatus("/terra/estado/logo-terraforming.png", 200);
