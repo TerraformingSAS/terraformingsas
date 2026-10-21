@@ -30,7 +30,7 @@ function draw(data){
  for(const b of 'ABCDEF'){const bounds=box(lots.filter(p=>p.manzana===b),0);$('#titulos').append(node('text',{x:bounds[0]+2,y:bounds[1]-7},'Manzana '+b));}
  document.querySelectorAll('#formas polygon,#etiquetas text').forEach(el=>el.classList.toggle('dim',!!block&&el.dataset.block!==block));
  if(previous){const lot=lots.find(l=>l.id===previous);if(lot)highlight(lot);}
- $('#fecha').textContent='Excel actualizado '+new Date(data.actualizado).toLocaleString('es-CO',{timeZone:'America/Bogota'});
+ $('#fecha').textContent='Fuente actualizada '+new Date(data.actualizado).toLocaleString('es-CO',{timeZone:'America/Bogota'});
  $('#carga').hidden=true;
 }
 let requesting=false,firstLoad=true;

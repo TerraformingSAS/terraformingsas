@@ -7,10 +7,10 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const folder = join(root, "public", "terra", "estado");
 const files = {
-  "index.html": "88c8709b1e727d93b39468c67db04f7db1f0d50ac67b5c227646c131c3ed83c9",
-  "estilos.css": "b5d36162347865dc8629b696df610f1c2c18ece337d1323c1010b87f63e1ec40",
+  "index.html": "f5e3d0ffe0ec2c1c5d046eb41ccd416b1794b563e3b9780485093f7eb04f4630",
+  "estilos.css": "a4dd1bcbb2ecc3b0799935b6bfa9c19f162effa9303b20e316157b9bb0f992bd",
   "header.js": "633deb77c2e2356dc4942eb4c023574fd843becc4c91c9ad4f5c9c832e646001",
-  "app.js": "46374559d1a973608391ba3433e41afa1471a31451823a74e4c3368790255780",
+  "app.js": "4384fa7ef3fe31a9235d568a7fb14be3cfc291b8622d1f8f5937855440f62f40",
   "logo-terraforming.png": "6ec6eab54659f8d5c89291f7ed2d0c15842adedb69047e9435a3012f9dc681d5",
   "ubicacion-etapa-i.webp": "ba5f191e96dd8d834a1753726cd4d031bca8e2c6fd89c32120e4b752e3cee493"
 };
@@ -95,6 +95,32 @@ if (!js.includes('quote.href=whatsappQuoteUrl(lot.id)') ||
     !js.includes('encodeURIComponent(message)') ||
     !js.includes("const WHATSAPP_PHONE='573214230090'")) {
   throw new Error("El enlace de WhatsApp no está asociado dinámicamente al lote seleccionado.");
+}
+const siteFooterStart = html.indexOf('<footer class="corporate-footer"');
+const statusStart = html.indexOf('<div class="source-update"');
+const statusId = html.indexOf('id="fecha"');
+if (siteFooterStart < 0 || statusStart < 0 || statusId <= statusStart ||
+    statusId >= siteFooterStart || html.includes('<footer class="site-footer"')) {
+  throw new Error("La fuente debe estar al final del contenido, antes del footer corporativo.");
+}
+if (!js.includes("textContent='Fuente actualizada '") ||
+    js.includes("textContent='Excel actualizado '") ||
+    !css.includes('footer.corporate-footer') ||
+    !css.includes('.corporate-footer__grid')) {
+  throw new Error("La fuente actualizada o el footer corporativo no están configurados.");
+}
+for (const required of [
+  "Enlaces", "Servicios", "Contacto",
+  "Infraestructura vial", "Acueductos y alcantarillados",
+  "Urbanismo y espacio público", "Vivienda y desarrollo urbano",
+  "Movimiento de tierras", "Alumbrado público",
+  "mailto:gerencia@terraformings.co", "mailto:mercadeo@terraformings.co",
+  "tel:+573214230090",
+  "Política de privacidad", "Tratamiento de datos",
+]) {
+  if (!html.slice(siteFooterStart).includes(required)) {
+    throw new Error("Falta un elemento del footer corporativo: " + required);
+  }
 }
 const corporateFooter = await readFile(join(root, "src", "components", "Footer.tsx"), "utf8");
 for (const content of [html, corporateFooter]) {
