@@ -80,6 +80,10 @@ if (!headerJs.includes('aria-expanded') || !headerJs.includes('window.scrollY > 
 }
 const generalForm = await readFile(join(root, "src", "components", "Contact.tsx"), "utf8");
 const presaleForm = await readFile(join(root, "src", "components", "terra", "TerraLeadForm.tsx"), "utf8");
+if (!presaleForm.includes('Preventa hasta el <span className="text-brand-orange">15 de noviembre</span>')) {
+  throw new Error("La fecha comercial de preventa del formulario TERRA debe ser 15 de noviembre.");
+}
+
 for (const required of [
   'name="origen" value="Página principal"',
   'value="Terraforming | Nuevo contacto desde la página principal"',
