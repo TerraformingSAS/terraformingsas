@@ -105,7 +105,7 @@ export function TerraLeadForm() {
           Cupos limitados
         </span>
         <h2 className="mt-5 font-display text-2xl font-extrabold uppercase leading-tight sm:text-3xl">
-          Preventa hasta el <span className="text-brand-orange">25 de octubre</span>
+          Preventa hasta el <span className="text-brand-orange">15 de noviembre</span>
         </h2>
         <p className="mt-3 text-sm leading-relaxed text-white/90">
           Déjanos tus datos para asegurar tu descuento en esta etapa.
