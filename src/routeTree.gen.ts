@@ -21,6 +21,7 @@ import { Route as ApiAuthSolicitarCodigoRouteImport } from './routes/api.auth.so
 import { Route as ApiAuthVerificarCodigoRouteImport } from './routes/api.auth.verificar-codigo'
 import { Route as ApiAuthYoRouteImport } from './routes/api.auth.yo'
 import { Route as ApiCotizacionesEnviarRouteImport } from './routes/api.cotizaciones.enviar'
+import { Route as ApiCotizacionesAlertaRouteImport } from './routes/api.cotizaciones.alerta'
 import { Route as TerraCotizadorLoginRouteImport } from './routes/terra_.cotizador_.login'
 
 const IndexRoute = IndexRouteImport.update({
@@ -78,6 +79,11 @@ const ApiAuthYoRoute = ApiAuthYoRouteImport.update({
   path: '/api/auth/yo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCotizacionesAlertaRoute = ApiCotizacionesAlertaRouteImport.update({
+  id: '/api/cotizaciones/alerta',
+  path: '/api/cotizaciones/alerta',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiCotizacionesEnviarRoute = ApiCotizacionesEnviarRouteImport.update({
   id: '/api/cotizaciones/enviar',
   path: '/api/cotizaciones/enviar',
@@ -101,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/api/auth/solicitar-codigo': typeof ApiAuthSolicitarCodigoRoute
   '/api/auth/verificar-codigo': typeof ApiAuthVerificarCodigoRoute
   '/api/auth/yo': typeof ApiAuthYoRoute
+  '/api/cotizaciones/alerta': typeof ApiCotizacionesAlertaRoute
   '/api/cotizaciones/enviar': typeof ApiCotizacionesEnviarRoute
   '/terra/cotizador/login': typeof TerraCotizadorLoginRoute
 }
@@ -116,6 +123,7 @@ export interface FileRoutesByTo {
   '/api/auth/solicitar-codigo': typeof ApiAuthSolicitarCodigoRoute
   '/api/auth/verificar-codigo': typeof ApiAuthVerificarCodigoRoute
   '/api/auth/yo': typeof ApiAuthYoRoute
+  '/api/cotizaciones/alerta': typeof ApiCotizacionesAlertaRoute
   '/api/cotizaciones/enviar': typeof ApiCotizacionesEnviarRoute
   '/terra/cotizador/login': typeof TerraCotizadorLoginRoute
 }
@@ -132,6 +140,7 @@ export interface FileRoutesById {
   '/api/auth/solicitar-codigo': typeof ApiAuthSolicitarCodigoRoute
   '/api/auth/verificar-codigo': typeof ApiAuthVerificarCodigoRoute
   '/api/auth/yo': typeof ApiAuthYoRoute
+  '/api/cotizaciones/alerta': typeof ApiCotizacionesAlertaRoute
   '/api/cotizaciones/enviar': typeof ApiCotizacionesEnviarRoute
   '/terra_/cotizador_/login': typeof TerraCotizadorLoginRoute
 }
@@ -149,6 +158,7 @@ export interface FileRouteTypes {
     | '/api/auth/solicitar-codigo'
     | '/api/auth/verificar-codigo'
     | '/api/auth/yo'
+    | '/api/cotizaciones/alerta'
     | '/api/cotizaciones/enviar'
     | '/terra/cotizador/login'
   fileRoutesByTo: FileRoutesByTo
@@ -164,6 +174,7 @@ export interface FileRouteTypes {
     | '/api/auth/solicitar-codigo'
     | '/api/auth/verificar-codigo'
     | '/api/auth/yo'
+    | '/api/cotizaciones/alerta'
     | '/api/cotizaciones/enviar'
     | '/terra/cotizador/login'
   id:
@@ -179,6 +190,7 @@ export interface FileRouteTypes {
     | '/api/auth/solicitar-codigo'
     | '/api/auth/verificar-codigo'
     | '/api/auth/yo'
+    | '/api/cotizaciones/alerta'
     | '/api/cotizaciones/enviar'
     | '/terra_/cotizador_/login'
   fileRoutesById: FileRoutesById
@@ -195,6 +207,7 @@ export interface RootRouteChildren {
   ApiAuthSolicitarCodigoRoute: typeof ApiAuthSolicitarCodigoRoute
   ApiAuthVerificarCodigoRoute: typeof ApiAuthVerificarCodigoRoute
   ApiAuthYoRoute: typeof ApiAuthYoRoute
+  ApiCotizacionesAlertaRoute: typeof ApiCotizacionesAlertaRoute
   ApiCotizacionesEnviarRoute: typeof ApiCotizacionesEnviarRoute
   TerraCotizadorLoginRoute: typeof TerraCotizadorLoginRoute
 }
@@ -278,6 +291,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthYoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/cotizaciones/alerta': {
+      id: '/api/cotizaciones/alerta'
+      path: '/api/cotizaciones/alerta'
+      fullPath: '/api/cotizaciones/alerta'
+      preLoaderRoute: typeof ApiCotizacionesAlertaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/cotizaciones/enviar': {
       id: '/api/cotizaciones/enviar'
       path: '/api/cotizaciones/enviar'
@@ -307,6 +327,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAuthSolicitarCodigoRoute: ApiAuthSolicitarCodigoRoute,
   ApiAuthVerificarCodigoRoute: ApiAuthVerificarCodigoRoute,
   ApiAuthYoRoute: ApiAuthYoRoute,
+  ApiCotizacionesAlertaRoute: ApiCotizacionesAlertaRoute,
   ApiCotizacionesEnviarRoute: ApiCotizacionesEnviarRoute,
   TerraCotizadorLoginRoute: TerraCotizadorLoginRoute,
 }

@@ -9,6 +9,7 @@ import {
   fmtCOP,
   fmtNum,
   fmtPct,
+  diferenciasTarifa,
   inconsistenciasExcel,
   toLote,
 } from "../../../features/terra-cotizador/lib/lotes.js";
@@ -113,6 +114,44 @@ export async function POST(req: Request): Promise<Response> {
       { ok: false, error: "No se pudo enviar la cotización a mercadeo." },
       { status: 503 },
     );
+  }
+}
+
+export async function alertar(req: Request): Promise<Response> {
+  try {
+    const sesion = await validarSesion(req);
+    if (!sesion.ok) return noAutorizado(sesion.motivo);
+    const body = (await req.json().catch(() => ({}))) as { id?: unknown };
+    const id = String(body.id ?? "").trim();
+    if (!id) return Response.json({ ok: false }, { status: 400 });
+    const { lotes } = await filasDePrecios();
+    const lote = lotes.map(toLote).find((l) => l?.id === id) ?? null;
+    if (!lote) return Response.json({ ok: false, error: "Lote no encontrado" }, { status: 404 });
+    const diferencias = diferenciasTarifa(lote);
+    if (diferencias.length === 0) return Response.json({ ok: true, aviso: false });
+    await graph(`/users/${encodeURIComponent(env("MAIL_SENDER"))}/sendMail`, {
+      method: "POST",
+      body: JSON.stringify({
+        message: {
+          subject: `Precio distinto a la tabla · lote ${lote.idLote}`,
+          body: {
+            contentType: "HTML",
+            content: `<!doctype html><html><body style="font-family:Segoe UI,Arial,sans-serif;color:#0e2a47">
+<p>El cotizador no generó la cotización del lote <b>${esc(lote.idLote)}</b> porque el Excel no coincide con la tabla de preventa.</p>
+<ul>${diferencias.map((m) => `<li>${esc(m)}</li>`).join("")}</ul>
+<p style="color:#263746">Excel: ${esc(fmtNum(lote.area))} m² · ${esc(fmtCOP(lote.valorM2))} por m² · preventa ${esc(fmtCOP(lote.valorPreventa))}</p>
+<p style="color:#263746">Aviso de ${esc(sesion.sesion.nombre)} · ${esc(fechaLarga(new Date()))}</p>
+</body></html>`,
+          },
+          toRecipients: [{ emailAddress: { address: DESTINO } }],
+        },
+        saveToSentItems: false,
+      }),
+    });
+    return Response.json({ ok: true, aviso: true });
+  } catch (e) {
+    console.error("alerta-precios", e);
+    return Response.json({ ok: false }, { status: 503 });
   }
 }
 
