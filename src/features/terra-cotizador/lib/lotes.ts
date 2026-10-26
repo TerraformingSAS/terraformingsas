@@ -62,6 +62,37 @@ export function cuotaDelPlan(lote: Lote, meses: number): number | null {
   return null;
 }
 
+/** Tabla oficial de preventa por tamaño. La cotización se niega si el Excel difiere. */
+export const TARIFA_PREVENTA = [
+  { area: 120, valorM2: 617_500, preventa: 74_100_000 },
+  { area: 154, valorM2: 604_500, preventa: 93_093_000 },
+  { area: 165, valorM2: 601_900, preventa: 99_313_500 },
+  { area: 211.75, valorM2: 598_000, preventa: 126_626_500 },
+  { area: 442.75, valorM2: 585_000, preventa: 259_008_750 },
+] as const;
+
+export function diferenciasTarifa(lote: Pick<Lote, "idLote" | "area" | "valorM2" | "valorPreventa">): string[] {
+  const fila = TARIFA_PREVENTA.find((t) => Math.abs(lote.area - t.area) <= 0.05);
+  if (!fila) {
+    const tamanos = TARIFA_PREVENTA.map((t) => fmtNum(t.area)).join(", ");
+    return [
+      `El lote ${lote.idLote} mide ${fmtNum(lote.area)} m² y ese tamaño no está en la tabla de preventa (${tamanos}).`,
+    ];
+  }
+  const mensajes: string[] = [];
+  if (Math.abs(lote.valorM2 - fila.valorM2) > 1) {
+    mensajes.push(
+      `El Excel trae ${fmtCOP(lote.valorM2)} por m² y la tabla de ${fmtNum(fila.area)} m² indica ${fmtCOP(fila.valorM2)}.`,
+    );
+  }
+  if (Math.abs(lote.valorPreventa - fila.preventa) > 1) {
+    mensajes.push(
+      `El Excel trae preventa de ${fmtCOP(lote.valorPreventa)} y la tabla de ${fmtNum(fila.area)} m² indica ${fmtCOP(fila.preventa)}.`,
+    );
+  }
+  return mensajes;
+}
+
 function cuadra(actual: number, esperado: number): boolean {
   if (!Number.isFinite(actual) || !Number.isFinite(esperado)) return false;
   return Math.abs(actual - esperado) <= Math.max(2, Math.abs(esperado) * 0.005);
@@ -69,7 +100,7 @@ function cuadra(actual: number, esperado: number): boolean {
 
 /** Rechaza la cotización cuando la fila del Excel no cuadra o el plan no existe. */
 export function inconsistenciasExcel(lote: Lote, meses: number): string[] {
-  const mensajes: string[] = [];
+  const mensajes: string[] = [...diferenciasTarifa(lote)];
   const montos = [
     lote.area,
     lote.valorLote,

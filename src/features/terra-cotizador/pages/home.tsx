@@ -21,6 +21,7 @@ import {
   cleanCC,
   codigoCotizacion,
   describirError,
+  diferenciasTarifa,
   estadoInfo,
   etapaRomana,
   fmtCOP,
@@ -90,9 +91,11 @@ export function HomePage() {
       return;
     }
     const meses = Number(cuotas);
+    const deTabla = diferenciasTarifa(lote);
     const inconsistencias = inconsistenciasExcel(lote, meses);
     if (inconsistencias.length > 0) {
       setExcelError(inconsistencias.join(" "));
+      if (deTabla.length > 0) void avisarDiferenciaDeTabla(lote.id);
       return;
     }
     const fecha = new Date();
@@ -585,6 +588,14 @@ function LoteResumen({ lote }: { lote: Lote | null }) {
       </div>
     </section>
   );
+}
+
+function avisarDiferenciaDeTabla(id: string) {
+  void apiFetch("/api/cotizaciones/alerta", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id }),
+  }).catch(() => undefined);
 }
 
 async function enviarAMercadeo(c: Cotizacion): Promise<boolean> {
