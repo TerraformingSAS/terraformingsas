@@ -21,24 +21,34 @@ async function leerTabla(drive: string, item: string, table: string) {
   return { filas, modificado: new Date(meta.lastModifiedDateTime) };
 }
 
+export async function filasDePrecios(): Promise<{
+  lotes: Record<string, unknown>[];
+  actualizado: Date;
+}> {
+  const [precios, mapa] = await Promise.all([
+    leerTabla(
+      env("PRECIOS_DRIVE_ID"),
+      env("PRECIOS_ITEM_ID"),
+      process.env.PRECIOS_TABLE ?? "TablaPreciosPreVenta",
+    ),
+    leerTabla(env("MAPA_DRIVE_ID"), env("MAPA_ITEM_ID"), process.env.MAPA_TABLE ?? "TablaLotes"),
+  ]);
+  const estado = new Map(mapa.filas.map((r) => [String(r.ID), r.Estado]));
+  const lotes = precios.filas.map((p) => ({
+    ...p,
+    Estado: estado.has(String(p.ID)) ? estado.get(String(p.ID)) : p.Estado,
+  }));
+  return {
+    lotes,
+    actualizado: new Date(Math.max(precios.modificado.getTime(), mapa.modificado.getTime())),
+  };
+}
+
 export async function GET(req: Request): Promise<Response> {
   try {
     const sesion = await validarSesion(req);
     if (!sesion.ok) return noAutorizado(sesion.motivo);
-    const [precios, mapa] = await Promise.all([
-      leerTabla(
-        env("PRECIOS_DRIVE_ID"),
-        env("PRECIOS_ITEM_ID"),
-        process.env.PRECIOS_TABLE ?? "TablaPreciosPreVenta",
-      ),
-      leerTabla(env("MAPA_DRIVE_ID"), env("MAPA_ITEM_ID"), process.env.MAPA_TABLE ?? "TablaLotes"),
-    ]);
-    const estado = new Map(mapa.filas.map((r) => [String(r.ID), r.Estado]));
-    const lotes = precios.filas.map((p) => ({
-      ...p,
-      Estado: estado.has(String(p.ID)) ? estado.get(String(p.ID)) : p.Estado,
-    }));
-    const actualizado = new Date(Math.max(precios.modificado.getTime(), mapa.modificado.getTime()));
+    const { lotes, actualizado } = await filasDePrecios();
     return Response.json(
       { lotes, actualizado: actualizado.toISOString() },
       { headers: { "Cache-Control": "private, no-store" } },

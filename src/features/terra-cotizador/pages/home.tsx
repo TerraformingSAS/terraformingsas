@@ -10,17 +10,21 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useSesion } from "@/features/terra-cotizador/lib/auth";
+import { toast } from "sonner";
 import { PdfExportButton } from "@/features/terra-cotizador/components/pdf-export-button";
+import { apiFetch } from "@/features/terra-cotizador/lib/actividad";
 import { EmptyState, LoadingState } from "@/features/terra-cotizador/components/states";
 import { cn } from "@/lib/utils";
 import logoDark from "@/features/terra-cotizador/assets/terraforming-logo-dark.png";
 import {
   ESTADOS,
   cleanCC,
+  codigoCotizacion,
   describirError,
   estadoInfo,
   etapaRomana,
   fmtCOP,
+  inconsistenciasExcel,
   fmtNum,
   fmtPct,
   isValidCC,
@@ -37,6 +41,8 @@ type Cotizacion = {
   email: string;
   vendedor: string;
   referido: string;
+  cuotas: number;
+  codigo: string;
   fecha: Date;
   fechaLimite: Date;
 };
@@ -52,7 +58,9 @@ export function HomePage() {
   const [cc, setCc] = useState("");
   const [email, setEmail] = useState("");
   const [fechaLimite, setFechaLimite] = useState<Date>(() => addDays(new Date(), 8));
+  const [cuotas, setCuotas] = useState("12");
   const [intentado, setIntentado] = useState(false);
+  const [excelError, setExcelError] = useState("");
   const [cotizacion, setCotizacion] = useState<Cotizacion | null>(null);
 
   const lotes = useMemo(() => lotesQuery.data?.lotes ?? [], [lotesQuery.data]);
@@ -69,24 +77,37 @@ export function HomePage() {
     cc: cc.trim() && !isValidCC(cc) ? "La cédula debe tener solo números (5 a 11 dígitos)." : "",
     email: email.trim() && !isValidEmail(email) ? "Correo con formato inválido." : "",
     contacto: !cc.trim() && !email.trim() ? "Ingresa la cédula o el correo (al menos uno)." : "",
+    cuotas: /^[0-9]+$/.test(cuotas.trim()) ? "" : "Indica el número de cuotas.",
   };
   const valido = Object.values(errores).every((e) => !e);
 
   function generar() {
     setIntentado(true);
     if (!valido || !lote) {
+      setExcelError("");
       const first = document.querySelector<HTMLElement>("[aria-invalid='true']");
       first?.focus();
       return;
     }
+    const meses = Number(cuotas);
+    const inconsistencias = inconsistenciasExcel(lote, meses);
+    if (inconsistencias.length > 0) {
+      setExcelError(inconsistencias.join(" "));
+      return;
+    }
+    const fecha = new Date();
+    const nombreLimpio = nombre.trim();
+    setExcelError("");
     setCotizacion({
       lote,
-      nombre: nombre.trim(),
+      nombre: nombreLimpio,
       cc: cleanCC(cc),
       email: email.trim(),
       vendedor: vendedor.trim(),
       referido: referido.trim(),
-      fecha: new Date(),
+      cuotas: meses,
+      codigo: codigoCotizacion(nombreLimpio, fecha, lote.idLote, meses),
+      fecha,
       fechaLimite,
     });
     window.scrollTo({ top: 0 });
@@ -99,6 +120,8 @@ export function HomePage() {
     setCc("");
     setEmail("");
     setReferido("");
+    setCuotas("12");
+    setExcelError("");
     setIntentado(false);
     window.scrollTo({ top: 0 });
   }
@@ -241,6 +264,19 @@ export function HomePage() {
                 {errores.contacto}
               </p>
             )}
+            <Field id="cuotas" label="Número de cuotas *" error={showErr("cuotas")}>
+              <Input
+                id="cuotas"
+                value={cuotas}
+                onChange={(e) => {
+                  setCuotas(e.target.value);
+                  setExcelError("");
+                }}
+                inputMode="numeric"
+                aria-invalid={!!showErr("cuotas")}
+                aria-describedby="cuotas-err"
+              />
+            </Field>
             <div className="grid gap-1.5">
               <Label htmlFor="fecha-limite">Separar antes del</Label>
               <Popover>
@@ -273,6 +309,11 @@ export function HomePage() {
               <span className="font-semibold">Lote {lote.idLote}</span>
               <span className="tabular-nums">Valor {fmtCOP(lote.valorPreventa)}</span>
               <span className="tabular-nums">Sep. {fmtCOP(lote.separacion)}</span>
+            </p>
+          )}
+          {excelError && (
+            <p className="mb-2 text-sm font-medium text-destructive" role="alert">
+              {excelError}
             </p>
           )}
           <Button
@@ -426,7 +467,7 @@ function LotMap({
                                 aria-label={`Lote ${l.idLote}, ${info.label}, ${fmtNum(l.area)} metros cuadrados`}
                                 style={{ gridRow: ri + 1, gridColumn: ci + 1 }}
                                 className={cn(
-                                  "flex h-12 items-center justify-center rounded-[3px] border text-[11px] font-semibold text-[#1c2821] transition focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-foreground",
+                                  "flex h-12 items-center justify-center rounded-[3px] border text-[11px] font-semibold text-[#0e2a47] transition focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-foreground",
                                   info.tile,
                                   sel &&
                                     "z-10 ring-2 ring-foreground ring-offset-2 ring-offset-background",
@@ -483,7 +524,7 @@ function LoteResumen({ lote }: { lote: Lote | null }) {
       aria-label="Lote seleccionado"
       className="overflow-hidden rounded-xl border border-border bg-card"
     >
-      <div className="flex flex-wrap items-start justify-between gap-3 border-b-2 border-[#5a913b] bg-[#1c2821] px-4 py-3 text-white">
+      <div className="flex flex-wrap items-start justify-between gap-3 border-b-2 border-[#f7941d] bg-[#0e2a47] px-4 py-3 text-white">
         <div>
           <p className="text-[11px] uppercase tracking-[0.16em] text-white/80">Lote seleccionado</p>
           <p className="text-2xl font-bold">{lote.idLote}</p>
@@ -546,16 +587,39 @@ function LoteResumen({ lote }: { lote: Lote | null }) {
   );
 }
 
+async function enviarAMercadeo(c: Cotizacion): Promise<boolean> {
+  try {
+    const res = await apiFetch("/api/cotizaciones/enviar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: c.lote.id,
+        nombre: c.nombre,
+        cc: c.cc,
+        email: c.email,
+        referido: c.referido,
+        cuotas: c.cuotas,
+        codigo: c.codigo,
+        fecha: c.fecha.toISOString(),
+        fechaLimite: c.fechaLimite.toISOString(),
+      }),
+    });
+    if (!res.ok) {
+      const j = (await res.json().catch(() => ({}))) as { error?: string };
+      toast.error(j.error || "No se pudo enviar la cotización a mercadeo.");
+      return false;
+    }
+    return true;
+  } catch {
+    toast.error("No se pudo enviar la cotización a mercadeo.");
+    return false;
+  }
+}
+
 /* ---------- Cotización (documento) ---------- */
 function QuoteView({ c, onBack, onNew }: { c: Cotizacion; onBack: () => void; onNew: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
-  const cliente =
-    c.nombre
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^A-Za-z0-9]+/g, "_")
-      .replace(/^_|_$/g, "") || "cliente";
-  const fileName = `Cotizacion_TERRA_Lote_${c.lote.idLote}_${cliente}_${format(c.fecha, "yyyy-MM-dd")}.pdf`;
+  const fileName = `${c.codigo}.pdf`;
   return (
     <div className="mx-auto flex w-full min-w-0 max-w-4xl flex-col gap-3 px-3 pb-10 pt-4 sm:px-4">
       <div
@@ -577,7 +641,7 @@ function QuoteView({ c, onBack, onNew }: { c: Cotizacion; onBack: () => void; on
         <div className="min-w-0">
           <p className="text-xs font-bold uppercase tracking-[0.16em]">Cotización lista</p>
           <p className="truncate text-sm">
-            Lote {c.lote.idLote} · {c.nombre} · {fmtCOP(c.lote.valorPreventa)}
+            {c.codigo}
           </p>
           <p className="truncate text-xs text-muted-foreground">{fileName}</p>
         </div>
@@ -585,6 +649,7 @@ function QuoteView({ c, onBack, onNew }: { c: Cotizacion; onBack: () => void; on
           targetRef={ref}
           fileName={fileName}
           options={{ paperSize: "letter", marginPoints: 18, scale: 2 }}
+          onBeforePrint={() => enviarAMercadeo(c)}
         >
           <Download aria-hidden="true" /> Descargar PDF
         </PdfExportButton>
@@ -596,7 +661,7 @@ function QuoteView({ c, onBack, onNew }: { c: Cotizacion; onBack: () => void; on
   );
 }
 
-const INK = "text-[#1c2821]";
+const INK = "text-[#0e2a47]";
 const LABEL = "text-[10px] font-bold uppercase tracking-[0.14em] text-[#4b5563]";
 
 function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElement> }) {
@@ -609,21 +674,21 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
   return (
     <div
       ref={ref}
-      className="w-[800px] bg-white px-10 pb-8 pt-0 font-sans text-[#1f2937]"
+      className="w-[190mm] bg-white px-8 pb-6 pt-0 font-sans text-[#263746]"
       style={{ colorScheme: "light" }}
     >
       <div className="-mx-10 mb-7 flex h-2">
-        <div className="flex-[3] bg-[#1c2821]" />
-        <div className="flex-1 bg-[#5a913b]" />
-        <div className="w-16 bg-[#e9c98a]" />
+        <div className="flex-[3] bg-[#0e2a47]" />
+        <div className="flex-1 bg-[#5f8d4e]" />
+        <div className="w-16 bg-[#f7941d]" />
       </div>
 
       {/* Encabezado */}
       <div className="flex items-start justify-between">
         <img src={logoDark} alt="Terra Forming" className="h-20 w-auto" />
         <div className="text-right">
-          <span className="inline-block rounded-full bg-[#1c2821] px-4 py-1.5 text-[11px] font-bold tracking-[0.18em] text-white">
-            PROPUESTA COMERCIAL
+          <span className="inline-block rounded-full bg-[#0e2a47] px-4 py-1.5 text-[11px] font-bold tracking-[0.18em] text-white">
+            {c.codigo}
           </span>
           <p className={cn("mt-2 text-sm font-bold", INK)}>{proyecto}</p>
           <p className="text-xs text-[#4b5563]">Fecha: {fecha(c.fecha)}</p>
@@ -633,7 +698,7 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
 
       {/* Cliente y lote */}
       <div className="mt-6 grid grid-cols-[1fr_auto] overflow-hidden rounded-lg border border-[#e5e7eb]">
-        <div className="border-l-4 border-l-[#1c2821] px-5 py-3">
+        <div className="border-l-4 border-l-[#0e2a47] px-5 py-3">
           <p className={LABEL}>Cliente</p>
           <p className={cn("text-lg font-bold leading-tight", INK)}>{c.nombre}</p>
           <p className="mt-0.5 text-xs text-[#374151]">
@@ -642,7 +707,7 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
             {c.email}
           </p>
         </div>
-        <div className="flex flex-col justify-center bg-[#1c2821] px-6 py-3 text-right text-white">
+        <div className="flex flex-col justify-center bg-[#0e2a47] px-6 py-3 text-right text-white">
           <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/75">Lote</p>
           <p className="text-2xl font-extrabold leading-tight">{l.idLote}</p>
           <p className="text-xs text-white/85">{fmtNum(l.area)} m²</p>
@@ -659,12 +724,12 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
           <p className="text-base font-semibold text-[#374151] line-through decoration-[#9ca3af]">
             {fmtCOP(l.valorLote)}
           </p>
-          <p className="mt-1 text-[11px] text-[#3f6e27]">
+          <p className="mt-1 text-[11px] text-[#5f8d4e]">
             Descuento preventa {fmtPct(l.descuento)}: −{fmtCOP(descuentoValor)}
           </p>
         </div>
-        <div className="rounded-lg border-2 border-[#4a7f2e] bg-[#f2f8ee] px-4 py-3">
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#3f6e27]">
+        <div className="rounded-lg border-2 border-[#5f8d4e] bg-[#f4f7f2] px-4 py-3">
+          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#5f8d4e]">
             Valor del lote (preventa)
           </p>
           <p className={cn("text-2xl font-extrabold leading-tight", INK)}>
@@ -672,23 +737,23 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
           </p>
           <p className="mt-1 text-[11px] text-[#4b5563]">{fmtCOP(l.valorM2)} por m²</p>
         </div>
-        <div className="rounded-lg border border-[#ecd29c] bg-[#fdf7ea] px-4 py-3">
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#7a5410]">
+        <div className="rounded-lg border border-[#f6d7a8] bg-[#fff8ef] px-4 py-3">
+          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#c56a00]">
             Separación
           </p>
-          <p className="text-2xl font-extrabold leading-tight text-[#3d2a08]">
+          <p className="text-2xl font-extrabold leading-tight text-[#0e2a47]">
             {fmtCOP(l.separacion)}
           </p>
-          <p className="mt-1 text-[11px] text-[#3d2a08]">Antes del {fecha(c.fechaLimite)}</p>
+          <p className="mt-1 text-[11px] text-[#263746]">Antes del {fecha(c.fechaLimite)}</p>
         </div>
       </div>
 
-      <div className="mt-3 flex items-center justify-between rounded-lg bg-[#1c2821] px-6 py-3.5 text-white">
+      <div className="mt-3 flex items-center justify-between rounded-lg bg-[#0e2a47] px-6 py-3.5 text-white">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.08em]">Saldo a financiar</p>
           <p className="text-xs text-white/85">Valor del lote menos la separación</p>
         </div>
-        <p className="text-2xl font-extrabold text-[#b5e09a]">{fmtCOP(l.valorFinanciar)}</p>
+        <p className="text-2xl font-extrabold text-[#f7941d]">{fmtCOP(l.valorFinanciar)}</p>
       </div>
 
       {/* Financiación */}
@@ -701,8 +766,16 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
           { m: 24, v: l.cuota24, ipc: true },
           { m: 36, v: l.cuota36, ipc: true },
         ].map((e) => (
-          <div key={e.m} className="rounded-lg border border-[#e5e7eb] px-4 py-3 text-center">
-            <p className={LABEL}>{e.m} meses</p>
+          <div
+            key={e.m}
+            className={cn(
+              "rounded-lg border px-4 py-3 text-center",
+              e.m === c.cuotas ? "border-[#f7941d] bg-[#fff8ef]" : "border-[#e5e7eb]",
+            )}
+          >
+            <p className={LABEL}>
+              {e.m} meses{e.m === c.cuotas ? " · elegido" : ""}
+            </p>
             <p className={cn("text-xl font-bold", INK)}>{fmtCOP(e.v)}</p>
             <p className="text-[11px] text-[#4b5563]">cuota mensual{e.ipc ? " *" : ""}</p>
           </div>
