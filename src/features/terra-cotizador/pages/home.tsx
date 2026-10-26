@@ -10,7 +10,9 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useSesion } from "@/features/terra-cotizador/lib/auth";
+import { toast } from "sonner";
 import { PdfExportButton } from "@/features/terra-cotizador/components/pdf-export-button";
+import { apiFetch } from "@/features/terra-cotizador/lib/actividad";
 import { EmptyState, LoadingState } from "@/features/terra-cotizador/components/states";
 import { cn } from "@/lib/utils";
 import logoDark from "@/features/terra-cotizador/assets/terraforming-logo-dark.png";
@@ -585,6 +587,35 @@ function LoteResumen({ lote }: { lote: Lote | null }) {
   );
 }
 
+async function enviarAMercadeo(c: Cotizacion): Promise<boolean> {
+  try {
+    const res = await apiFetch("/api/cotizaciones/enviar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: c.lote.id,
+        nombre: c.nombre,
+        cc: c.cc,
+        email: c.email,
+        referido: c.referido,
+        cuotas: c.cuotas,
+        codigo: c.codigo,
+        fecha: c.fecha.toISOString(),
+        fechaLimite: c.fechaLimite.toISOString(),
+      }),
+    });
+    if (!res.ok) {
+      const j = (await res.json().catch(() => ({}))) as { error?: string };
+      toast.error(j.error || "No se pudo enviar la cotización a mercadeo.");
+      return false;
+    }
+    return true;
+  } catch {
+    toast.error("No se pudo enviar la cotización a mercadeo.");
+    return false;
+  }
+}
+
 /* ---------- Cotización (documento) ---------- */
 function QuoteView({ c, onBack, onNew }: { c: Cotizacion; onBack: () => void; onNew: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -618,6 +649,7 @@ function QuoteView({ c, onBack, onNew }: { c: Cotizacion; onBack: () => void; on
           targetRef={ref}
           fileName={fileName}
           options={{ paperSize: "letter", marginPoints: 18, scale: 2 }}
+          onBeforePrint={() => enviarAMercadeo(c)}
         >
           <Download aria-hidden="true" /> Descargar PDF
         </PdfExportButton>

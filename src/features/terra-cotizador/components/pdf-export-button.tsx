@@ -4,14 +4,20 @@ import { Button } from "@/components/ui/button";
 export function PdfExportButton({
   targetRef,
   fileName,
+  onBeforePrint,
   children,
 }: {
   targetRef: RefObject<HTMLElement | null>;
   fileName: string;
   options?: unknown;
+  onBeforePrint?: () => Promise<boolean>;
   children?: ReactNode;
 }) {
-  function printQuote() {
+  async function printQuote() {
+    if (onBeforePrint) {
+      const seguir = await onBeforePrint();
+      if (!seguir) return;
+    }
     const target = targetRef.current;
     if (!target) return;
     const previousTitle = document.title;
