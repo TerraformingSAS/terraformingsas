@@ -120,7 +120,7 @@ function CotizadorShell({ children }: { children: ReactNode }) {
       >
         Saltar al cotizador
       </a>
-      <header className="sticky top-0 z-30 bg-[#111814] text-white shadow-[0_1px_0_0_#5a913b]">
+      <header className="sticky top-0 z-30 border-b-2 border-[#f7941d] bg-[#0e2a47] text-white">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-2.5 px-3 sm:gap-3 sm:px-4">
           <img src={emblem} alt="" aria-hidden="true" className="h-7 w-auto shrink-0 sm:h-8" />
           <div className="flex min-w-0 flex-col leading-tight">
@@ -129,12 +129,12 @@ function CotizadorShell({ children }: { children: ReactNode }) {
               aria-label="Terra Forming"
             >
               <span className="text-white">TERRA</span>{" "}
-              <span className="text-[#8cc56a]">FORMING</span>
+              <span className="text-[#8fbf7a]">FORMING</span>
             </span>
             <span className="flex items-center gap-1.5 truncate text-[10px] uppercase tracking-[0.1em] text-white/75 sm:text-[11px] sm:tracking-[0.16em]">
               Cotizador preventa
               <span
-                className="hidden size-1 shrink-0 rounded-full bg-[#e9c98a] min-[400px]:inline-block"
+                className="hidden size-1 shrink-0 rounded-full bg-[#f7941d] min-[400px]:inline-block"
                 aria-hidden="true"
               />
               <span className="hidden min-[400px]:inline">Etapa I</span>

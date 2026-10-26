@@ -53,6 +53,89 @@ export const ESTADOS: { key: Estado; label: string; tile: string; dot: string }[
 ];
 export const estadoInfo = (e: Estado) => ESTADOS.find((x) => x.key === e)!;
 
+export const PLANES_CUOTAS = [12, 24, 36] as const;
+
+export function cuotaDelPlan(lote: Lote, meses: number): number | null {
+  if (meses === 12) return lote.cuota12;
+  if (meses === 24) return lote.cuota24;
+  if (meses === 36) return lote.cuota36;
+  return null;
+}
+
+function cuadra(actual: number, esperado: number): boolean {
+  if (!Number.isFinite(actual) || !Number.isFinite(esperado)) return false;
+  return Math.abs(actual - esperado) <= Math.max(2, Math.abs(esperado) * 0.005);
+}
+
+/** Rechaza la cotización cuando la fila del Excel no cuadra o el plan no existe. */
+export function inconsistenciasExcel(lote: Lote, meses: number): string[] {
+  const mensajes: string[] = [];
+  const montos = [
+    lote.area,
+    lote.valorLote,
+    lote.descuento,
+    lote.valorPreventa,
+    lote.valorM2,
+    lote.separacion,
+    lote.saldoCuotaInicial,
+    lote.valorFinanciar,
+  ];
+  if (montos.some((n) => !Number.isFinite(n) || n < 0)) {
+    mensajes.push("El Excel tiene valores vacíos o no numéricos en este lote.");
+  }
+  if (!(lote.descuento >= 0 && lote.descuento < 1)) {
+    mensajes.push("El descuento de preventa del Excel no está entre 0% y 100%.");
+  }
+  if (!cuadra(lote.valorPreventa, lote.valorLote * (1 - lote.descuento))) {
+    mensajes.push("El valor de preventa no coincide con el valor comercial menos el descuento.");
+  }
+  if (!(lote.area > 0) || !cuadra(lote.valorM2, lote.valorPreventa / lote.area)) {
+    mensajes.push("El valor por m² no coincide con el valor de preventa dividido por el área.");
+  }
+  const conInicial = lote.valorPreventa - lote.separacion - lote.saldoCuotaInicial;
+  const sinInicial = lote.valorPreventa - lote.separacion;
+  if (!cuadra(lote.valorFinanciar, conInicial) && !cuadra(lote.valorFinanciar, sinInicial)) {
+    mensajes.push("El saldo a financiar no coincide con el valor de preventa menos la separación.");
+  }
+  if (!PLANES_CUOTAS.includes(meses as (typeof PLANES_CUOTAS)[number])) {
+    mensajes.push("El Excel solo tiene planes de 12, 24 y 36 cuotas.");
+  } else {
+    const cuota = cuotaDelPlan(lote, meses);
+    if (cuota === null || !Number.isFinite(cuota) || cuota <= 0) {
+      mensajes.push(`El Excel no tiene una cuota válida a ${meses} meses.`);
+    } else if (lote.valorFinanciar > 0) {
+      const total = cuota * meses;
+      if (total < lote.valorFinanciar * 0.95 || total > lote.valorFinanciar * 3) {
+        mensajes.push(`La cuota a ${meses} meses no cuadra con el saldo a financiar del Excel.`);
+      }
+    }
+  }
+  return mensajes;
+}
+
+export function codigoCotizacion(nombre: string, fecha: Date, idLote: string, cuotas: number): string {
+  const partes = nombre
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase()
+    .split(/[^A-Z0-9]+/)
+    .filter(Boolean);
+  const nom = partes[0] || "NOMBRE";
+  const apellido = partes.length > 1 ? partes[partes.length - 1] : "APELLIDO";
+  const fmt = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "America/Bogota",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  });
+  const p = Object.fromEntries(fmt.formatToParts(fecha).map((x) => [x.type, x.value]));
+  const lote = idLote.toUpperCase().replace(/[^A-Z0-9]+/g, "-");
+  return `CT-${nom}_${apellido}-${p.day}-${p.month}-${p.year}-${p.hour}-${p.minute}-${lote}-${String(cuotas).padStart(2, "0")}`;
+}
+
 /** Maps the workbook's Estado text; blanks, 0 or unknown values are "No disponible". */
 export function parseEstado(value: unknown): Estado {
   const s = String(value ?? "")

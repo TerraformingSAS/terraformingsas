@@ -110,7 +110,7 @@ export function LoginPage() {
   return (
     <div className="grid min-h-dvh lg:grid-cols-[1.1fr_1fr]">
       {/* Panel de marca (solo escritorio) */}
-      <aside className="relative hidden overflow-hidden bg-[#111814] text-white lg:flex lg:flex-col lg:justify-between lg:p-12">
+      <aside className="relative hidden overflow-hidden bg-[#0e2a47] text-white lg:flex lg:flex-col lg:justify-between lg:p-12">
         <svg
           aria-hidden="true"
           className="absolute inset-0 h-full w-full opacity-[0.07]"
@@ -127,7 +127,7 @@ export function LoginPage() {
                 height="30"
                 rx="2"
                 fill="none"
-                stroke="#8cc56a"
+                stroke="#5f8d4e"
                 strokeWidth="1"
               />
             )),
@@ -135,7 +135,7 @@ export function LoginPage() {
         </svg>
         <img src={logoLight} alt="Terra Forming" className="relative w-72" />
         <div className="relative max-w-md">
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#8cc56a]">
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#f7941d]">
             Proyecto TERRA · Etapa I
           </p>
           <p className="mt-3 text-3xl font-semibold leading-tight">Cotizador de preventa</p>
@@ -150,10 +150,10 @@ export function LoginPage() {
 
       {/* Formulario */}
       <main className="flex flex-col bg-background">
-        <header className="flex items-center gap-3 bg-[#111814] px-5 py-4 text-white lg:hidden">
+        <header className="flex items-center gap-3 border-b-2 border-[#f7941d] bg-[#0e2a47] px-5 py-4 text-white lg:hidden">
           <img src={emblem} alt="" aria-hidden="true" className="h-7 w-auto" />
           <span className="text-sm font-bold tracking-[0.2em]">
-            TERRA <span className="text-[#8cc56a]">FORMING</span>
+            TERRA <span className="text-[#8fbf7a]">FORMING</span>
           </span>
         </header>
 
@@ -171,7 +171,7 @@ export function LoginPage() {
             {paso === "correo" ? (
               <form onSubmit={pedirCodigo} noValidate className="flex flex-col gap-5">
                 <div>
-                  <span className="grid size-11 place-items-center rounded-full bg-[#eaf3e3] text-[#3f6e27] dark:bg-[#1f2c1a] dark:text-[#8cc56a]">
+                  <span className="grid size-11 place-items-center rounded-full bg-[#f4f6f7] text-[#0e2a47] dark:bg-secondary dark:text-foreground">
                     <Mail className="size-5" aria-hidden="true" />
                   </span>
                   <h1 className="mt-4 text-2xl font-semibold">Ingresa al cotizador</h1>
@@ -217,7 +217,7 @@ export function LoginPage() {
                   >
                     <ArrowLeft className="size-4" aria-hidden="true" /> Cambiar correo
                   </button>
-                  <span className="mt-4 grid size-11 place-items-center rounded-full bg-[#eaf3e3] text-[#3f6e27] dark:bg-[#1f2c1a] dark:text-[#8cc56a]">
+                  <span className="mt-4 grid size-11 place-items-center rounded-full bg-[#f4f6f7] text-[#0e2a47] dark:bg-secondary dark:text-foreground">
                     <ShieldCheck className="size-5" aria-hidden="true" />
                   </span>
                   <h1 className="mt-4 text-2xl font-semibold">Revisa tu correo</h1>
