@@ -674,10 +674,10 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
   return (
     <div
       ref={ref}
-      className="w-[190mm] bg-white px-8 pb-6 pt-0 font-sans text-[#263746]"
+      className="box-border w-[190mm] max-w-[190mm] bg-white px-6 pb-4 pt-0 font-sans text-[#263746]"
       style={{ colorScheme: "light" }}
     >
-      <div className="-mx-10 mb-7 flex h-2">
+      <div className="-mx-6 mb-4 flex h-1.5">
         <div className="flex-[3] bg-[#0e2a47]" />
         <div className="flex-1 bg-[#5f8d4e]" />
         <div className="w-16 bg-[#f7941d]" />
@@ -685,9 +685,9 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
 
       {/* Encabezado */}
       <div className="flex items-start justify-between">
-        <img src={logoDark} alt="Terra Forming" className="h-20 w-auto" />
+        <img src={logoDark} alt="Terra Forming" className="h-14 w-auto" />
         <div className="text-right">
-          <span className="inline-block rounded-full bg-[#0e2a47] px-4 py-1.5 text-[11px] font-bold tracking-[0.18em] text-white">
+          <span className="inline-block max-w-[280px] rounded-full bg-[#0e2a47] px-3 py-1 text-[10px] font-bold leading-snug tracking-[0.04em] text-white">
             {c.codigo}
           </span>
           <p className={cn("mt-2 text-sm font-bold", INK)}>{proyecto}</p>
@@ -697,7 +697,7 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
       </div>
 
       {/* Cliente y lote */}
-      <div className="mt-6 grid grid-cols-[1fr_auto] overflow-hidden rounded-lg border border-[#e5e7eb]">
+      <div className="mt-3 grid grid-cols-[1fr_auto] overflow-hidden rounded-lg border border-[#e5e7eb]">
         <div className="border-l-4 border-l-[#0e2a47] px-5 py-3">
           <p className={LABEL}>Cliente</p>
           <p className={cn("text-lg font-bold leading-tight", INK)}>{c.nombre}</p>
@@ -715,7 +715,7 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
       </div>
 
       {/* Valor de inversión */}
-      <p className={cn("mt-6 text-xs font-bold uppercase tracking-[0.14em]", INK)}>
+      <p className={cn("mt-3 text-xs font-bold uppercase tracking-[0.14em]", INK)}>
         Valor de la inversión
       </p>
       <div className="mt-2 grid grid-cols-3 gap-3">
@@ -748,7 +748,7 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
         </div>
       </div>
 
-      <div className="mt-3 flex items-center justify-between rounded-lg bg-[#0e2a47] px-6 py-3.5 text-white">
+      <div className="mt-2 flex items-center justify-between rounded-lg bg-[#0e2a47] px-5 py-2.5 text-white">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.08em]">Saldo a financiar</p>
           <p className="text-xs text-white/85">Valor del lote menos la separación</p>
@@ -757,7 +757,7 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
       </div>
 
       {/* Financiación */}
-      <p className={cn("mt-6 text-xs font-bold uppercase tracking-[0.14em]", INK)}>
+      <p className={cn("mt-3 text-xs font-bold uppercase tracking-[0.14em]", INK)}>
         Opciones de financiación directa
       </p>
       <div className="mt-2 grid grid-cols-3 gap-3">
@@ -786,7 +786,7 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
       </p>
 
       {/* Especificaciones */}
-      <div className="mt-5 grid grid-cols-4 gap-3 rounded-lg bg-[#f6f7f5] px-5 py-3 text-[11px]">
+      <div className="mt-3 grid grid-cols-4 gap-3 rounded-lg bg-[#f6f7f5] px-4 py-2 text-[11px]">
         <div>
           <p className={LABEL}>Proyecto</p>
           <p className={cn("font-bold", INK)}>{proyecto}</p>
@@ -808,10 +808,10 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
       </div>
 
       {/* Condiciones */}
-      <p className={cn("mt-5 text-xs font-bold uppercase tracking-[0.14em]", INK)}>
+      <p className={cn("mt-3 text-xs font-bold uppercase tracking-[0.14em]", INK)}>
         Vigencia y condiciones
       </p>
-      <ul className="mt-2 list-disc space-y-1 pl-5 text-[11px] leading-relaxed text-[#374151]">
+      <ul className="mt-1 list-disc space-y-0.5 pl-5 text-[11px] leading-snug text-[#374151]">
         <li>
           Cotización válida hasta el {fecha(c.fechaLimite)}, sujeta a disponibilidad del lote.
         </li>
@@ -829,7 +829,7 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
       </ul>
 
       {/* Pagos y asesor */}
-      <div className="mt-5 grid grid-cols-[1.4fr_1fr] gap-3">
+      <div className="mt-3 grid grid-cols-[1.4fr_1fr] gap-3">
         <div className="rounded-lg border border-[#e5e7eb] px-5 py-3">
           <p className={LABEL}>Pagos y transferencias</p>
           <p className="mt-1 text-[11px] font-semibold text-[#1f2937]">
@@ -848,7 +848,7 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
         </div>
       </div>
 
-      <div className="mt-5 flex justify-between border-t border-[#e5e7eb] pt-3 text-[10px] text-[#374151]">
+      <div className="mt-3 flex justify-between border-t border-[#e5e7eb] pt-2 text-[10px] text-[#374151]">
         <span className="font-semibold">mercadeo@terraformings.co · 321 423 0090</span>
         <span>Calle 10 # 4-40, Of. 1001, Edificio Bolsa de Occidente · Cali</span>
       </div>
