@@ -99,7 +99,8 @@ export const Route = createFileRoute("/terra")({
       { property: "og:title", content: "TERRA | Naturaleza que te pertenece" },
       {
         property: "og:description",
-        content: "Lotes para un mejor mañana. Naturaleza, comunidad y oportunidades en un solo lugar.",
+        content:
+          "Lotes para un mejor mañana. Naturaleza, comunidad y oportunidades en un solo lugar.",
       },
     ],
   }),
@@ -125,51 +126,54 @@ function TerraPage() {
 
           <div className="relative container-tf grid min-h-screen items-center gap-10 pt-32 pb-14 text-white lg:grid-cols-[minmax(0,1fr)_minmax(360px,460px)] lg:gap-12">
             <div className="min-w-0">
-            <Reveal>
-              <div className="max-w-2xl">
-                <div className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.22em] uppercase text-white">
-                  <span className="h-px w-8 bg-brand-orange" />
-                  <span className="text-white/95">Un proyecto único</span>
-                </div>
-                <h1 className="mt-4 font-display text-4xl sm:text-5xl md:text-6xl lg:text-[4.25rem] font-bold leading-[1.05] tracking-tight">
-                  Lotes para un <span className="text-brand-orange">mejor mañana</span>
-                </h1>
-                <p className="mt-5 max-w-xl text-base sm:text-lg text-white/90 leading-relaxed">
-                  Naturaleza, comunidad y oportunidades en un solo lugar.
-                </p>
-              </div>
-            </Reveal>
-
-            <div className="mt-10 grid gap-6 sm:grid-cols-3 max-w-4xl">
-              {HERO_STATS.map((s, i) => (
-                <Reveal key={i} delay={80 + i * 70}>
-                  <div className="flex items-start gap-3 text-sm sm:text-[15px] text-white/95 leading-snug">
-                    {s.icon}
-                    <p>
-                      {s.primary}
-                      {s.rest}
-                    </p>
+              <Reveal>
+                <div className="max-w-2xl">
+                  <div className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.22em] uppercase text-white">
+                    <span className="h-px w-8 bg-brand-orange" />
+                    <span className="text-white/95">Un proyecto único</span>
                   </div>
-                </Reveal>
-              ))}
-            </div>
+                  <h1 className="mt-4 font-display text-4xl sm:text-5xl md:text-6xl lg:text-[4.25rem] font-bold leading-[1.05] tracking-tight">
+                    Lotes para un <span className="text-brand-orange">mejor mañana</span>
+                  </h1>
+                  <p className="mt-5 max-w-xl text-base sm:text-lg text-white/90 leading-relaxed">
+                    Naturaleza, comunidad y oportunidades en un solo lugar.
+                  </p>
+                </div>
+              </Reveal>
 
-            <Reveal delay={280}>
-              <div className="mt-9 flex flex-wrap items-center gap-3 sm:gap-4">
-                <a
-                  href={WA_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex min-h-12 items-center gap-2.5 rounded-md bg-brand-orange px-6 sm:px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-white shadow-lg shadow-brand-orange/25 transition-all hover:brightness-110 hover:-translate-y-0.5"
-                >
-                  <WhatsAppIcon />
-                  Quiero más información
-                  <ArrowIcon />
-                </a>
+              <div className="mt-10 grid gap-6 sm:grid-cols-3 max-w-4xl">
+                {HERO_STATS.map((s, i) => (
+                  <Reveal key={i} delay={80 + i * 70}>
+                    <div className="flex items-start gap-3 text-sm sm:text-[15px] text-white/95 leading-snug">
+                      {s.icon}
+                      <p>
+                        {s.primary}
+                        {s.rest}
+                      </p>
+                    </div>
+                  </Reveal>
+                ))}
               </div>
-            </Reveal>
+
+              <Reveal delay={280}>
+                <div className="mt-9 flex flex-wrap items-center gap-3 sm:gap-4">
+                  <a
+                    href={WA_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-12 items-center gap-2.5 rounded-md bg-brand-orange px-6 sm:px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-white shadow-lg shadow-brand-orange/25 transition-all hover:brightness-110 hover:-translate-y-0.5"
+                  >
+                    <WhatsAppIcon />
+                    Quiero más información
+                    <ArrowIcon />
+                  </a>
+                </div>
+              </Reveal>
             </div>
-            <Reveal delay={200} className="w-full max-w-[460px] justify-self-center lg:justify-self-end">
+            <Reveal
+              delay={200}
+              className="w-full max-w-[460px] justify-self-center lg:justify-self-end"
+            >
               <TerraLeadForm />
             </Reveal>
           </div>
@@ -188,9 +192,9 @@ function TerraPage() {
                   Naturaleza y bienestar real
                 </h2>
                 <p className="mt-5 text-brand-dark/80 leading-relaxed max-w-xl">
-                  TERRA integra un entorno natural excepcional con espacios para vivir, invertir
-                  y crecer. El paisaje, el humedal y la comunidad se encuentran en un solo
-                  proyecto pensado para el largo plazo.
+                  TERRA integra un entorno natural excepcional con espacios para vivir, invertir y
+                  crecer. El paisaje, el humedal y la comunidad se encuentran en un solo proyecto
+                  pensado para el largo plazo.
                 </p>
               </div>
             </Reveal>
@@ -213,7 +217,9 @@ function TerraPage() {
                       <div className="text-[10px] font-semibold tracking-[0.18em] uppercase text-brand-orange">
                         Humedal natural
                       </div>
-                      <p className="text-sm text-white/90">Un ecosistema que te conecta con la vida.</p>
+                      <p className="text-sm text-white/90">
+                        Un ecosistema que te conecta con la vida.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -271,7 +277,9 @@ function TerraPage() {
                     <div className="text-[10px] font-semibold tracking-[0.18em] uppercase text-brand-orange">
                       Zona comercial
                     </div>
-                    <p className="text-sm text-white/90">Ubicación estratégica con parqueaderos y alto flujo.</p>
+                    <p className="text-sm text-white/90">
+                      Ubicación estratégica con parqueaderos y alto flujo.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -368,7 +376,9 @@ function TerraPage() {
                     <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-brand-navy text-brand-navy bg-white">
                       {a.icon}
                     </div>
-                    <h3 className="mt-4 text-sm font-semibold text-brand-navy leading-snug">{a.title}</h3>
+                    <h3 className="mt-4 text-sm font-semibold text-brand-navy leading-snug">
+                      {a.title}
+                    </h3>
                   </div>
                 </Reveal>
               ))}
@@ -377,7 +387,10 @@ function TerraPage() {
         </section>
 
         {/* Closing band — TERRA wordmark baked into the left of the image; copy/CTA on the navy right */}
-        <section id="contacto" className="relative overflow-hidden text-white py-20 sm:py-24 min-h-[420px] flex items-center">
+        <section
+          id="contacto"
+          className="relative overflow-hidden text-white py-20 sm:py-24 min-h-[420px] flex items-center"
+        >
           <img
             src={cierreImg}
             alt=""

@@ -70,30 +70,30 @@
 
 :root {
   --radius: 0.625rem;
-  --brand-navy: #0E2A47;
-  --brand-green: #5F8D4E;
-  --brand-orange: #F7941D;
-  --brand-gray: #F4F6F7;
+  --brand-navy: #0e2a47;
+  --brand-green: #5f8d4e;
+  --brand-orange: #f7941d;
+  --brand-gray: #f4f6f7;
   --brand-dark: #263746;
-  --background: #FFFFFF;
-  --foreground: #0E2A47;
-  --card: #FFFFFF;
-  --card-foreground: #0E2A47;
-  --popover: #FFFFFF;
-  --popover-foreground: #0E2A47;
-  --primary: #0E2A47;
-  --primary-foreground: #FFFFFF;
-  --secondary: #F4F6F7;
-  --secondary-foreground: #0E2A47;
-  --muted: #F4F6F7;
+  --background: #ffffff;
+  --foreground: #0e2a47;
+  --card: #ffffff;
+  --card-foreground: #0e2a47;
+  --popover: #ffffff;
+  --popover-foreground: #0e2a47;
+  --primary: #0e2a47;
+  --primary-foreground: #ffffff;
+  --secondary: #f4f6f7;
+  --secondary-foreground: #0e2a47;
+  --muted: #f4f6f7;
   --muted-foreground: #263746;
-  --accent: #F7941D;
-  --accent-foreground: #FFFFFF;
+  --accent: #f7941d;
+  --accent-foreground: #ffffff;
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: #E5E9EC;
-  --input: #E5E9EC;
-  --ring: #0E2A47;
+  --border: #e5e9ec;
+  --input: #e5e9ec;
+  --ring: #0e2a47;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -157,7 +157,12 @@
     text-rendering: optimizeLegibility;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-display);
     letter-spacing: -0.01em;
   }
@@ -173,9 +178,76 @@
 @utility fade-up {
   opacity: 0;
   transform: translateY(24px);
-  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  transition:
+    opacity 0.8s ease-out,
+    transform 0.8s ease-out;
 }
 @utility fade-up-in {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Cotizador interno TERRA: tokens del producto entregado, aislados del sitio corporativo. */
+.terra-cotizador-app {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.45 0.12 150);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.53 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.45 0.12 150);
+  --radius: 0.75rem;
+  font-family: "Inter", var(--font-sans);
+}
+
+.terra-cotizador-app.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.64 0.13 150);
+  --primary-foreground: oklch(0.15 0.01 150);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.64 0.13 150);
+}
+
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+
+  .terra-print-target,
+  .terra-print-target * {
+    visibility: visible !important;
+  }
+
+  .terra-print-target {
+    position: absolute !important;
+    inset: 0 auto auto 0 !important;
+    width: 800px !important;
+    box-shadow: none !important;
+  }
 }

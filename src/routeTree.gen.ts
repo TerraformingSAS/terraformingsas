@@ -10,12 +10,26 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PoliticaDePrivacidadRouteImport } from './routes/politica-de-privacidad'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TerraRouteImport } from './routes/terra'
+import { Route as ApiLotesRouteImport } from './routes/api.lotes'
+import { Route as ApiTerraEstadoRouteImport } from './routes/api.terra-estado'
+import { Route as TerraCotizadorRouteImport } from './routes/terra_.cotizador'
+import { Route as ApiAuthSalirRouteImport } from './routes/api.auth.salir'
+import { Route as ApiAuthSolicitarCodigoRouteImport } from './routes/api.auth.solicitar-codigo'
+import { Route as ApiAuthVerificarCodigoRouteImport } from './routes/api.auth.verificar-codigo'
+import { Route as ApiAuthYoRouteImport } from './routes/api.auth.yo'
+import { Route as TerraCotizadorLoginRouteImport } from './routes/terra_.cotizador_.login'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PoliticaDePrivacidadRoute = PoliticaDePrivacidadRouteImport.update({
+  id: '/politica-de-privacidad',
+  path: '/politica-de-privacidad',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -28,35 +42,148 @@ const TerraRoute = TerraRouteImport.update({
   path: '/terra',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiLotesRoute = ApiLotesRouteImport.update({
+  id: '/api/lotes',
+  path: '/api/lotes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTerraEstadoRoute = ApiTerraEstadoRouteImport.update({
+  id: '/api/terra-estado',
+  path: '/api/terra-estado',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TerraCotizadorRoute = TerraCotizadorRouteImport.update({
+  id: '/terra_/cotizador',
+  path: '/terra/cotizador',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthSalirRoute = ApiAuthSalirRouteImport.update({
+  id: '/api/auth/salir',
+  path: '/api/auth/salir',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthSolicitarCodigoRoute = ApiAuthSolicitarCodigoRouteImport.update({
+  id: '/api/auth/solicitar-codigo',
+  path: '/api/auth/solicitar-codigo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthVerificarCodigoRoute = ApiAuthVerificarCodigoRouteImport.update({
+  id: '/api/auth/verificar-codigo',
+  path: '/api/auth/verificar-codigo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthYoRoute = ApiAuthYoRouteImport.update({
+  id: '/api/auth/yo',
+  path: '/api/auth/yo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TerraCotizadorLoginRoute = TerraCotizadorLoginRouteImport.update({
+  id: '/terra_/cotizador_/login',
+  path: '/terra/cotizador/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/politica-de-privacidad': typeof PoliticaDePrivacidadRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terra': typeof TerraRoute
+  '/api/lotes': typeof ApiLotesRoute
+  '/api/terra-estado': typeof ApiTerraEstadoRoute
+  '/terra/cotizador': typeof TerraCotizadorRoute
+  '/api/auth/salir': typeof ApiAuthSalirRoute
+  '/api/auth/solicitar-codigo': typeof ApiAuthSolicitarCodigoRoute
+  '/api/auth/verificar-codigo': typeof ApiAuthVerificarCodigoRoute
+  '/api/auth/yo': typeof ApiAuthYoRoute
+  '/terra/cotizador/login': typeof TerraCotizadorLoginRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/politica-de-privacidad': typeof PoliticaDePrivacidadRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terra': typeof TerraRoute
+  '/api/lotes': typeof ApiLotesRoute
+  '/api/terra-estado': typeof ApiTerraEstadoRoute
+  '/terra/cotizador': typeof TerraCotizadorRoute
+  '/api/auth/salir': typeof ApiAuthSalirRoute
+  '/api/auth/solicitar-codigo': typeof ApiAuthSolicitarCodigoRoute
+  '/api/auth/verificar-codigo': typeof ApiAuthVerificarCodigoRoute
+  '/api/auth/yo': typeof ApiAuthYoRoute
+  '/terra/cotizador/login': typeof TerraCotizadorLoginRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/politica-de-privacidad': typeof PoliticaDePrivacidadRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terra': typeof TerraRoute
+  '/api/lotes': typeof ApiLotesRoute
+  '/api/terra-estado': typeof ApiTerraEstadoRoute
+  '/terra_/cotizador': typeof TerraCotizadorRoute
+  '/api/auth/salir': typeof ApiAuthSalirRoute
+  '/api/auth/solicitar-codigo': typeof ApiAuthSolicitarCodigoRoute
+  '/api/auth/verificar-codigo': typeof ApiAuthVerificarCodigoRoute
+  '/api/auth/yo': typeof ApiAuthYoRoute
+  '/terra_/cotizador_/login': typeof TerraCotizadorLoginRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/sitemap.xml' | '/terra'
+  fullPaths:
+    | '/'
+    | '/politica-de-privacidad'
+    | '/sitemap.xml'
+    | '/terra'
+    | '/api/lotes'
+    | '/api/terra-estado'
+    | '/terra/cotizador'
+    | '/api/auth/salir'
+    | '/api/auth/solicitar-codigo'
+    | '/api/auth/verificar-codigo'
+    | '/api/auth/yo'
+    | '/terra/cotizador/login'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/sitemap.xml' | '/terra'
-  id: '__root__' | '/' | '/sitemap.xml' | '/terra'
+  to:
+    | '/'
+    | '/politica-de-privacidad'
+    | '/sitemap.xml'
+    | '/terra'
+    | '/api/lotes'
+    | '/api/terra-estado'
+    | '/terra/cotizador'
+    | '/api/auth/salir'
+    | '/api/auth/solicitar-codigo'
+    | '/api/auth/verificar-codigo'
+    | '/api/auth/yo'
+    | '/terra/cotizador/login'
+  id:
+    | '__root__'
+    | '/'
+    | '/politica-de-privacidad'
+    | '/sitemap.xml'
+    | '/terra'
+    | '/api/lotes'
+    | '/api/terra-estado'
+    | '/terra_/cotizador'
+    | '/api/auth/salir'
+    | '/api/auth/solicitar-codigo'
+    | '/api/auth/verificar-codigo'
+    | '/api/auth/yo'
+    | '/terra_/cotizador_/login'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PoliticaDePrivacidadRoute: typeof PoliticaDePrivacidadRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TerraRoute: typeof TerraRoute
+  ApiLotesRoute: typeof ApiLotesRoute
+  ApiTerraEstadoRoute: typeof ApiTerraEstadoRoute
+  TerraCotizadorRoute: typeof TerraCotizadorRoute
+  ApiAuthSalirRoute: typeof ApiAuthSalirRoute
+  ApiAuthSolicitarCodigoRoute: typeof ApiAuthSolicitarCodigoRoute
+  ApiAuthVerificarCodigoRoute: typeof ApiAuthVerificarCodigoRoute
+  ApiAuthYoRoute: typeof ApiAuthYoRoute
+  TerraCotizadorLoginRoute: typeof TerraCotizadorLoginRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -66,6 +193,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/politica-de-privacidad': {
+      id: '/politica-de-privacidad'
+      path: '/politica-de-privacidad'
+      fullPath: '/politica-de-privacidad'
+      preLoaderRoute: typeof PoliticaDePrivacidadRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -82,13 +216,78 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TerraRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/lotes': {
+      id: '/api/lotes'
+      path: '/api/lotes'
+      fullPath: '/api/lotes'
+      preLoaderRoute: typeof ApiLotesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/terra-estado': {
+      id: '/api/terra-estado'
+      path: '/api/terra-estado'
+      fullPath: '/api/terra-estado'
+      preLoaderRoute: typeof ApiTerraEstadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terra_/cotizador': {
+      id: '/terra_/cotizador'
+      path: '/terra/cotizador'
+      fullPath: '/terra/cotizador'
+      preLoaderRoute: typeof TerraCotizadorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/salir': {
+      id: '/api/auth/salir'
+      path: '/api/auth/salir'
+      fullPath: '/api/auth/salir'
+      preLoaderRoute: typeof ApiAuthSalirRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/solicitar-codigo': {
+      id: '/api/auth/solicitar-codigo'
+      path: '/api/auth/solicitar-codigo'
+      fullPath: '/api/auth/solicitar-codigo'
+      preLoaderRoute: typeof ApiAuthSolicitarCodigoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/verificar-codigo': {
+      id: '/api/auth/verificar-codigo'
+      path: '/api/auth/verificar-codigo'
+      fullPath: '/api/auth/verificar-codigo'
+      preLoaderRoute: typeof ApiAuthVerificarCodigoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/yo': {
+      id: '/api/auth/yo'
+      path: '/api/auth/yo'
+      fullPath: '/api/auth/yo'
+      preLoaderRoute: typeof ApiAuthYoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terra_/cotizador_/login': {
+      id: '/terra_/cotizador_/login'
+      path: '/terra/cotizador/login'
+      fullPath: '/terra/cotizador/login'
+      preLoaderRoute: typeof TerraCotizadorLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PoliticaDePrivacidadRoute: PoliticaDePrivacidadRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TerraRoute: TerraRoute,
+  ApiLotesRoute: ApiLotesRoute,
+  ApiTerraEstadoRoute: ApiTerraEstadoRoute,
+  TerraCotizadorRoute: TerraCotizadorRoute,
+  ApiAuthSalirRoute: ApiAuthSalirRoute,
+  ApiAuthSolicitarCodigoRoute: ApiAuthSolicitarCodigoRoute,
+  ApiAuthVerificarCodigoRoute: ApiAuthVerificarCodigoRoute,
+  ApiAuthYoRoute: ApiAuthYoRoute,
+  TerraCotizadorLoginRoute: TerraCotizadorLoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
