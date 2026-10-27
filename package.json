@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "terra:verify": "node scripts/verify-terra-visor.mjs && node scripts/verify-terra-server.mjs",
-    "terra:test": "node --test src/server/terra/test/*.test.cjs"
+    "terra:test": "node --test src/server/terra/test/*.test.cjs && node --experimental-strip-types --test src/features/terra-cotizador/lib/financiacion.test.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

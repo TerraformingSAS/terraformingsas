@@ -33,6 +33,14 @@ import {
   type Estado,
   type Lote,
 } from "@/features/terra-cotizador/lib/lotes";
+import {
+  PLANES_MESES,
+  PORCENTAJES,
+  calcularFinanciacion,
+  type PlanFinanciacion,
+  type PlanMeses,
+  type PorcentajeFinanciacion,
+} from "@/features/terra-cotizador/lib/financiacion";
 import { useLotes } from "@/features/terra-cotizador/lib/datos";
 
 type Cotizacion = {
@@ -42,7 +50,7 @@ type Cotizacion = {
   email: string;
   vendedor: string;
   referido: string;
-  cuotas: number;
+  plan: PlanFinanciacion;
   codigo: string;
   fecha: Date;
   fechaLimite: Date;
@@ -59,13 +67,15 @@ export function HomePage() {
   const [cc, setCc] = useState("");
   const [email, setEmail] = useState("");
   const [fechaLimite, setFechaLimite] = useState<Date>(() => addDays(new Date(), 8));
-  const [cuotas, setCuotas] = useState("12");
+  const [porcentaje, setPorcentaje] = useState<PorcentajeFinanciacion>(70);
+  const [meses, setMeses] = useState<PlanMeses>(12);
   const [intentado, setIntentado] = useState(false);
   const [excelError, setExcelError] = useState("");
   const [cotizacion, setCotizacion] = useState<Cotizacion | null>(null);
 
   const lotes = useMemo(() => lotesQuery.data?.lotes ?? [], [lotesQuery.data]);
   const lote = lotes.find((l) => l.id === seleccion) ?? null;
+  const plan = lote ? calcularFinanciacion(lote.valorPreventa, porcentaje, meses) : null;
 
   const errores = {
     vendedor: vendedor ? "" : "No se pudo identificar al vendedor con tu inicio de sesión.",
@@ -78,7 +88,6 @@ export function HomePage() {
     cc: cc.trim() && !isValidCC(cc) ? "La cédula debe tener solo números (5 a 11 dígitos)." : "",
     email: email.trim() && !isValidEmail(email) ? "Correo con formato inválido." : "",
     contacto: !cc.trim() && !email.trim() ? "Ingresa la cédula o el correo (al menos uno)." : "",
-    cuotas: /^[0-9]+$/.test(cuotas.trim()) ? "" : "Indica el número de cuotas.",
   };
   const valido = Object.values(errores).every((e) => !e);
 
@@ -90,9 +99,8 @@ export function HomePage() {
       first?.focus();
       return;
     }
-    const meses = Number(cuotas);
     const deTabla = diferenciasTarifa(lote);
-    const inconsistencias = inconsistenciasExcel(lote, meses);
+    const inconsistencias = inconsistenciasExcel(lote);
     if (inconsistencias.length > 0) {
       setExcelError(inconsistencias.join(" "));
       if (deTabla.length > 0) void avisarDiferenciaDeTabla(lote.id);
@@ -100,6 +108,7 @@ export function HomePage() {
     }
     const fecha = new Date();
     const nombreLimpio = nombre.trim();
+    const planElegido = calcularFinanciacion(lote.valorPreventa, porcentaje, meses);
     setExcelError("");
     setCotizacion({
       lote,
@@ -108,7 +117,7 @@ export function HomePage() {
       email: email.trim(),
       vendedor: vendedor.trim(),
       referido: referido.trim(),
-      cuotas: meses,
+      plan: planElegido,
       codigo: codigoCotizacion(nombreLimpio, fecha, lote.idLote, meses),
       fecha,
       fechaLimite,
@@ -123,7 +132,8 @@ export function HomePage() {
     setCc("");
     setEmail("");
     setReferido("");
-    setCuotas("12");
+    setPorcentaje(70);
+    setMeses(12);
     setExcelError("");
     setIntentado(false);
     window.scrollTo({ top: 0 });
@@ -197,7 +207,7 @@ export function HomePage() {
         aria-label="Datos de la cotización"
         className="flex min-w-0 flex-col gap-4 lg:sticky lg:top-[4.5rem] lg:self-start"
       >
-        <LoteResumen lote={lote} />
+        <LoteResumen lote={lote} plan={plan} />
 
         <fieldset className="rounded-xl border border-border bg-card p-4">
           <legend className="sr-only">Asesor</legend>
@@ -267,19 +277,47 @@ export function HomePage() {
                 {errores.contacto}
               </p>
             )}
-            <Field id="cuotas" label="Número de cuotas *" error={showErr("cuotas")}>
-              <Input
-                id="cuotas"
-                value={cuotas}
-                onChange={(e) => {
-                  setCuotas(e.target.value);
-                  setExcelError("");
-                }}
-                inputMode="numeric"
-                aria-invalid={!!showErr("cuotas")}
-                aria-describedby="cuotas-err"
-              />
-            </Field>
+            <fieldset className="grid gap-2">
+              <legend className="text-sm font-medium">Financiación</legend>
+              <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Porcentaje a financiar">
+                {PORCENTAJES.map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    role="radio"
+                    aria-checked={porcentaje === p}
+                    onClick={() => setPorcentaje(p)}
+                    className={cn(
+                      "rounded-lg border px-3 py-2 text-sm font-semibold",
+                      porcentaje === p
+                        ? "border-[#f7941d] bg-[#fff8ef] text-[#0e2a47]"
+                        : "border-border bg-background",
+                    )}
+                  >
+                    {p}%
+                  </button>
+                ))}
+              </div>
+              <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Plazo">
+                {PLANES_MESES.map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    role="radio"
+                    aria-checked={meses === m}
+                    onClick={() => setMeses(m)}
+                    className={cn(
+                      "rounded-lg border px-3 py-2 text-sm font-semibold",
+                      meses === m
+                        ? "border-[#f7941d] bg-[#fff8ef] text-[#0e2a47]"
+                        : "border-border bg-background",
+                    )}
+                  >
+                    {m} meses
+                  </button>
+                ))}
+              </div>
+            </fieldset>
             <div className="grid gap-1.5">
               <Label htmlFor="fecha-limite">Separar antes del</Label>
               <Popover>
@@ -311,7 +349,9 @@ export function HomePage() {
             >
               <span className="font-semibold">Lote {lote.idLote}</span>
               <span className="tabular-nums">Valor {fmtCOP(lote.valorPreventa)}</span>
-              <span className="tabular-nums">Sep. {fmtCOP(lote.separacion)}</span>
+              <span className="tabular-nums">
+                {plan ? `${plan.meses} × ${fmtCOP(plan.cuota)}` : `Sep. ${fmtCOP(lote.separacion)}`}
+              </span>
             </p>
           )}
           {excelError && (
@@ -513,8 +553,8 @@ function LotMap({
   );
 }
 
-function LoteResumen({ lote }: { lote: Lote | null }) {
-  if (!lote) {
+function LoteResumen({ lote, plan }: { lote: Lote | null; plan: PlanFinanciacion | null }) {
+  if (!lote || !plan) {
     return (
       <div className="hidden rounded-xl border border-dashed border-border bg-card p-4 text-sm text-muted-foreground lg:block">
         Ningún lote seleccionado
@@ -552,7 +592,7 @@ function LoteResumen({ lote }: { lote: Lote | null }) {
         <div className="flex items-baseline justify-between gap-3 px-4 py-2.5 sm:block sm:py-3">
           <p className="text-[11px] font-bold uppercase tracking-[0.12em]">Separación</p>
           <p className="text-lg font-bold leading-tight tabular-nums text-green-800 sm:text-xl dark:text-green-400">
-            {fmtCOP(lote.separacion)}
+            {fmtCOP(plan.separacion)}
           </p>
         </div>
       </div>
@@ -566,22 +606,31 @@ function LoteResumen({ lote }: { lote: Lote | null }) {
           <dd className="tabular-nums">− {fmtCOP(lote.valorLote - lote.valorPreventa)}</dd>
         </div>
         <div className="flex flex-wrap items-baseline justify-between gap-x-3 py-2">
-          <dt className="font-semibold">Saldo a financiar</dt>
-          <dd className="font-semibold tabular-nums">{fmtCOP(lote.valorFinanciar)}</dd>
+          <dt>Saldo</dt>
+          <dd className="tabular-nums">{fmtCOP(plan.saldo)}</dd>
+        </div>
+        <div className="flex flex-wrap items-baseline justify-between gap-x-3 py-2">
+          <dt className="font-semibold">A financiar ({plan.porcentaje}%)</dt>
+          <dd className="font-semibold tabular-nums">{fmtCOP(plan.valorFinanciar)}</dd>
+        </div>
+        <div className="flex flex-wrap items-baseline justify-between gap-x-3 py-2">
+          <dt>Saldo contra entrega</dt>
+          <dd className="tabular-nums">{fmtCOP(plan.saldoContraEntrega)}</dd>
         </div>
       </dl>
 
       <div className="border-t border-border bg-muted/50 px-4 pb-3 pt-2">
-        <p className="text-[11px] font-bold uppercase tracking-[0.16em]">Cuota mensual</p>
+        <p className="text-[11px] font-bold uppercase tracking-[0.16em]">
+          Cuota mensual · {plan.porcentaje}%
+        </p>
         <dl className="mt-1 grid grid-cols-3 gap-1 text-center text-[13px] sm:gap-2 sm:text-sm">
-          {[
-            ["12 meses", lote.cuota12],
-            ["24 meses", lote.cuota24],
-            ["36 meses", lote.cuota36],
-          ].map(([k, v]) => (
-            <div key={k as string}>
-              <dt className="text-xs">{k}</dt>
-              <dd className="font-semibold tabular-nums">{fmtCOP(v as number)}</dd>
+          {plan.cuotas.map((e) => (
+            <div
+              key={e.meses}
+              className={cn(e.meses === plan.meses && "rounded-md bg-[#fff8ef] py-1")}
+            >
+              <dt className="text-xs">{e.meses} meses</dt>
+              <dd className="font-semibold tabular-nums">{fmtCOP(e.valor)}</dd>
             </div>
           ))}
         </dl>
@@ -609,7 +658,8 @@ async function enviarAMercadeo(c: Cotizacion): Promise<boolean> {
         cc: c.cc,
         email: c.email,
         referido: c.referido,
-        cuotas: c.cuotas,
+        cuotas: c.plan.meses,
+        porcentaje: c.plan.porcentaje,
         codigo: c.codigo,
         fecha: c.fecha.toISOString(),
         fechaLimite: c.fechaLimite.toISOString(),
@@ -677,6 +727,7 @@ const LABEL = "text-[10px] font-bold uppercase tracking-[0.14em] text-[#4b5563]"
 
 function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElement> }) {
   const l = c.lote;
+  const p = c.plan;
   const fecha = (d: Date) => format(d, "d 'de' MMMM 'de' yyyy", { locale: es });
   const proyecto = `TERRA - Etapa ${etapaRomana(l.etapa)}`;
   const descuentoValor = l.valorLote - l.valorPreventa;
@@ -753,48 +804,58 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
             Separación
           </p>
           <p className="text-2xl font-extrabold leading-tight text-[#0e2a47]">
-            {fmtCOP(l.separacion)}
+            {fmtCOP(p.separacion)}
           </p>
           <p className="mt-1 text-[11px] text-[#263746]">Antes del {fecha(c.fechaLimite)}</p>
         </div>
       </div>
 
-      <div className="mt-2 flex items-center justify-between rounded-lg bg-[#0e2a47] px-5 py-2.5 text-white">
-        <div>
-          <p className="text-sm font-bold uppercase tracking-[0.08em]">Saldo a financiar</p>
-          <p className="text-xs text-white/85">Valor del lote menos la separación</p>
+      <div className="mt-2 grid grid-cols-3 gap-2">
+        <div className="rounded-lg bg-[#0e2a47] px-4 py-2.5 text-white">
+          <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-white/75">Saldo</p>
+          <p className="text-lg font-extrabold leading-tight">{fmtCOP(p.saldo)}</p>
+          <p className="text-[10px] text-white/80">Preventa − separación</p>
         </div>
-        <p className="text-2xl font-extrabold text-[#f7941d]">{fmtCOP(l.valorFinanciar)}</p>
+        <div className="rounded-lg bg-[#0e2a47] px-4 py-2.5 text-white">
+          <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-white/75">
+            A financiar {p.porcentaje}%
+          </p>
+          <p className="text-lg font-extrabold leading-tight text-[#f7941d]">{fmtCOP(p.valorFinanciar)}</p>
+          <p className="text-[10px] text-white/80">{p.meses} meses · {fmtCOP(p.cuota)}</p>
+        </div>
+        <div className="rounded-lg border border-[#f6d7a8] bg-[#fff8ef] px-4 py-2.5">
+          <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#c56a00]">
+            Contra entrega
+          </p>
+          <p className="text-lg font-extrabold leading-tight text-[#0e2a47]">
+            {fmtCOP(p.saldoContraEntrega)}
+          </p>
+          <p className="text-[10px] text-[#263746]">{p.porcentaje === 100 ? "Sin saldo restante" : "30% del saldo"}</p>
+        </div>
       </div>
 
-      {/* Financiación */}
       <p className={cn("mt-3 text-xs font-bold uppercase tracking-[0.14em]", INK)}>
-        Opciones de financiación directa
+        Cuotas mensuales · financiación {p.porcentaje}%
       </p>
       <div className="mt-2 grid grid-cols-3 gap-3">
-        {[
-          { m: 12, v: l.cuota12, ipc: false },
-          { m: 24, v: l.cuota24, ipc: true },
-          { m: 36, v: l.cuota36, ipc: true },
-        ].map((e) => (
+        {p.cuotas.map((e) => (
           <div
-            key={e.m}
+            key={e.meses}
             className={cn(
               "rounded-lg border px-4 py-3 text-center",
-              e.m === c.cuotas ? "border-[#f7941d] bg-[#fff8ef]" : "border-[#e5e7eb]",
+              e.meses === p.meses ? "border-[#f7941d] bg-[#fff8ef]" : "border-[#e5e7eb]",
             )}
           >
             <p className={LABEL}>
-              {e.m} meses{e.m === c.cuotas ? " · elegido" : ""}
+              {e.meses} meses{e.meses === p.meses ? " · elegido" : ""}
             </p>
-            <p className={cn("text-xl font-bold", INK)}>{fmtCOP(e.v)}</p>
-            <p className="text-[11px] text-[#4b5563]">cuota mensual{e.ipc ? " *" : ""}</p>
+            <p className={cn("text-xl font-bold", INK)}>{fmtCOP(e.valor)}</p>
+            <p className="text-[11px] text-[#4b5563]">
+              {e.meses === 12 ? "sin interés" : "1% mensual"}
+            </p>
           </div>
         ))}
       </div>
-      <p className="mt-1.5 text-[10px] text-[#4b5563]">
-        * Las cuotas a 24 y 36 meses incluyen IPC y valorización.
-      </p>
 
       {/* Especificaciones */}
       <div className="mt-3 grid grid-cols-4 gap-3 rounded-lg bg-[#f6f7f5] px-4 py-2 text-[11px]">
@@ -828,11 +889,14 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
         </li>
         <li>
           El descuento de preventa se mantiene al confirmar la separación con el pago de{" "}
-          {fmtCOP(l.separacion)}.
+          {fmtCOP(p.separacion)}.
         </li>
-        <li>El saldo a financiar corresponde al valor del lote menos la separación.</li>
         <li>
-          Las opciones de financiación a 12, 24 o 36 meses están sujetas al plan de pagos acordado.
+          El saldo es el valor de preventa menos la separación. Se financia el {p.porcentaje}% de
+          ese saldo; el resto queda contra entrega.
+        </li>
+        <li>
+          Las cuotas a 12 meses no tienen interés. Las de 24 y 36 meses se calculan al 1% mensual.
         </li>
         <li>
           Esta cotización no implica reserva del lote ni perfecciona por sí sola su compraventa.
