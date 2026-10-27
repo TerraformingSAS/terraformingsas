@@ -11,7 +11,6 @@ import {
   ArrowIcon,
   BikeIcon,
   GreenZonesIcon,
-  HectareIcon,
   HomeIcon,
   MeetIcon,
   ParkIcon,
@@ -31,27 +30,10 @@ import { createFileRoute } from "@tanstack/react-router";
 const WA_URL =
   "https://wa.me/573214230090?text=Hola%20TERRA%2C%20quiero%20más%20información%20sobre%20el%20proyecto.";
 
-const HERO_STATS = [
-  {
-    icon: <HectareIcon className="text-white shrink-0" />,
-    primary: (
-      <>
-        <span className="text-2xl sm:text-3xl font-extrabold tracking-tight">20</span>{" "}
-        <span className="font-bold tracking-wide uppercase">Hectáreas</span>
-      </>
-    ),
-    rest: " de un gran futuro.",
-  },
-  {
-    icon: <HomeIcon className="text-white shrink-0" />,
-    primary: <span className="font-bold">Lotes residenciales</span>,
-    rest: "",
-  },
-  {
-    icon: <StoreIcon className="text-white shrink-0" />,
-    primary: <span className="font-bold">Locales comerciales</span>,
-    rest: "",
-  },
+const HERO_OFFERS = [
+  { value: "$5", unit: "millones", label: "Separa tu lote" },
+  { value: "70%", unit: "", label: "Te financiamos" },
+  { value: "30%", unit: "", label: "Paga a la entrega" },
 ];
 
 const FEATURES = [
@@ -114,7 +96,7 @@ function TerraPage() {
       <Header />
       <main>
         {/* Terra hero content (below shared header); gradient baked into photo */}
-        <section id="inicio" className="relative min-h-screen w-full overflow-hidden">
+        <section id="inicio" className="relative w-full overflow-hidden lg:min-h-screen">
           <img
             src={heroImg}
             alt="Vista aérea del desarrollo TERRA al atardecer"
@@ -123,56 +105,77 @@ function TerraPage() {
             height={1015}
             fetchPriority="high"
           />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-brand-navy/55 via-brand-navy/25 to-brand-navy/10" />
 
-          <div className="relative container-tf grid min-h-screen items-center gap-10 pt-32 pb-14 text-white lg:grid-cols-[minmax(0,1fr)_minmax(360px,460px)] lg:gap-12">
+          <div className="relative container-tf grid items-start gap-6 pt-20 pb-10 text-white sm:gap-8 sm:pb-12 lg:min-h-screen lg:grid-cols-[minmax(0,1fr)_minmax(340px,440px)] lg:gap-10 lg:pb-14">
             <div className="min-w-0">
               <Reveal>
-                <div className="max-w-2xl">
+                <div className="max-w-xl">
                   <div className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.22em] uppercase text-white">
                     <span className="h-px w-8 bg-brand-orange" />
                     <span className="text-white/95">Un proyecto único</span>
                   </div>
-                  <h1 className="mt-4 font-display text-4xl sm:text-5xl md:text-6xl lg:text-[4.25rem] font-bold leading-[1.05] tracking-tight">
-                    Lotes para un <span className="text-brand-orange">mejor mañana</span>
+                  <h1 className="mt-3 font-display text-[2rem] font-bold leading-[1.08] tracking-tight sm:text-5xl lg:text-[3.35rem]">
+                    Separa tu lote con solo{" "}
+                    <span className="text-brand-orange">$5 millones</span>
                   </h1>
-                  <p className="mt-5 max-w-xl text-base sm:text-lg text-white/90 leading-relaxed">
-                    Naturaleza, comunidad y oportunidades en un solo lugar.
+                  <p className="mt-3 max-w-lg text-sm leading-relaxed text-white/90 sm:text-base">
+                    Te financiamos el 70% del valor de tu lote y pagas el 30% restante a la entrega.
                   </p>
                 </div>
               </Reveal>
 
-              <div className="mt-10 grid gap-6 sm:grid-cols-3 max-w-4xl">
-                {HERO_STATS.map((s, i) => (
-                  <Reveal key={i} delay={80 + i * 70}>
-                    <div className="flex items-start gap-3 text-sm sm:text-[15px] text-white/95 leading-snug">
-                      {s.icon}
-                      <p>
-                        {s.primary}
-                        {s.rest}
+              <div className="mt-5 grid grid-cols-3 gap-2 sm:mt-6 sm:gap-3 max-w-xl">
+                {HERO_OFFERS.map((offer, i) => (
+                  <Reveal key={offer.value} delay={70 + i * 60}>
+                    <div className="h-full rounded-2xl border border-white/25 bg-white/10 px-2.5 py-3 shadow-[0_10px_30px_rgba(8,24,40,0.18)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:bg-white/15 sm:px-4 sm:py-4">
+                      <p className="font-display text-[1.65rem] font-bold leading-none tracking-tight text-white sm:text-4xl">
+                        {offer.value}
+                      </p>
+                      {offer.unit ? (
+                        <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-brand-orange sm:text-[11px]">
+                          {offer.unit}
+                        </p>
+                      ) : (
+                        <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-transparent sm:text-[11px]" aria-hidden="true">
+                          ·
+                        </p>
+                      )}
+                      <p className="mt-2 text-[11px] font-medium leading-snug text-white/90 sm:text-sm">
+                        {offer.label}
                       </p>
                     </div>
                   </Reveal>
                 ))}
               </div>
 
-              <Reveal delay={280}>
-                <div className="mt-9 flex flex-wrap items-center gap-3 sm:gap-4">
-                  <a
-                    href={WA_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex min-h-12 items-center gap-2.5 rounded-md bg-brand-orange px-6 sm:px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-white shadow-lg shadow-brand-orange/25 transition-all hover:brightness-110 hover:-translate-y-0.5"
-                  >
-                    <WhatsAppIcon />
-                    Quiero más información
-                    <ArrowIcon />
-                  </a>
-                </div>
-              </Reveal>
+              <p className="mt-4 max-w-xl text-[11px] leading-relaxed text-white/75 sm:text-xs">
+                20 hectáreas · Lotes residenciales · Locales comerciales. Lotes para un mejor mañana:
+                naturaleza, comunidad y oportunidades en un solo lugar.
+              </p>
+
+              <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
+                <a
+                  href="/terra/estado"
+                  className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-white underline-offset-4 transition hover:text-brand-orange hover:underline"
+                >
+                  Ver lotes disponibles
+                  <ArrowIcon />
+                </a>
+                <a
+                  href={WA_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-white/85 transition hover:text-white"
+                >
+                  <WhatsAppIcon />
+                  Quiero más información
+                </a>
+              </div>
             </div>
             <Reveal
-              delay={200}
-              className="w-full max-w-[460px] justify-self-center lg:justify-self-end"
+              delay={160}
+              className="w-full max-w-[440px] justify-self-center lg:justify-self-end"
             >
               <TerraLeadForm />
             </Reveal>

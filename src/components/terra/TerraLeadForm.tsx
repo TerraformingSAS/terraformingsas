@@ -104,10 +104,11 @@ export function TerraLeadForm() {
         <span className="inline-flex rounded-full bg-brand-green px-4 py-1.5 text-xs font-semibold uppercase tracking-wide">
           Cupos limitados
         </span>
-        <h2 className="mt-5 font-display text-2xl font-extrabold uppercase leading-tight sm:text-3xl">
-          Preventa hasta el <span className="text-brand-orange">15 de noviembre</span>
+        <h2 className="mt-4 font-display text-2xl font-extrabold leading-tight sm:text-[1.85rem]">
+          Recibe tu cotización
         </h2>
-        <p className="mt-3 text-sm leading-relaxed text-white/90">
+        <p className="mt-2 text-sm leading-relaxed text-white/90">
+          Preventa hasta el <span className="font-semibold text-brand-orange">15 de noviembre</span>.
           Déjanos tus datos para asegurar tu descuento en esta etapa.
         </p>
       </div>
