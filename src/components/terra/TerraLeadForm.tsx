@@ -21,7 +21,7 @@ const initial: Lead = {
 };
 
 const baseInput =
-  "w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-brand-navy outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20";
+  "w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm text-brand-navy outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20";
 
 export function TerraLeadForm() {
   const [values, setValues] = useState<Lead>(initial);
@@ -99,21 +99,21 @@ export function TerraLeadForm() {
   }
 
   return (
-    <div id="preventa-terra" className="overflow-hidden rounded-[2rem] border border-white/60 bg-white text-brand-navy shadow-2xl">
-      <div className="bg-brand-navy px-6 pb-6 pt-7 text-white sm:px-8">
-        <span className="inline-flex rounded-full bg-brand-green px-4 py-1.5 text-xs font-semibold uppercase tracking-wide">
+    <div id="preventa-terra" className="overflow-hidden rounded-[1.6rem] border border-white/60 bg-white text-brand-navy shadow-2xl">
+      <div className="bg-brand-navy px-5 pb-4 pt-5 text-white sm:px-6">
+        <span className="inline-flex rounded-full bg-brand-green px-3 py-1 text-[11px] font-semibold uppercase tracking-wide">
           Cupos limitados
         </span>
-        <h2 className="mt-4 font-display text-2xl font-extrabold leading-tight sm:text-[1.85rem]">
+        <h2 className="mt-2.5 font-display text-xl font-extrabold leading-tight sm:text-2xl">
           Recibe tu cotización
         </h2>
-        <p className="mt-2 text-sm leading-relaxed text-white/90">
+        <p className="mt-1.5 text-xs leading-relaxed text-white/90 sm:text-sm">
           Preventa hasta el <span className="font-semibold text-brand-orange">15 de noviembre</span>.
           Déjanos tus datos para asegurar tu descuento en esta etapa.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-3 px-5 py-6 sm:px-8 sm:py-7">
+      <form onSubmit={handleSubmit} className="space-y-2 px-4 py-4 sm:px-6 sm:py-5">
         <label className="sr-only" htmlFor="terra-nombre">Nombre completo</label>
         <input id="terra-nombre" name="nombre" type="text" autoComplete="name" className={baseInput}
           placeholder="Nombre completo *" aria-label="Nombre completo" value={values.nombre}
@@ -126,7 +126,7 @@ export function TerraLeadForm() {
         <input id="terra-correo" name="correo" type="email" autoComplete="email" className={baseInput}
           placeholder="Correo electrónico *" aria-label="Correo electrónico" value={values.correo}
           onChange={(event) => set("correo", event.target.value)} required maxLength={120} />
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <div>
             <label className="sr-only" htmlFor="terra-tipo-documento">Tipo de documento</label>
             <select id="terra-tipo-documento" name="tipo_documento" value={values.tipo_documento}
@@ -150,7 +150,7 @@ export function TerraLeadForm() {
           </div>
         </div>
         <div>
-          <label htmlFor="terra-referido-por" className="mb-1.5 block text-xs font-semibold text-brand-navy">
+          <label htmlFor="terra-referido-por" className="mb-1 block text-xs font-semibold text-brand-navy">
             ¿Quién te contó de nosotros? <span className="font-normal text-brand-dark/65">(opcional)</span>
           </label>
           <input id="terra-referido-por" name="referido_por" type="text" autoComplete="off"
@@ -158,7 +158,7 @@ export function TerraLeadForm() {
             value={values.referido_por} onChange={(event) => set("referido_por", event.target.value)}
             maxLength={100} />
         </div>
-        <label className="flex items-start gap-3 py-2 text-xs leading-relaxed text-brand-dark">
+        <label className="flex items-start gap-2.5 py-1 text-xs leading-relaxed text-brand-dark">
           <input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)}
             className="mt-0.5 h-4 w-4 shrink-0 accent-brand-green" required />
           <span>
@@ -168,7 +168,7 @@ export function TerraLeadForm() {
         </label>
         <Web3FormsCaptcha onTokenChange={setCaptchaToken} resetKey={captchaResetKey} />
         <button type="submit" disabled={sending || !consent || !captchaToken}
-          className="w-full rounded-xl bg-brand-orange px-5 py-4 text-sm font-bold uppercase text-white shadow-md transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60">
+          className="w-full rounded-xl bg-brand-orange px-5 py-3 text-sm font-bold uppercase text-white shadow-md transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60">
           {sending ? "Enviando..." : "Quiero mi descuento →"}
         </button>
         <p role="status" aria-live="polite" className={"text-center text-sm " + (sent ? "text-green-800" : "text-red-700")}>

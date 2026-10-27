@@ -96,7 +96,7 @@ function TerraPage() {
       <Header />
       <main>
         {/* Terra hero content (below shared header); gradient baked into photo */}
-        <section id="inicio" className="relative w-full overflow-hidden lg:min-h-screen">
+        <section id="inicio" className="relative w-full overflow-hidden">
           <img
             src={heroImg}
             alt="Vista aérea del desarrollo TERRA al atardecer"
@@ -107,15 +107,15 @@ function TerraPage() {
           />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-brand-navy/55 via-brand-navy/25 to-brand-navy/10" />
 
-          <div className="relative container-tf grid items-start gap-8 pt-20 pb-12 text-white sm:pb-14 lg:min-h-screen lg:grid-cols-[minmax(0,1fr)_minmax(340px,440px)] lg:items-stretch lg:gap-12 lg:pb-16">
-            <div className="flex min-w-0 flex-col gap-6 sm:gap-7 lg:h-full lg:justify-between lg:gap-10 lg:py-2">
+          <div className="relative container-tf grid items-start gap-8 pt-20 pb-12 text-white sm:pb-14 lg:grid-cols-[minmax(0,1fr)_minmax(320px,400px)] lg:gap-12 lg:pb-16">
+            <div className="min-w-0">
               <Reveal>
                 <div className="max-w-xl">
                   <div className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.22em] uppercase text-white">
                     <span className="h-px w-8 bg-brand-orange" />
                     <span className="text-white/95">Un proyecto único</span>
                   </div>
-                  <h1 className="mt-3 font-display text-[2rem] font-bold leading-[1.08] tracking-tight sm:text-5xl lg:text-[3.35rem]">
+                  <h1 className="mt-3 font-display text-[2rem] font-bold leading-[1.08] tracking-tight sm:text-5xl lg:text-[3.15rem]">
                     Separa tu lote con solo{" "}
                     <span className="text-brand-orange">$5 millones</span>
                   </h1>
@@ -125,23 +125,19 @@ function TerraPage() {
                 </div>
               </Reveal>
 
-              <div className="grid grid-cols-3 gap-2 sm:gap-3 max-w-xl">
+              <div className="mt-6 flex max-w-xl flex-col gap-3">
                 {HERO_OFFERS.map((offer, i) => (
                   <Reveal key={offer.value} delay={70 + i * 60}>
-                    <div className="h-full rounded-2xl border border-white/25 bg-white/10 px-2.5 py-3 shadow-[0_10px_30px_rgba(8,24,40,0.18)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:bg-white/15 sm:px-4 sm:py-4">
-                      <p className="font-display text-[1.65rem] font-bold leading-none tracking-tight text-white sm:text-4xl">
+                    <div className="flex items-center gap-4 rounded-2xl border border-white/30 bg-white/10 px-4 py-4 shadow-[0_12px_32px_rgba(8,24,40,0.22)] backdrop-blur-md sm:gap-6 sm:px-5 sm:py-5">
+                      <p className="min-w-[6.5rem] shrink-0 font-display text-4xl font-bold leading-none tracking-tight text-white sm:min-w-[8.5rem] sm:text-5xl">
                         {offer.value}
+                        {offer.unit ? (
+                          <span className="mt-1 block text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-orange sm:text-xs">
+                            {offer.unit}
+                          </span>
+                        ) : null}
                       </p>
-                      {offer.unit ? (
-                        <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-brand-orange sm:text-[11px]">
-                          {offer.unit}
-                        </p>
-                      ) : (
-                        <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-transparent sm:text-[11px]" aria-hidden="true">
-                          ·
-                        </p>
-                      )}
-                      <p className="mt-2 text-[11px] font-medium leading-snug text-white/90 sm:text-sm">
+                      <p className="text-base font-medium leading-snug text-white sm:text-lg">
                         {offer.label}
                       </p>
                     </div>
@@ -149,13 +145,13 @@ function TerraPage() {
                 ))}
               </div>
 
-              <div>
+              <div className="mt-6">
                 <p className="max-w-xl text-[11px] leading-relaxed text-white/75 sm:text-xs">
                   20 hectáreas · Lotes residenciales · Locales comerciales. Lotes para un mejor mañana:
                   naturaleza, comunidad y oportunidades en un solo lugar.
                 </p>
 
-                <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
+                <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
                   <a
                     href="/terra/estado"
                     className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-white underline-offset-4 transition hover:text-brand-orange hover:underline"
@@ -177,7 +173,7 @@ function TerraPage() {
             </div>
             <Reveal
               delay={160}
-              className="w-full max-w-[440px] justify-self-center lg:self-center lg:justify-self-end"
+              className="w-full max-w-[400px] justify-self-center lg:justify-self-end"
             >
               <TerraLeadForm />
             </Reveal>
