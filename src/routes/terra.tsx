@@ -107,7 +107,7 @@ function TerraPage() {
           />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-brand-navy/55 via-brand-navy/25 to-brand-navy/10" />
 
-          <div className="relative container-tf grid items-center gap-6 pt-24 pb-10 text-white sm:gap-8 sm:pt-28 sm:pb-14 lg:min-h-screen lg:grid-cols-[minmax(0,1fr)_minmax(340px,440px)] lg:gap-10 lg:pt-28">
+          <div className="relative container-tf grid items-start gap-6 pt-20 pb-10 text-white sm:gap-8 sm:pb-12 lg:min-h-screen lg:grid-cols-[minmax(0,1fr)_minmax(340px,440px)] lg:gap-10 lg:pb-14">
             <div className="min-w-0">
               <Reveal>
                 <div className="max-w-xl">
