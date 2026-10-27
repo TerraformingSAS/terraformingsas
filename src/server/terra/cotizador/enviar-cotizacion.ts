@@ -4,7 +4,6 @@ import { env } from "./env.js";
 import { noAutorizado, validarSesion } from "./session.js";
 import { filasDePrecios } from "./lotes.js";
 import {
-  cuotaDelPlan,
   etapaRomana,
   fmtCOP,
   fmtNum,
@@ -13,6 +12,11 @@ import {
   inconsistenciasExcel,
   toLote,
 } from "../../../features/terra-cotizador/lib/lotes.js";
+import {
+  calcularFinanciacion,
+  esPlanMeses,
+  esPorcentaje,
+} from "../../../features/terra-cotizador/lib/financiacion.js";
 
 const DESTINO = "mercadeo@terraformings.co";
 
@@ -23,6 +27,7 @@ type Body = {
   email?: unknown;
   referido?: unknown;
   cuotas?: unknown;
+  porcentaje?: unknown;
   fecha?: unknown;
   fechaLimite?: unknown;
 };
@@ -48,9 +53,16 @@ export async function POST(req: Request): Promise<Response> {
     const id = String(body.id ?? "").trim();
     const nombre = String(body.nombre ?? "").trim();
     const cuotas = Number(body.cuotas);
+    const porcentaje = Number(body.porcentaje);
     const fecha = new Date(String(body.fecha ?? ""));
     const fechaLimite = new Date(String(body.fechaLimite ?? ""));
-    if (!id || nombre.length < 3 || !Number.isFinite(cuotas) || Number.isNaN(fecha.getTime())) {
+    if (
+      !id ||
+      nombre.length < 3 ||
+      !esPlanMeses(cuotas) ||
+      !esPorcentaje(porcentaje) ||
+      Number.isNaN(fecha.getTime())
+    ) {
       return Response.json({ ok: false, error: "La cotización está incompleta." }, { status: 400 });
     }
 
@@ -62,12 +74,12 @@ export async function POST(req: Request): Promise<Response> {
         { status: 409 },
       );
     }
-    const fallas = inconsistenciasExcel(lote, cuotas);
+    const fallas = inconsistenciasExcel(lote);
     if (fallas.length > 0) {
       return Response.json({ ok: false, error: fallas.join(" ") }, { status: 422 });
     }
 
-    const cuota = cuotaDelPlan(lote, cuotas)!;
+    const plan = calcularFinanciacion(lote.valorPreventa, porcentaje, cuotas);
     const cc = String(body.cc ?? "").trim();
     const email = String(body.email ?? "").trim();
     const referido = String(body.referido ?? "").trim();
@@ -93,11 +105,13 @@ export async function POST(req: Request): Promise<Response> {
               area: fmtNum(lote.area),
               etapa: etapaRomana(lote.etapa),
               valor: fmtCOP(lote.valorPreventa),
-              separacion: fmtCOP(lote.separacion),
-              financiar: fmtCOP(lote.valorFinanciar),
+              separacion: fmtCOP(plan.separacion),
+              financiar: fmtCOP(plan.valorFinanciar),
               descuento: fmtPct(lote.descuento),
+              porcentaje: plan.porcentaje,
+              contraEntrega: fmtCOP(plan.saldoContraEntrega),
               cuotas,
-              cuota: fmtCOP(cuota),
+              cuota: fmtCOP(plan.cuota),
               fecha: fechaLarga(fecha),
               limite,
             }),
@@ -169,6 +183,8 @@ function correoHtml(d: {
   separacion: string;
   financiar: string;
   descuento: string;
+  porcentaje: number;
+  contraEntrega: string;
   cuotas: number;
   cuota: string;
   fecha: string;
@@ -194,8 +210,9 @@ ${fila("Etapa", d.etapa)}
 ${fila("Valor preventa", d.valor)}
 ${fila("Descuento", d.descuento)}
 ${fila("Separación", d.separacion)}
-${fila("Saldo a financiar", d.financiar)}
+${fila("A financiar", `${d.porcentaje}% · ${d.financiar}`)}
 ${fila("Cuotas", `${d.cuotas} × ${d.cuota}`)}
+${fila("Contra entrega", d.contraEntrega)}
 ${fila("Generada", d.fecha)}
 ${d.limite ? fila("Separar antes del", d.limite) : ""}
 </table>

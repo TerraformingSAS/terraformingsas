@@ -1,5 +1,6 @@
 import { apiFetch } from "@/features/terra-cotizador/lib/actividad";
 import { NoAutorizado, leerMotivo } from "@/features/terra-cotizador/lib/auth";
+import { SEPARACION_COP } from "./financiacion";
 
 const COLUMNS = [
   "No",
@@ -53,15 +54,6 @@ export const ESTADOS: { key: Estado; label: string; tile: string; dot: string }[
 ];
 export const estadoInfo = (e: Estado) => ESTADOS.find((x) => x.key === e)!;
 
-export const PLANES_CUOTAS = [12, 24, 36] as const;
-
-export function cuotaDelPlan(lote: Lote, meses: number): number | null {
-  if (meses === 12) return lote.cuota12;
-  if (meses === 24) return lote.cuota24;
-  if (meses === 36) return lote.cuota36;
-  return null;
-}
-
 /** Tabla oficial de preventa por tamaño. La cotización se niega si el Excel difiere. */
 export const TARIFA_PREVENTA = [
   { area: 120, valorM2: 617_500, preventa: 74_100_000 },
@@ -98,19 +90,10 @@ function cuadra(actual: number, esperado: number): boolean {
   return Math.abs(actual - esperado) <= Math.max(2, Math.abs(esperado) * 0.005);
 }
 
-/** Rechaza la cotización cuando la fila del Excel no cuadra o el plan no existe. */
-export function inconsistenciasExcel(lote: Lote, meses: number): string[] {
+/** Rechaza la cotización si el Excel no coincide con la tabla de preventa. */
+export function inconsistenciasExcel(lote: Lote): string[] {
   const mensajes: string[] = [...diferenciasTarifa(lote)];
-  const montos = [
-    lote.area,
-    lote.valorLote,
-    lote.descuento,
-    lote.valorPreventa,
-    lote.valorM2,
-    lote.separacion,
-    lote.saldoCuotaInicial,
-    lote.valorFinanciar,
-  ];
+  const montos = [lote.area, lote.valorLote, lote.descuento, lote.valorPreventa, lote.valorM2];
   if (montos.some((n) => !Number.isFinite(n) || n < 0)) {
     mensajes.push("El Excel tiene valores vacíos o no numéricos en este lote.");
   }
@@ -123,23 +106,10 @@ export function inconsistenciasExcel(lote: Lote, meses: number): string[] {
   if (!(lote.area > 0) || !cuadra(lote.valorM2, lote.valorPreventa / lote.area)) {
     mensajes.push("El valor por m² no coincide con el valor de preventa dividido por el área.");
   }
-  const conInicial = lote.valorPreventa - lote.separacion - lote.saldoCuotaInicial;
-  const sinInicial = lote.valorPreventa - lote.separacion;
-  if (!cuadra(lote.valorFinanciar, conInicial) && !cuadra(lote.valorFinanciar, sinInicial)) {
-    mensajes.push("El saldo a financiar no coincide con el valor de preventa menos la separación.");
-  }
-  if (!PLANES_CUOTAS.includes(meses as (typeof PLANES_CUOTAS)[number])) {
-    mensajes.push("El Excel solo tiene planes de 12, 24 y 36 cuotas.");
-  } else {
-    const cuota = cuotaDelPlan(lote, meses);
-    if (cuota === null || !Number.isFinite(cuota) || cuota <= 0) {
-      mensajes.push(`El Excel no tiene una cuota válida a ${meses} meses.`);
-    } else if (lote.valorFinanciar > 0) {
-      const total = cuota * meses;
-      if (total < lote.valorFinanciar * 0.95 || total > lote.valorFinanciar * 3) {
-        mensajes.push(`La cuota a ${meses} meses no cuadra con el saldo a financiar del Excel.`);
-      }
-    }
+  if (Number.isFinite(lote.separacion) && Math.abs(lote.separacion - SEPARACION_COP) > 1) {
+    mensajes.push(
+      `El Excel trae separación de ${fmtCOP(lote.separacion)} y la tabla fija ${fmtCOP(SEPARACION_COP)}.`,
+    );
   }
   return mensajes;
 }
