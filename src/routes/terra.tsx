@@ -107,8 +107,8 @@ function TerraPage() {
           />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-brand-navy/55 via-brand-navy/25 to-brand-navy/10" />
 
-          <div className="relative container-tf grid items-start gap-6 pt-20 pb-10 text-white sm:gap-8 sm:pb-12 lg:min-h-screen lg:grid-cols-[minmax(0,1fr)_minmax(340px,440px)] lg:gap-10 lg:pb-14">
-            <div className="min-w-0">
+          <div className="relative container-tf grid items-start gap-8 pt-20 pb-12 text-white sm:pb-14 lg:min-h-screen lg:grid-cols-[minmax(0,1fr)_minmax(340px,440px)] lg:items-stretch lg:gap-12 lg:pb-16">
+            <div className="flex min-w-0 flex-col gap-6 sm:gap-7 lg:h-full lg:justify-between lg:gap-10 lg:py-2">
               <Reveal>
                 <div className="max-w-xl">
                   <div className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.22em] uppercase text-white">
@@ -125,7 +125,7 @@ function TerraPage() {
                 </div>
               </Reveal>
 
-              <div className="mt-5 grid grid-cols-3 gap-2 sm:mt-6 sm:gap-3 max-w-xl">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3 max-w-xl">
                 {HERO_OFFERS.map((offer, i) => (
                   <Reveal key={offer.value} delay={70 + i * 60}>
                     <div className="h-full rounded-2xl border border-white/25 bg-white/10 px-2.5 py-3 shadow-[0_10px_30px_rgba(8,24,40,0.18)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:bg-white/15 sm:px-4 sm:py-4">
@@ -149,33 +149,35 @@ function TerraPage() {
                 ))}
               </div>
 
-              <p className="mt-4 max-w-xl text-[11px] leading-relaxed text-white/75 sm:text-xs">
-                20 hectáreas · Lotes residenciales · Locales comerciales. Lotes para un mejor mañana:
-                naturaleza, comunidad y oportunidades en un solo lugar.
-              </p>
+              <div>
+                <p className="max-w-xl text-[11px] leading-relaxed text-white/75 sm:text-xs">
+                  20 hectáreas · Lotes residenciales · Locales comerciales. Lotes para un mejor mañana:
+                  naturaleza, comunidad y oportunidades en un solo lugar.
+                </p>
 
-              <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
-                <a
-                  href="/terra/estado"
-                  className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-white underline-offset-4 transition hover:text-brand-orange hover:underline"
-                >
-                  Ver lotes disponibles
-                  <ArrowIcon />
-                </a>
-                <a
-                  href={WA_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-white/85 transition hover:text-white"
-                >
-                  <WhatsAppIcon />
-                  Quiero más información
-                </a>
+                <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
+                  <a
+                    href="/terra/estado"
+                    className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-white underline-offset-4 transition hover:text-brand-orange hover:underline"
+                  >
+                    Ver lotes disponibles
+                    <ArrowIcon />
+                  </a>
+                  <a
+                    href={WA_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-white/85 transition hover:text-white"
+                  >
+                    <WhatsAppIcon />
+                    Quiero más información
+                  </a>
+                </div>
               </div>
             </div>
             <Reveal
               delay={160}
-              className="w-full max-w-[440px] justify-self-center lg:justify-self-end"
+              className="w-full max-w-[440px] justify-self-center lg:self-center lg:justify-self-end"
             >
               <TerraLeadForm />
             </Reveal>
