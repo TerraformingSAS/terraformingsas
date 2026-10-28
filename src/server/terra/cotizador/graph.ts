@@ -34,7 +34,7 @@ async function token(): Promise<string> {
   return cache.token;
 }
 
-export async function graph<T = unknown>(path: string, init: RequestInit = {}): Promise<T> {
+export async function graph<T = unknown>(path: string, init: RequestInit = {}, attempt = 0): Promise<T> {
   let res: Response;
   try {
     res = await fetch(`https://graph.microsoft.com/v1.0${path}`, {
@@ -47,8 +47,26 @@ export async function graph<T = unknown>(path: string, init: RequestInit = {}): 
       },
     });
   } catch (e) {
+    const method = (init.method ?? "GET").toUpperCase();
+    if (
+      method === "GET" &&
+      e instanceof Error &&
+      (e.name === "TimeoutError" || e.name === "AbortError") &&
+      attempt < 1
+    ) {
+      await esperar(1500);
+      return graph(path, init, attempt + 1);
+    }
     if (e instanceof Error && e.name === "TimeoutError") throw new GraphError(504, path);
     throw e;
+  }
+  const method = (init.method ?? "GET").toUpperCase();
+  if (!res.ok && method === "GET" && (res.status === 429 || res.status === 503) && attempt < 1) {
+    await res.text().catch(() => "");
+    const retryAfter = Number(res.headers.get("retry-after"));
+    const wait = Number.isFinite(retryAfter) && retryAfter > 0 ? Math.min(retryAfter * 1000, 8_000) : 1_500;
+    await esperar(wait);
+    return graph(path, init, attempt + 1);
   }
   if (!res.ok) {
     console.error("graph error", res.status, path, await res.text().catch(() => ""));
@@ -56,4 +74,8 @@ export async function graph<T = unknown>(path: string, init: RequestInit = {}): 
   }
   if (res.status === 202 || res.status === 204) return undefined as T;
   return (await res.json()) as T;
+}
+
+function esperar(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
