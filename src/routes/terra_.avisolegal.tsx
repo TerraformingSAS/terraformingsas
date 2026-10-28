@@ -1,19 +1,17 @@
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { TerraLegalNoticeBody } from "@/components/terra/TerraLegalNotice";
+import { pageSeo } from "@/lib/seo";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/terra_/avisolegal")({
-  head: () => ({
-    meta: [
-      { title: "Información importante | TERRA" },
-      {
-        name: "description",
-        content:
-          "Aviso legal de TERRA: el proyecto está en estructuración, diseño y preventa preliminar. La información publicada es ilustrativa y no constituye oferta comercial.",
-      },
-    ],
-  }),
+  head: () =>
+    pageSeo({
+      title: "Información importante y aviso legal | TERRA",
+      description:
+        "Aviso legal de TERRA: el proyecto está en estructuración, diseño y preventa preliminar. La información publicada es ilustrativa y no constituye oferta comercial.",
+      path: "/terra/avisolegal",
+    }),
   component: TerraLegalNoticePage,
 });
 

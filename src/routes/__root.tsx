@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { type ReactNode } from "react";
 
+import { absoluteUrl } from "@/lib/seo";
 import appCss from "../styles.css?url";
 
 const GA_MEASUREMENT_ID = "G-T419MSNEWJ";
@@ -19,16 +20,16 @@ function NotFoundComponent() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">Página no encontrada</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+          La página que buscas no existe o cambió de dirección.
         </p>
         <div className="mt-6">
           <Link
             to="/"
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Go home
+            Ir al inicio
           </Link>
         </div>
       </div>
@@ -63,7 +64,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             href="/"
             className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
           >
-            Go home
+            Ir al inicio
           </a>
         </div>
       </div>
@@ -78,7 +79,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "TERRA FORMING | Ingeniería, construcción e infraestructura en Colombia" },
       { name: "description", content: "TERRA FORMING S.A.S. desarrolla soluciones integrales de infraestructura vial, urbanismo, obras civiles, acueductos, alcantarillados y movimiento de tierras en Colombia." },
-      { name: "keywords", content: "Constructora en Cali, obras civiles Colombia, infraestructura vial, pavimentación, acueductos y alcantarillados, urbanismo, movimiento de tierras, contratista obras civiles" },
+      { name: "keywords", content: "TERRA FORMING, constructora en Cali, obras civiles Colombia, infraestructura vial, pavimentación, acueductos y alcantarillados, urbanismo, movimiento de tierras, contratista de obras civiles, proyecto TERRA" },
       { name: "author", content: "TERRA FORMING S.A.S." },
       { name: "theme-color", content: "#0E2A47" },
       { property: "og:title", content: "TERRA FORMING | Ingeniería, construcción e infraestructura" },
@@ -113,18 +114,36 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         type: "application/ld+json",
         children: JSON.stringify({
           "@context": "https://schema.org",
-          "@type": "LocalBusiness",
-          name: "TERRA FORMING S.A.S.",
-          description: "Ingeniería, construcción e infraestructura en Colombia.",
-          address: {
-            "@type": "PostalAddress",
-            addressLocality: "Cali",
-            addressRegion: "Valle del Cauca",
-            addressCountry: "CO",
-          },
-          telephone: "+57 3214230090",
-          email: "gerencia@terraformings.co",
-          areaServed: "CO",
+          "@graph": [
+            {
+              "@type": ["Organization", "LocalBusiness"],
+              "@id": `${absoluteUrl("/")}#organization`,
+              name: "TERRA FORMING S.A.S.",
+              url: absoluteUrl("/"),
+              logo: absoluteUrl("/terra/estado/logo-terraforming.png"),
+              image: absoluteUrl("/terra/estado/logo-terraforming.png"),
+              description:
+                "Ingeniería, construcción e infraestructura vial, urbanismo y obras civiles en Colombia.",
+              email: "gerencia@terraformings.co",
+              telephone: "+573214230090",
+              address: {
+                "@type": "PostalAddress",
+                streetAddress: "Calle 10 # 4 - 40, Oficina 1001, Edificio Bolsa de Occidente",
+                addressLocality: "Cali",
+                addressRegion: "Valle del Cauca",
+                addressCountry: "CO",
+              },
+              areaServed: { "@type": "Country", name: "Colombia" },
+            },
+            {
+              "@type": "WebSite",
+              "@id": `${absoluteUrl("/")}#website`,
+              url: absoluteUrl("/"),
+              name: "TERRA FORMING",
+              inLanguage: "es-CO",
+              publisher: { "@id": `${absoluteUrl("/")}#organization` },
+            },
+          ],
         }),
       },
     ],

@@ -1,18 +1,16 @@
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { pageSeo } from "@/lib/seo";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/politica-de-privacidad")({
-  head: () => ({
-    meta: [
-      { title: "Política de datos y privacidad | TERRA FORMING" },
-      {
-        name: "description",
-        content:
-          "Conoce cómo TERRA FORMING S.A.S. recolecta, utiliza y protege tus datos personales y cómo ejercer tus derechos.",
-      },
-    ],
-  }),
+  head: () =>
+    pageSeo({
+      title: "Política de datos y privacidad | TERRA FORMING",
+      description:
+        "Conoce cómo TERRA FORMING S.A.S. recolecta, utiliza y protege tus datos personales y cómo ejercer tus derechos de consulta, rectificación y supresión.",
+      path: "/politica-de-privacidad",
+    }),
   component: PrivacyPolicyPage,
 });
 

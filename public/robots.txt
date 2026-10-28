@@ -1,2 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /terra/cotizador
+
+Sitemap: https://www.terraformings.co/sitemap.xml

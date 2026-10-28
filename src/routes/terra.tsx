@@ -26,6 +26,7 @@ import {
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { TerraLeadForm } from "@/components/terra/TerraLeadForm";
 import { TERRA_LEGAL_NOTICE_PATH, TerraLegalNoticeBody } from "@/components/terra/TerraLegalNotice";
+import { absoluteUrl, pageSeo } from "@/lib/seo";
 import { createFileRoute } from "@tanstack/react-router";
 
 const WA_URL =
@@ -95,18 +96,32 @@ const AMENITIES = [
 
 export const Route = createFileRoute("/terra")({
   head: () => ({
-    meta: [
-      { title: "TERRA | Naturaleza que te pertenece" },
+    ...pageSeo({
+      title: "TERRA | Lotes residenciales y locales comerciales",
+      description:
+        "TERRA es un proyecto inmobiliario en estructuración y preventa preliminar: lotes residenciales, locales comerciales, humedal natural y zonas verdes. Conoce la información del proyecto.",
+      path: "/terra",
+    }),
+    scripts: [
       {
-        name: "description",
-        content:
-          "TERRA: lotes residenciales y locales comerciales en un proyecto con humedal natural, zonas verdes y oportunidades de valorización.",
-      },
-      { property: "og:title", content: "TERRA | Naturaleza que te pertenece" },
-      {
-        property: "og:description",
-        content:
-          "Lotes para un mejor mañana. Naturaleza, comunidad y oportunidades en un solo lugar.",
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "@id": `${absoluteUrl("/terra")}#webpage`,
+          url: absoluteUrl("/terra"),
+          name: "TERRA | Lotes residenciales y locales comerciales",
+          inLanguage: "es-CO",
+          isPartOf: { "@id": `${absoluteUrl("/")}#website` },
+          about: {
+            "@type": "Place",
+            name: "TERRA",
+            description:
+              "Proyecto inmobiliario en fase de estructuración, diseño y preventa preliminar.",
+          },
+          description:
+            "Página del proyecto TERRA, en fase de estructuración, diseño y preventa preliminar. La información publicada es ilustrativa.",
+        }),
       },
     ],
   }),
