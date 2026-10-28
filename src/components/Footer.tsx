@@ -68,6 +68,7 @@ export function Footer() {
         <div className="flex flex-wrap gap-x-5 gap-y-2">
           <a href="/politica-de-privacidad" className="hover:text-white">Política de privacidad</a>
           <a href="/politica-de-privacidad" className="hover:text-white">Tratamiento de datos</a>
+          <a href="/terra/avisolegal" className="hover:text-white">Información importante</a>
         </div>
       </div>
     </footer>

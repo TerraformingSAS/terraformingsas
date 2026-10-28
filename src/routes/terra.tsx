@@ -25,10 +25,14 @@ import {
 } from "@/components/terra/icons";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { TerraLeadForm } from "@/components/terra/TerraLeadForm";
+import { TERRA_LEGAL_NOTICE_PATH, TerraLegalNoticeBody } from "@/components/terra/TerraLegalNotice";
 import { createFileRoute } from "@tanstack/react-router";
 
 const WA_URL =
-  "https://wa.me/573214230090?text=Hola%20TERRA%2C%20quiero%20más%20información%20sobre%20el%20proyecto.";
+  "https://wa.me/573214230090?text=" +
+  encodeURIComponent(
+    "Hola TERRA, quiero más información sobre el proyecto. Información importante: https://www.terraformings.co/terra/avisolegal",
+  );
 
 const TERRA_MAP_EMBED =
   "https://www.google.com/maps/d/u/0/embed?mid=1W2I5RfshHNClX4RHmQsCxKhD0VJ12TY&ehbc=2E312F&noprof=1";
@@ -187,6 +191,12 @@ function TerraPage() {
                   >
                     <WhatsAppIcon />
                     Quiero más información
+                  </a>
+                  <a
+                    href={TERRA_LEGAL_NOTICE_PATH}
+                    className="inline-flex min-h-11 items-center text-sm font-medium text-white/85 underline-offset-4 transition hover:text-white hover:underline"
+                  >
+                    Información importante
                   </a>
                 </div>
               </div>
@@ -471,6 +481,24 @@ function TerraPage() {
           </div>
         </section>
 
+        <section id="informacion-importante" className="bg-white py-16 sm:py-20">
+          <div className="container-tf max-w-3xl">
+            <Reveal>
+              <h2 className="font-display text-2xl font-bold leading-tight text-brand-navy sm:text-3xl">
+                Información importante
+              </h2>
+              <TerraLegalNoticeBody />
+              <a
+                href={TERRA_LEGAL_NOTICE_PATH}
+                className="mt-6 inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-brand-navy underline-offset-4 transition hover:text-brand-orange hover:underline"
+              >
+                Ver aviso legal
+                <ArrowIcon />
+              </a>
+            </Reveal>
+          </div>
+        </section>
+
         {/* Closing band — TERRA wordmark baked into the left of the image; copy/CTA on the navy right */}
         <section
           id="contacto"
@@ -503,6 +531,12 @@ function TerraPage() {
                     <WhatsAppIcon />
                     +57 321 423 0090 Escríbenos por WhatsApp
                     <ArrowIcon />
+                  </a>
+                  <a
+                    href={TERRA_LEGAL_NOTICE_PATH}
+                    className="mt-4 block text-sm font-medium text-white/85 underline-offset-4 hover:text-white hover:underline"
+                  >
+                    Información importante
                   </a>
                 </div>
               </div>
