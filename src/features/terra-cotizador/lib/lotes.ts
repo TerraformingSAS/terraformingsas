@@ -114,24 +114,27 @@ export function inconsistenciasExcel(lote: Lote): string[] {
   return mensajes;
 }
 
-export function codigoCotizacion(nombre: string, fecha: Date, idLote: string): string {
+export function codigoCotizacion(nombre: string, fecha: Date, idLote: string, cuotas: number): string {
   const partes = nombre
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toUpperCase()
     .split(/[^A-Z0-9]+/)
     .filter(Boolean);
-  const persona =
-    partes.length > 1 ? `${partes[0]}_${partes[partes.length - 1]}` : partes[0] || "NOMBRE";
+  const nom = partes[0] || "NOMBRE";
+  const apellido = partes.length > 1 ? partes[partes.length - 1] : "APELLIDO";
   const fmt = new Intl.DateTimeFormat("en-GB", {
     timeZone: "America/Bogota",
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
   });
   const p = Object.fromEntries(fmt.formatToParts(fecha).map((x) => [x.type, x.value]));
   const lote = idLote.toUpperCase().replace(/[^A-Z0-9]+/g, "-");
-  return `CT-${persona}-${p.day}-${p.month}-${p.year}-${lote}`;
+  return `CT-${nom}_${apellido}-${p.day}-${p.month}-${p.year}-${p.hour}-${p.minute}-${lote}-${String(cuotas).padStart(2, "0")}`;
 }
 
 /** Maps the workbook's Estado text; blanks, 0 or unknown values are "No disponible". */
