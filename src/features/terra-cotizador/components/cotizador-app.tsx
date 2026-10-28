@@ -2,8 +2,10 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Loader2, LogOut, Moon, RotateCw, Sun } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
+import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import emblem from "@/features/terra-cotizador/assets/tf-emblem-light.png";
+import logoColor from "@/assets/logo.png";
+import { Link } from "@tanstack/react-router";
 import { HomePage } from "@/features/terra-cotizador/pages/home";
 import { useLotes } from "@/features/terra-cotizador/lib/datos";
 import { fmtFechaHora } from "@/features/terra-cotizador/lib/lotes";
@@ -120,54 +122,47 @@ function CotizadorShell({ children }: { children: ReactNode }) {
       >
         Saltar al cotizador
       </a>
-      <header className="sticky top-0 z-30 border-b-2 border-[#f7941d] bg-[#0e2a47] text-white">
-        <div className="mx-auto flex h-16 max-w-7xl items-center gap-2.5 px-3 sm:gap-3 sm:px-4">
-          <img src={emblem} alt="" aria-hidden="true" className="h-7 w-auto shrink-0 sm:h-8" />
-          <div className="flex min-w-0 flex-col leading-tight">
-            <span
-              className="truncate text-sm font-bold tracking-[0.18em] sm:text-base sm:tracking-[0.28em]"
-              aria-label="Terra Forming"
+      <header className="sticky top-0 z-30 border-b border-border bg-white/95 shadow-sm backdrop-blur">
+        <div className="container-tf flex h-18 items-center justify-between gap-3 py-3">
+          <Link to="/" className="flex shrink-0 items-center gap-3" aria-label="TERRA FORMING inicio">
+            <img src={logoColor} alt="TERRA FORMING" className="h-11 w-auto" width={300} height={83} />
+          </Link>
+          <p className="hidden min-w-0 truncate text-sm font-medium tracking-wide text-brand-navy sm:block">
+            Cotizador preventa
+          </p>
+          <div className="ml-auto flex items-center gap-1 sm:gap-2">
+            <span className="hidden max-w-48 truncate text-sm font-medium text-brand-navy md:inline">
+              {sesion.data?.nombre}
+            </span>
+            <button
+              type="button"
+              onClick={toggle}
+              aria-pressed={dark}
+              aria-label={dark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+              className="grid size-10 shrink-0 place-items-center rounded-md text-brand-navy transition-colors hover:text-brand-orange focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
             >
-              <span className="text-white">TERRA</span>{" "}
-              <span className="text-[#8fbf7a]">FORMING</span>
-            </span>
-            <span className="flex items-center gap-1.5 truncate text-[10px] uppercase tracking-[0.1em] text-white/75 sm:text-[11px] sm:tracking-[0.16em]">
-              Cotizador preventa
-              <span
-                className="hidden size-1 shrink-0 rounded-full bg-[#f7941d] min-[400px]:inline-block"
-                aria-hidden="true"
-              />
-              <span className="hidden min-[400px]:inline">Etapa I</span>
-            </span>
+              {dark ? (
+                <Sun className="size-5" aria-hidden="true" />
+              ) : (
+                <Moon className="size-5" aria-hidden="true" />
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => void salir()}
+              aria-label="Cerrar sesión"
+              className="grid size-10 shrink-0 place-items-center rounded-md text-brand-navy transition-colors hover:text-brand-orange focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
+            >
+              <LogOut className="size-5" aria-hidden="true" />
+            </button>
           </div>
-          <span className="ml-auto hidden max-w-48 truncate text-xs text-white/80 md:inline">
-            {sesion.data?.nombre}
-          </span>
-          <button
-            type="button"
-            onClick={toggle}
-            aria-pressed={dark}
-            aria-label={dark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
-            className="ml-auto grid size-10 shrink-0 place-items-center rounded-full border border-white/20 text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:ml-0"
-          >
-            {dark ? (
-              <Sun className="size-5" aria-hidden="true" />
-            ) : (
-              <Moon className="size-5" aria-hidden="true" />
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={() => void salir()}
-            aria-label="Cerrar sesión"
-            className="grid size-10 shrink-0 place-items-center rounded-full border border-white/20 text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-          >
-            <LogOut className="size-5" aria-hidden="true" />
-          </button>
         </div>
       </header>
       <main className="flex flex-1 flex-col">{children}</main>
-      <FuenteFooter />
+      <div className="pb-36 lg:pb-0">
+        <FuenteFooter />
+        <Footer />
+      </div>
       <Toaster />
     </div>
   );
@@ -176,7 +171,7 @@ function CotizadorShell({ children }: { children: ReactNode }) {
 function FuenteFooter() {
   const query = useLotes();
   return (
-    <footer className="border-t border-border bg-background px-4 pb-32 pt-3 text-center text-xs lg:pb-3">
+    <p className="border-t border-border bg-white px-4 py-3 text-center text-xs text-brand-navy/70">
       <span className="font-medium">Precios actualizados:</span>{" "}
       {query.isPending ? (
         "consultando…"
@@ -187,6 +182,6 @@ function FuenteFooter() {
           {fmtFechaHora(query.data.actualizado)}
         </time>
       )}
-    </footer>
+    </p>
   );
 }
