@@ -12,9 +12,17 @@ import { Projects } from "@/components/Projects";
 import { Sectors } from "@/components/Sectors";
 import { Services } from "@/components/Services";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { pageSeo } from "@/lib/seo";
 import { createFileRoute, useRouterState } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
+  head: () =>
+    pageSeo({
+      title: "TERRA FORMING | Ingeniería, construcción e infraestructura en Colombia",
+      description:
+        "TERRA FORMING S.A.S. diseña y construye infraestructura vial, urbanismo, acueductos, alcantarillados y obras civiles para proyectos públicos y privados en Colombia. Oficina en Cali.",
+      path: "/",
+    }),
   component: Index,
 });
 

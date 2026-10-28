@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 
-const BASE_URL = "";
+import { SITE_URL } from "@/lib/seo";
+
+const BASE_URL = SITE_URL;
 
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
@@ -12,6 +14,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
           `  <url><loc>${BASE_URL}/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>`,
           `  <url><loc>${BASE_URL}/terra</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>`,
+          `  <url><loc>${BASE_URL}/terra/estado</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>`,
           `  <url><loc>${BASE_URL}/politica-de-privacidad</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>`,
           `  <url><loc>${BASE_URL}/terra/avisolegal</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>`,
           `</urlset>`,
