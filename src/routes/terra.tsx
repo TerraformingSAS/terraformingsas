@@ -30,6 +30,24 @@ import { createFileRoute } from "@tanstack/react-router";
 const WA_URL =
   "https://wa.me/573214230090?text=Hola%20TERRA%2C%20quiero%20más%20información%20sobre%20el%20proyecto.";
 
+const TERRA_MAP_EMBED =
+  "https://www.google.com/maps/d/u/0/embed?mid=1W2I5RfshHNClX4RHmQsCxKhD0VJ12TY&ehbc=2E312F&noprof=1";
+
+const LOCATION_POINTS = [
+  {
+    title: "20 hectáreas",
+    desc: "Un predio amplio para lotes residenciales, locales comerciales y zonas verdes.",
+  },
+  {
+    title: "Acceso desde la vía existente",
+    desc: "La Etapa I se conecta por el acceso señalado en el plano y se entrega con vías pavimentadas.",
+  },
+  {
+    title: "Humedal y quebrada",
+    desc: "El paisaje natural —humedal y quebrada— organiza el proyecto y define su entorno.",
+  },
+];
+
 const HERO_OFFERS = [
   { value: "$5", unit: "millones", label: "Separa tu lote" },
   { value: "70%", unit: "", label: "Te financiamos" },
@@ -180,6 +198,55 @@ function TerraPage() {
           </div>
         </section>
 
+        <section id="ubicacion" className="bg-brand-gray py-16 sm:py-24">
+          <div className="container-tf grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
+            <Reveal>
+              <div className="overflow-hidden rounded-xl border border-brand-navy/10 bg-white shadow-sm">
+                <iframe
+                  src={TERRA_MAP_EMBED}
+                  title="Mapa de ubicación del proyecto TERRA"
+                  width={640}
+                  height={480}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="aspect-[4/3] h-auto w-full border-0"
+                />
+              </div>
+            </Reveal>
+            <Reveal delay={100}>
+              <div>
+                <div className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.22em] uppercase text-brand-orange">
+                  <span className="h-px w-8 bg-brand-orange" />
+                  Ubicación
+                </div>
+                <h2 className="mt-4 font-display text-3xl font-bold leading-tight text-brand-navy sm:text-4xl">
+                  El proyecto en su entorno
+                </h2>
+                <p className="mt-5 max-w-xl leading-relaxed text-brand-dark/80">
+                  TERRA se desarrolla sobre un terreno de 20 hectáreas pensado para vivir e invertir.
+                  En el mapa ves el predio, el acceso y cómo se relacionan las etapas con el paisaje
+                  que las rodea.
+                </p>
+                <ul className="mt-8 space-y-5">
+                  {LOCATION_POINTS.map((point) => (
+                    <li key={point.title}>
+                      <h3 className="text-base font-semibold text-brand-navy">{point.title}</h3>
+                      <p className="mt-1 text-sm leading-relaxed text-brand-dark/75">{point.desc}</p>
+                    </li>
+                  ))}
+                </ul>
+                <a
+                  href="/terra/estado"
+                  className="mt-8 inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-brand-navy underline-offset-4 transition hover:text-brand-orange hover:underline"
+                >
+                  Ver la distribución de lotes
+                  <ArrowIcon />
+                </a>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
         {/* Naturaleza y bienestar */}
         <section id="proyecto" className="py-20 sm:py-28 bg-white">
           <div className="container-tf grid gap-10 lg:grid-cols-2 lg:gap-14 items-center">
@@ -229,7 +296,7 @@ function TerraPage() {
           </div>
         </section>
 
-        <section id="ubicacion" className="py-16 sm:py-20 bg-brand-gray">
+        <section className="py-16 sm:py-20 bg-white">
           <div className="container-tf">
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {FEATURES.map((f, i) => (
