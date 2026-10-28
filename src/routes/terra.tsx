@@ -25,7 +25,7 @@ import {
 } from "@/components/terra/icons";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { TerraLeadForm } from "@/components/terra/TerraLeadForm";
-import { TERRA_LEGAL_NOTICE_PATH, TerraLegalNoticeBody } from "@/components/terra/TerraLegalNotice";
+import { TERRA_LEGAL_NOTICE_PATH } from "@/components/terra/TerraLegalNotice";
 import { absoluteUrl, pageSeo } from "@/lib/seo";
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -493,24 +493,6 @@ function TerraPage() {
                 </Reveal>
               ))}
             </div>
-          </div>
-        </section>
-
-        <section id="informacion-importante" className="bg-white py-16 sm:py-20">
-          <div className="container-tf max-w-3xl">
-            <Reveal>
-              <h2 className="font-display text-2xl font-bold leading-tight text-brand-navy sm:text-3xl">
-                Información importante
-              </h2>
-              <TerraLegalNoticeBody />
-              <a
-                href={TERRA_LEGAL_NOTICE_PATH}
-                className="mt-6 inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-brand-navy underline-offset-4 transition hover:text-brand-orange hover:underline"
-              >
-                Ver aviso legal
-                <ArrowIcon />
-              </a>
-            </Reveal>
           </div>
         </section>
 
