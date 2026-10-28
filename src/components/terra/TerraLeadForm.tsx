@@ -171,6 +171,13 @@ export function TerraLeadForm() {
           className="w-full rounded-xl bg-brand-orange px-5 py-3 text-sm font-bold uppercase text-white shadow-md transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60">
           {sending ? "Enviando..." : "Quiero mi descuento →"}
         </button>
+        <p className="text-center text-xs leading-relaxed text-brand-dark/70">
+          Antes de separar o pedir información, lee la{" "}
+          <a href="/terra/avisolegal" className="font-semibold text-brand-navy underline underline-offset-4 hover:text-brand-orange">
+            Información importante
+          </a>
+          .
+        </p>
         <p role="status" aria-live="polite" className={"text-center text-sm " + (sent ? "text-green-800" : "text-red-700")}>
           {feedback}
         </p>

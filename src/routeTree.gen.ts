@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as PoliticaDePrivacidadRouteImport } from './routes/politica-de-privacidad'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TerraRouteImport } from './routes/terra'
+import { Route as TerraAvisolegalRouteImport } from './routes/terra_.avisolegal'
 import { Route as ApiLotesRouteImport } from './routes/api.lotes'
 import { Route as ApiTerraEstadoRouteImport } from './routes/api.terra-estado'
 import { Route as TerraCotizadorRouteImport } from './routes/terra_.cotizador'
@@ -42,6 +43,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const TerraRoute = TerraRouteImport.update({
   id: '/terra',
   path: '/terra',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TerraAvisolegalRoute = TerraAvisolegalRouteImport.update({
+  id: '/terra_/avisolegal',
+  path: '/terra/avisolegal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiLotesRoute = ApiLotesRouteImport.update({
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/politica-de-privacidad': typeof PoliticaDePrivacidadRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terra': typeof TerraRoute
+  '/terra/avisolegal': typeof TerraAvisolegalRoute
   '/api/lotes': typeof ApiLotesRoute
   '/api/terra-estado': typeof ApiTerraEstadoRoute
   '/terra/cotizador': typeof TerraCotizadorRoute
@@ -116,6 +123,7 @@ export interface FileRoutesByTo {
   '/politica-de-privacidad': typeof PoliticaDePrivacidadRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terra': typeof TerraRoute
+  '/terra/avisolegal': typeof TerraAvisolegalRoute
   '/api/lotes': typeof ApiLotesRoute
   '/api/terra-estado': typeof ApiTerraEstadoRoute
   '/terra/cotizador': typeof TerraCotizadorRoute
@@ -133,6 +141,7 @@ export interface FileRoutesById {
   '/politica-de-privacidad': typeof PoliticaDePrivacidadRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terra': typeof TerraRoute
+  '/terra_/avisolegal': typeof TerraAvisolegalRoute
   '/api/lotes': typeof ApiLotesRoute
   '/api/terra-estado': typeof ApiTerraEstadoRoute
   '/terra_/cotizador': typeof TerraCotizadorRoute
@@ -151,6 +160,7 @@ export interface FileRouteTypes {
     | '/politica-de-privacidad'
     | '/sitemap.xml'
     | '/terra'
+    | '/terra/avisolegal'
     | '/api/lotes'
     | '/api/terra-estado'
     | '/terra/cotizador'
@@ -167,6 +177,7 @@ export interface FileRouteTypes {
     | '/politica-de-privacidad'
     | '/sitemap.xml'
     | '/terra'
+    | '/terra/avisolegal'
     | '/api/lotes'
     | '/api/terra-estado'
     | '/terra/cotizador'
@@ -183,6 +194,7 @@ export interface FileRouteTypes {
     | '/politica-de-privacidad'
     | '/sitemap.xml'
     | '/terra'
+    | '/terra_/avisolegal'
     | '/api/lotes'
     | '/api/terra-estado'
     | '/terra_/cotizador'
@@ -200,6 +212,7 @@ export interface RootRouteChildren {
   PoliticaDePrivacidadRoute: typeof PoliticaDePrivacidadRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TerraRoute: typeof TerraRoute
+  TerraAvisolegalRoute: typeof TerraAvisolegalRoute
   ApiLotesRoute: typeof ApiLotesRoute
   ApiTerraEstadoRoute: typeof ApiTerraEstadoRoute
   TerraCotizadorRoute: typeof TerraCotizadorRoute
@@ -240,6 +253,13 @@ declare module '@tanstack/react-router' {
       path: '/terra'
       fullPath: '/terra'
       preLoaderRoute: typeof TerraRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terra_/avisolegal': {
+      id: '/terra_/avisolegal'
+      path: '/terra/avisolegal'
+      fullPath: '/terra/avisolegal'
+      preLoaderRoute: typeof TerraAvisolegalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/lotes': {
@@ -320,6 +340,7 @@ const rootRouteChildren: RootRouteChildren = {
   PoliticaDePrivacidadRoute: PoliticaDePrivacidadRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TerraRoute: TerraRoute,
+  TerraAvisolegalRoute: TerraAvisolegalRoute,
   ApiLotesRoute: ApiLotesRoute,
   ApiTerraEstadoRoute: ApiTerraEstadoRoute,
   TerraCotizadorRoute: TerraCotizadorRoute,
