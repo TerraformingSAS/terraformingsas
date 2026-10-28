@@ -18,7 +18,6 @@ async function token(): Promise<string> {
     `https://login.microsoftonline.com/${env("AZURE_TENANT_ID")}/oauth2/v2.0/token`,
     {
       method: "POST",
-      signal: AbortSignal.timeout(15_000),
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({
         client_id: env("AZURE_CLIENT_ID"),
@@ -35,21 +34,14 @@ async function token(): Promise<string> {
 }
 
 export async function graph<T = unknown>(path: string, init: RequestInit = {}): Promise<T> {
-  let res: Response;
-  try {
-    res = await fetch(`https://graph.microsoft.com/v1.0${path}`, {
-      ...init,
-      signal: init.signal ?? AbortSignal.timeout(20_000),
-      headers: {
-        Authorization: `Bearer ${await token()}`,
-        "Content-Type": "application/json",
-        ...(init.headers as Record<string, string> | undefined),
-      },
-    });
-  } catch (e) {
-    if (e instanceof Error && e.name === "TimeoutError") throw new GraphError(504, path);
-    throw e;
-  }
+  const res = await fetch(`https://graph.microsoft.com/v1.0${path}`, {
+    ...init,
+    headers: {
+      Authorization: `Bearer ${await token()}`,
+      "Content-Type": "application/json",
+      ...(init.headers as Record<string, string> | undefined),
+    },
+  });
   if (!res.ok) {
     console.error("graph error", res.status, path, await res.text().catch(() => ""));
     throw new GraphError(res.status, path);

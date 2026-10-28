@@ -47,6 +47,8 @@ const LOCATION_POINTS = [
     desc: "El paisaje natural —humedal y quebrada— organiza el proyecto y define su entorno.",
   },
 ];
+const MAP_URL =
+  "https://www.google.com/maps/d/u/0/edit?mid=1W2I5RfshHNClX4RHmQsCxKhD0VJ12TY&usp=sharing";
 
 const HERO_OFFERS = [
   { value: "$5", unit: "millones", label: "Separa tu lote" },
@@ -264,10 +266,25 @@ function TerraPage() {
                   crecer. El paisaje, el humedal y la comunidad se encuentran en un solo proyecto
                   pensado para el largo plazo.
                 </p>
+                <a
+                  href={MAP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-6 inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-brand-navy underline-offset-4 transition hover:text-brand-orange hover:underline"
+                >
+                  Ver el mapa del proyecto
+                  <ArrowIcon />
+                </a>
               </div>
             </Reveal>
             <Reveal className="order-1 lg:order-2">
-              <div className="relative overflow-hidden rounded-xl">
+              <a
+                href={MAP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative block overflow-hidden rounded-xl"
+                aria-label="Abrir el mapa del proyecto TERRA"
+              >
                 <img
                   src={wetlandImg}
                   alt="Humedal natural TERRA al atardecer con deck de madera"
@@ -291,7 +308,7 @@ function TerraPage() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </a>
             </Reveal>
           </div>
         </section>
