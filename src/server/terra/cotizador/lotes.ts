@@ -6,17 +6,14 @@ import { noAutorizado, validarSesion } from "./session.js";
 
 type Fila = Record<string, unknown>;
 
-async function leerRangos(base: string, table: string, headers: Record<string, string>) {
+async function leerTabla(drive: string, item: string, table: string) {
+  const base = `/drives/${drive}/items/${item}`;
   const t = encodeURIComponent(table);
-  const cab = await graph<{ values: unknown[][] }>(
-    `${base}/workbook/tables/${t}/headerRowRange?$select=values`,
-    { headers },
-  );
-  const cuerpo = await graph<{ values: unknown[][] }>(
-    `${base}/workbook/tables/${t}/dataBodyRange?$select=values`,
-    { headers },
-  );
-  const meta = await graph<{ lastModifiedDateTime: string }>(`${base}?$select=lastModifiedDateTime`);
+  const [cab, cuerpo, meta] = await Promise.all([
+    graph<{ values: unknown[][] }>(`${base}/workbook/tables/${t}/headerRowRange?$select=values`),
+    graph<{ values: unknown[][] }>(`${base}/workbook/tables/${t}/dataBodyRange?$select=values`),
+    graph<{ lastModifiedDateTime: string }>(`${base}?$select=lastModifiedDateTime`),
+  ]);
   const enc = cab.values[0].map(String);
   const filas: Fila[] = cuerpo.values
     .map((f) => Object.fromEntries(enc.map((h, i) => [h, f[i]])))
@@ -24,44 +21,18 @@ async function leerRangos(base: string, table: string, headers: Record<string, s
   return { filas, modificado: new Date(meta.lastModifiedDateTime) };
 }
 
-/** Una sesión por libro y lecturas en serie. Graph responde 503 si el mismo xlsx se abre en paralelo. */
-async function leerTabla(drive: string, item: string, table: string) {
-  const base = `/drives/${drive}/items/${item}`;
-  let sessionId = "";
-  try {
-    const sesion = await graph<{ id: string }>(`${base}/workbook/createSession`, {
-      method: "POST",
-      body: JSON.stringify({ persistChanges: false }),
-    });
-    sessionId = sesion.id;
-    return await leerRangos(base, table, { "workbook-session-id": sessionId });
-  } catch (e) {
-    if (sessionId || !(e instanceof GraphError)) throw e;
-    return leerRangos(base, table, {});
-  } finally {
-    if (sessionId) {
-      await graph(`${base}/workbook/closeSession`, {
-        method: "POST",
-        headers: { "workbook-session-id": sessionId },
-      }).catch(() => undefined);
-    }
-  }
-}
-
 export async function filasDePrecios(): Promise<{
   lotes: Record<string, unknown>[];
   actualizado: Date;
 }> {
-  const precios = await leerTabla(
-    env("PRECIOS_DRIVE_ID"),
-    env("PRECIOS_ITEM_ID"),
-    process.env.PRECIOS_TABLE ?? "TablaPreciosPreVenta",
-  );
-  const mapa = await leerTabla(
-    env("MAPA_DRIVE_ID"),
-    env("MAPA_ITEM_ID"),
-    process.env.MAPA_TABLE ?? "TablaLotes",
-  );
+  const [precios, mapa] = await Promise.all([
+    leerTabla(
+      env("PRECIOS_DRIVE_ID"),
+      env("PRECIOS_ITEM_ID"),
+      process.env.PRECIOS_TABLE ?? "TablaPreciosPreVenta",
+    ),
+    leerTabla(env("MAPA_DRIVE_ID"), env("MAPA_ITEM_ID"), process.env.MAPA_TABLE ?? "TablaLotes"),
+  ]);
   const estado = new Map(mapa.filas.map((r) => [String(r.ID), r.Estado]));
   const lotes = precios.filas.map((p) => ({
     ...p,
