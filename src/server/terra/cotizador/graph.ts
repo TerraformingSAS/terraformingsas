@@ -18,6 +18,7 @@ async function token(): Promise<string> {
     `https://login.microsoftonline.com/${env("AZURE_TENANT_ID")}/oauth2/v2.0/token`,
     {
       method: "POST",
+      signal: AbortSignal.timeout(15_000),
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({
         client_id: env("AZURE_CLIENT_ID"),
@@ -33,19 +34,48 @@ async function token(): Promise<string> {
   return cache.token;
 }
 
-export async function graph<T = unknown>(path: string, init: RequestInit = {}): Promise<T> {
-  const res = await fetch(`https://graph.microsoft.com/v1.0${path}`, {
-    ...init,
-    headers: {
-      Authorization: `Bearer ${await token()}`,
-      "Content-Type": "application/json",
-      ...(init.headers as Record<string, string> | undefined),
-    },
-  });
+export async function graph<T = unknown>(path: string, init: RequestInit = {}, attempt = 0): Promise<T> {
+  let res: Response;
+  try {
+    res = await fetch(`https://graph.microsoft.com/v1.0${path}`, {
+      ...init,
+      signal: init.signal ?? AbortSignal.timeout(20_000),
+      headers: {
+        Authorization: `Bearer ${await token()}`,
+        "Content-Type": "application/json",
+        ...(init.headers as Record<string, string> | undefined),
+      },
+    });
+  } catch (e) {
+    const method = (init.method ?? "GET").toUpperCase();
+    if (
+      method === "GET" &&
+      e instanceof Error &&
+      (e.name === "TimeoutError" || e.name === "AbortError") &&
+      attempt < 1
+    ) {
+      await esperar(1500);
+      return graph(path, init, attempt + 1);
+    }
+    if (e instanceof Error && e.name === "TimeoutError") throw new GraphError(504, path);
+    throw e;
+  }
+  const method = (init.method ?? "GET").toUpperCase();
+  if (!res.ok && method === "GET" && (res.status === 429 || res.status === 503) && attempt < 1) {
+    await res.text().catch(() => "");
+    const retryAfter = Number(res.headers.get("retry-after"));
+    const wait = Number.isFinite(retryAfter) && retryAfter > 0 ? Math.min(retryAfter * 1000, 8_000) : 1_500;
+    await esperar(wait);
+    return graph(path, init, attempt + 1);
+  }
   if (!res.ok) {
     console.error("graph error", res.status, path, await res.text().catch(() => ""));
     throw new GraphError(res.status, path);
   }
   if (res.status === 202 || res.status === 204) return undefined as T;
   return (await res.json()) as T;
+}
+
+function esperar(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

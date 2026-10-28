@@ -118,7 +118,7 @@ export function HomePage() {
       vendedor: vendedor.trim(),
       referido: referido.trim(),
       plan: planElegido,
-      codigo: codigoCotizacion(nombreLimpio, fecha, lote.idLote, meses),
+      codigo: codigoCotizacion(nombreLimpio, fecha, lote.idLote),
       fecha,
       fechaLimite,
     });
@@ -701,10 +701,7 @@ function QuoteView({ c, onBack, onNew }: { c: Cotizacion; onBack: () => void; on
       >
         <div className="min-w-0">
           <p className="text-xs font-bold uppercase tracking-[0.16em]">Cotización lista</p>
-          <p className="truncate text-sm">
-            {c.codigo}
-          </p>
-          <p className="truncate text-xs text-muted-foreground">{fileName}</p>
+          <p className="truncate text-sm">{c.nombre}</p>
         </div>
         <PdfExportButton
           targetRef={ref}
