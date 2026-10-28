@@ -8,7 +8,8 @@ import { ArrowLeft, Info, Loader2, Mail, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import emblem from "@/features/terra-cotizador/assets/tf-emblem-light.png";
+import logoColor from "@/assets/logo.png";
+import { Link } from "@tanstack/react-router";
 import logoLight from "@/features/terra-cotizador/assets/terraforming-logo-light.png";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -150,11 +151,12 @@ export function LoginPage() {
 
       {/* Formulario */}
       <main className="flex flex-col bg-background">
-        <header className="flex items-center gap-3 border-b-2 border-[#f7941d] bg-[#0e2a47] px-5 py-4 text-white lg:hidden">
-          <img src={emblem} alt="" aria-hidden="true" className="h-7 w-auto" />
-          <span className="text-sm font-bold tracking-[0.2em]">
-            TERRA <span className="text-[#8fbf7a]">FORMING</span>
-          </span>
+        <header className="border-b border-border bg-white/95 shadow-sm backdrop-blur lg:hidden">
+          <div className="container-tf flex h-18 items-center py-3">
+            <Link to="/" aria-label="TERRA FORMING inicio">
+              <img src={logoColor} alt="TERRA FORMING" className="h-11 w-auto" width={300} height={83} />
+            </Link>
+          </div>
         </header>
 
         <div className="flex flex-1 items-center justify-center px-5 py-10">
