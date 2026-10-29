@@ -12,7 +12,7 @@ const files = {
   "header.js": "633deb77c2e2356dc4942eb4c023574fd843becc4c91c9ad4f5c9c832e646001",
   "app.js": "1241a45a591aa713d681242b0d6fe59ab6c1dd426d7ff43ab7ed052e40adbafe",
   "logo-terraforming.png": "6ec6eab54659f8d5c89291f7ed2d0c15842adedb69047e9435a3012f9dc681d5",
-  "ubicacion-etapa-i.webp": "1c293b51edf79fb92ae1b381a5c8b71405bcea8a0431386a4607ac4a548a42cb"
+  "ubicacion-etapa-i.webp": "66a34d7c5175c992c50c0d5d3c59032acf722a9cc20a6c6941556d26ee362deb"
 };
 
 for (const [name, expected] of Object.entries(files)) {
