@@ -829,9 +829,11 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
               {e.meses} meses{e.meses === p.meses ? " · elegido" : ""}
             </p>
             <p className={cn("text-xl font-bold", INK)}>{fmtCOP(e.valor)}</p>
-            <p className="text-[11px] text-[#4b5563]">
-              {e.meses === 12 ? "sin interés" : "1% mensual"}
-            </p>
+            {e.meses !== 12 && (
+              <p className="text-[11px] leading-snug text-[#4b5563]">
+                La cuota incluye valorización e IPC
+              </p>
+            )}
           </div>
         ))}
       </div>
@@ -876,7 +878,7 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
           ese saldo; el resto queda contra entrega.
         </li>
         <li>
-          Las cuotas a 12 meses no tienen interés. Las de 24 y 36 meses se calculan al 1% mensual.
+          En las cuotas a 24 y 36 meses, la cuota incluye valorización e IPC.
         </li>
         <li>
           Esta cotización no implica reserva del lote ni perfecciona por sí sola su compraventa.
