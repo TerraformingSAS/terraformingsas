@@ -29,7 +29,6 @@ type Body = {
   cuotas?: unknown;
   porcentaje?: unknown;
   fecha?: unknown;
-  fechaLimite?: unknown;
 };
 
 const esc = (s: string) =>
@@ -55,7 +54,6 @@ export async function POST(req: Request): Promise<Response> {
     const cuotas = Number(body.cuotas);
     const porcentaje = Number(body.porcentaje);
     const fecha = new Date(String(body.fecha ?? ""));
-    const fechaLimite = new Date(String(body.fechaLimite ?? ""));
     if (
       !id ||
       nombre.length < 3 ||
@@ -84,7 +82,6 @@ export async function POST(req: Request): Promise<Response> {
     const email = String(body.email ?? "").trim();
     const referido = String(body.referido ?? "").trim();
     const codigo = String(body.codigo ?? "").trim();
-    const limite = Number.isNaN(fechaLimite.getTime()) ? "" : fechaLarga(fechaLimite);
     const asunto = codigo || `Cotización lote ${lote.idLote}`;
 
     await graph(`/users/${encodeURIComponent(env("MAIL_SENDER"))}/sendMail`, {
@@ -113,7 +110,6 @@ export async function POST(req: Request): Promise<Response> {
               cuotas,
               cuota: fmtCOP(plan.cuota),
               fecha: fechaLarga(fecha),
-              limite,
             }),
           },
           toRecipients: [{ emailAddress: { address: DESTINO } }],
@@ -188,7 +184,6 @@ function correoHtml(d: {
   cuotas: number;
   cuota: string;
   fecha: string;
-  limite: string;
 }): string {
   const fila = (k: string, v: string) =>
     `<tr><td style="padding:6px 10px;color:#263746">${esc(k)}</td><td style="padding:6px 10px;font-weight:700;color:#0e2a47">${esc(v)}</td></tr>`;
@@ -214,7 +209,7 @@ ${fila("A financiar", `${d.porcentaje}% · ${d.financiar}`)}
 ${fila("Cuotas", `${d.cuotas} × ${d.cuota}`)}
 ${fila("Contra entrega", d.contraEntrega)}
 ${fila("Generada", d.fecha)}
-${d.limite ? fila("Separar antes del", d.limite) : ""}
+${fila("Vigencia", "5 días calendario")}
 </table>
 </td></tr></table></td></tr></table></body></html>`;
 }
