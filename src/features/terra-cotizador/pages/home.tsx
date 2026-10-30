@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { format } from "date-fns";
+import { addDays, format } from "date-fns";
 import { es } from "date-fns/locale";
+
+const VIGENCIA_DIAS = 5;
 import { ArrowLeft, Download, FileText, RotateCw, Search } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -703,6 +705,7 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
   const l = c.lote;
   const p = c.plan;
   const fecha = (d: Date) => format(d, "d 'de' MMMM 'de' yyyy", { locale: es });
+  const fechaLimite = addDays(c.fecha, VIGENCIA_DIAS);
   const proyecto = `TERRA - Etapa ${etapaRomana(l.etapa)}`;
   const descuentoValor = l.valorLote - l.valorPreventa;
   const ccFmt = c.cc ? Number(c.cc).toLocaleString("es-CO") : "";
@@ -728,7 +731,9 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
           </span>
           <p className={cn("mt-2 text-sm font-bold", INK)}>{proyecto}</p>
           <p className="text-xs text-[#4b5563]">Fecha: {fecha(c.fecha)}</p>
-          <p className="text-xs text-[#4b5563]">Vigencia: 5 días calendario</p>
+          <p className="text-xs text-[#4b5563]">
+            Vigencia: {VIGENCIA_DIAS} días calendario
+          </p>
         </div>
       </div>
 
@@ -780,6 +785,7 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
           <p className="text-2xl font-extrabold leading-tight text-[#0e2a47]">
             {fmtCOP(p.separacion)}
           </p>
+          <p className="mt-1 text-[11px] text-[#263746]">Antes del {fecha(fechaLimite)}</p>
         </div>
       </div>
 
@@ -858,7 +864,8 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
       </p>
       <ul className="mt-1 list-disc space-y-0.5 pl-5 text-[11px] leading-snug text-[#374151]">
         <li>
-          Vigencia de cotización: 5 días calendario, sujeta a disponibilidad del lote.
+          Vigencia de cotización: {VIGENCIA_DIAS} días calendario (hasta el{" "}
+          {fecha(fechaLimite)}), sujeta a disponibilidad del lote.
         </li>
         <li>
           El descuento de preventa se mantiene al confirmar la separación con el pago de{" "}
