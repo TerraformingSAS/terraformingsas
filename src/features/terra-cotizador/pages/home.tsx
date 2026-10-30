@@ -1,13 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { addDays, format } from "date-fns";
+import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { ArrowLeft, CalendarIcon, Download, FileText, RotateCw, Search } from "lucide-react";
+import { ArrowLeft, Download, FileText, RotateCw, Search } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useSesion } from "@/features/terra-cotizador/lib/auth";
 import { toast } from "sonner";
@@ -53,7 +51,6 @@ type Cotizacion = {
   plan: PlanFinanciacion;
   codigo: string;
   fecha: Date;
-  fechaLimite: Date;
 };
 
 export function HomePage() {
@@ -66,7 +63,6 @@ export function HomePage() {
   const [nombre, setNombre] = useState("");
   const [cc, setCc] = useState("");
   const [email, setEmail] = useState("");
-  const [fechaLimite, setFechaLimite] = useState<Date>(() => addDays(new Date(), 8));
   const [porcentaje, setPorcentaje] = useState<PorcentajeFinanciacion>(70);
   const [meses, setMeses] = useState<PlanMeses>(12);
   const [intentado, setIntentado] = useState(false);
@@ -120,7 +116,6 @@ export function HomePage() {
       plan: planElegido,
       codigo: codigoCotizacion(nombreLimpio, fecha, lote.idLote, meses),
       fecha,
-      fechaLimite,
     });
     window.scrollTo({ top: 0 });
   }
@@ -318,26 +313,6 @@ export function HomePage() {
                 ))}
               </div>
             </fieldset>
-            <div className="grid gap-1.5">
-              <Label htmlFor="fecha-limite">Separar antes del</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button id="fecha-limite" variant="outline" className="justify-start font-normal">
-                    <CalendarIcon aria-hidden="true" />
-                    {format(fechaLimite, "d 'de' MMMM 'de' yyyy", { locale: es })}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    locale={es}
-                    selected={fechaLimite}
-                    onSelect={(d) => d && setFechaLimite(d)}
-                    disabled={{ before: new Date() }}
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
           </div>
         </fieldset>
 
@@ -662,7 +637,6 @@ async function enviarAMercadeo(c: Cotizacion): Promise<boolean> {
         porcentaje: c.plan.porcentaje,
         codigo: c.codigo,
         fecha: c.fecha.toISOString(),
-        fechaLimite: c.fechaLimite.toISOString(),
       }),
     });
     if (!res.ok) {
@@ -754,7 +728,7 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
           </span>
           <p className={cn("mt-2 text-sm font-bold", INK)}>{proyecto}</p>
           <p className="text-xs text-[#4b5563]">Fecha: {fecha(c.fecha)}</p>
-          <p className="text-xs text-[#4b5563]">Válida hasta: {fecha(c.fechaLimite)}</p>
+          <p className="text-xs text-[#4b5563]">Vigencia: 5 días calendario</p>
         </div>
       </div>
 
@@ -806,7 +780,6 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
           <p className="text-2xl font-extrabold leading-tight text-[#0e2a47]">
             {fmtCOP(p.separacion)}
           </p>
-          <p className="mt-1 text-[11px] text-[#263746]">Antes del {fecha(c.fechaLimite)}</p>
         </div>
       </div>
 
@@ -885,7 +858,7 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
       </p>
       <ul className="mt-1 list-disc space-y-0.5 pl-5 text-[11px] leading-snug text-[#374151]">
         <li>
-          Cotización válida hasta el {fecha(c.fechaLimite)}, sujeta a disponibilidad del lote.
+          Vigencia de cotización: 5 días calendario, sujeta a disponibilidad del lote.
         </li>
         <li>
           El descuento de preventa se mantiene al confirmar la separación con el pago de{" "}
