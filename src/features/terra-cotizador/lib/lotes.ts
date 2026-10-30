@@ -122,7 +122,8 @@ export function codigoCotizacion(nombre: string, fecha: Date, idLote: string, cu
     .split(/[^A-Z0-9]+/)
     .filter(Boolean);
   const nom = partes[0] || "NOMBRE";
-  const apellido = partes.length > 1 ? partes[partes.length - 1] : "APELLIDO";
+  const persona =
+    partes.length > 1 ? `${nom}_${partes[partes.length - 1]}` : nom;
   const fmt = new Intl.DateTimeFormat("en-GB", {
     timeZone: "America/Bogota",
     day: "2-digit",
@@ -134,7 +135,7 @@ export function codigoCotizacion(nombre: string, fecha: Date, idLote: string, cu
   });
   const p = Object.fromEntries(fmt.formatToParts(fecha).map((x) => [x.type, x.value]));
   const lote = idLote.toUpperCase().replace(/[^A-Z0-9]+/g, "-");
-  return `CT-${nom}_${apellido}-${p.day}-${p.month}-${p.year}-${p.hour}-${p.minute}-${lote}-${String(cuotas).padStart(2, "0")}`;
+  return `CT-${persona}-${p.day}-${p.month}-${p.year}-${p.hour}-${p.minute}-${lote}-${String(cuotas).padStart(2, "0")}`;
 }
 
 /** Maps the workbook's Estado text; blanks, 0 or unknown values are "No disponible". */
