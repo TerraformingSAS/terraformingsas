@@ -28,6 +28,8 @@ import { Route as ApiParametrosRouteImport } from './routes/api.parametros'
 import { Route as ApiAdminParametrosRouteImport } from './routes/api.admin.parametros'
 import { Route as ApiAdminEstadisticasRouteImport } from './routes/api.admin.estadisticas'
 import { Route as TerraCotizadorLoginRouteImport } from './routes/terra_.cotizador_.login'
+import { Route as TerraCotizadorParametrosRouteImport } from './routes/terra_.cotizador_.parametros'
+import { Route as TerraCotizadorEstadisticasRouteImport } from './routes/terra_.cotizador_.estadisticas'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -124,6 +126,16 @@ const TerraCotizadorLoginRoute = TerraCotizadorLoginRouteImport.update({
   path: '/terra/cotizador/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TerraCotizadorParametrosRoute = TerraCotizadorParametrosRouteImport.update({
+  id: '/terra_/cotizador_/parametros',
+  path: '/terra/cotizador/parametros',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TerraCotizadorEstadisticasRoute = TerraCotizadorEstadisticasRouteImport.update({
+  id: '/terra_/cotizador_/estadisticas',
+  path: '/terra/cotizador/estadisticas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -145,6 +157,8 @@ export interface FileRoutesByFullPath {
   '/api/admin/parametros': typeof ApiAdminParametrosRoute
   '/api/admin/estadisticas': typeof ApiAdminEstadisticasRoute
   '/terra/cotizador/login': typeof TerraCotizadorLoginRoute
+  '/terra/cotizador/parametros': typeof TerraCotizadorParametrosRoute
+  '/terra/cotizador/estadisticas': typeof TerraCotizadorEstadisticasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -166,6 +180,8 @@ export interface FileRoutesByTo {
   '/api/admin/parametros': typeof ApiAdminParametrosRoute
   '/api/admin/estadisticas': typeof ApiAdminEstadisticasRoute
   '/terra/cotizador/login': typeof TerraCotizadorLoginRoute
+  '/terra/cotizador/parametros': typeof TerraCotizadorParametrosRoute
+  '/terra/cotizador/estadisticas': typeof TerraCotizadorEstadisticasRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -188,6 +204,8 @@ export interface FileRoutesById {
   '/api/admin/parametros': typeof ApiAdminParametrosRoute
   '/api/admin/estadisticas': typeof ApiAdminEstadisticasRoute
   '/terra_/cotizador_/login': typeof TerraCotizadorLoginRoute
+  '/terra_/cotizador_/parametros': typeof TerraCotizadorParametrosRoute
+  '/terra_/cotizador_/estadisticas': typeof TerraCotizadorEstadisticasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -211,6 +229,8 @@ export interface FileRouteTypes {
     | '/api/admin/parametros'
     | '/api/admin/estadisticas'
     | '/terra/cotizador/login'
+    | '/terra/cotizador/parametros'
+    | '/terra/cotizador/estadisticas'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -232,6 +252,8 @@ export interface FileRouteTypes {
     | '/api/admin/parametros'
     | '/api/admin/estadisticas'
     | '/terra/cotizador/login'
+    | '/terra/cotizador/parametros'
+    | '/terra/cotizador/estadisticas'
   id:
     | '__root__'
     | '/'
@@ -253,6 +275,8 @@ export interface FileRouteTypes {
     | '/api/admin/parametros'
     | '/api/admin/estadisticas'
     | '/terra_/cotizador_/login'
+    | '/terra_/cotizador_/parametros'
+    | '/terra_/cotizador_/estadisticas'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -275,6 +299,8 @@ export interface RootRouteChildren {
   ApiAdminParametrosRoute: typeof ApiAdminParametrosRoute
   ApiAdminEstadisticasRoute: typeof ApiAdminEstadisticasRoute
   TerraCotizadorLoginRoute: typeof TerraCotizadorLoginRoute
+  TerraCotizadorParametrosRoute: typeof TerraCotizadorParametrosRoute
+  TerraCotizadorEstadisticasRoute: typeof TerraCotizadorEstadisticasRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -412,6 +438,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TerraCotizadorLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/terra_/cotizador_/parametros': {
+      id: '/terra_/cotizador_/parametros'
+      path: '/terra/cotizador/parametros'
+      fullPath: '/terra/cotizador/parametros'
+      preLoaderRoute: typeof TerraCotizadorParametrosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terra_/cotizador_/estadisticas': {
+      id: '/terra_/cotizador_/estadisticas'
+      path: '/terra/cotizador/estadisticas'
+      fullPath: '/terra/cotizador/estadisticas'
+      preLoaderRoute: typeof TerraCotizadorEstadisticasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -435,6 +475,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminParametrosRoute: ApiAdminParametrosRoute,
   ApiAdminEstadisticasRoute: ApiAdminEstadisticasRoute,
   TerraCotizadorLoginRoute: TerraCotizadorLoginRoute,
+  TerraCotizadorParametrosRoute: TerraCotizadorParametrosRoute,
+  TerraCotizadorEstadisticasRoute: TerraCotizadorEstadisticasRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

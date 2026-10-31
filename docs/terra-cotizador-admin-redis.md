@@ -1,11 +1,11 @@
 # Cotizador admin · Upstash Redis
 
-El panel de **Administrador** (`Rol = Administrador` en la lista SharePoint **Vendedores Cotizador**) usa **Upstash Redis** para:
+Las pantallas de **Administrador** (`Rol = Administrador` en SharePoint **Vendedores Cotizador**) usan **Upstash Redis** para:
 
-- Parámetros editables (cálculo, mensajes, pagos, contacto, tarifa)
-- Historial de cotizaciones / métricas por lote
+- Parámetros editables (`/terra/cotizador/parametros`)
+- Estadísticas / métricas por lote (`/terra/cotizador/estadisticas`)
 
-Los precios por lote siguen viniendo del Excel en SharePoint (solo lectura en el panel).
+Se abren desde la navegación superior del cotizador (no como modal). Los precios por lote siguen viniendo del Excel en SharePoint (solo lectura).
 
 ## Variables requeridas
 
@@ -26,6 +26,6 @@ Deben estar habilitadas también en **Preview** de Vercel si se prueba allí.
 ## Comportamiento
 
 - Si Redis no tiene parámetros guardados, la app usa defaults de código.
-- Guardar desde el panel escribe en Redis.
+- Guardar desde la pantalla de parámetros escribe en Redis.
 - Cada vez que un vendedor **genera** una cotización se agrega un registro al log.
 - Las estadísticas agrupan ese log por `IdLote`.
