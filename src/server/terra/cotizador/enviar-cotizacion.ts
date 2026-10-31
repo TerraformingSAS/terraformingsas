@@ -17,8 +17,7 @@ import {
   esPlanMeses,
   esPorcentaje,
 } from "../../../features/terra-cotizador/lib/financiacion.js";
-
-const DESTINO = "mercadeo@terraformings.co";
+import { leerParametros } from "./parametros.js";
 
 type Body = {
   id?: unknown;
@@ -64,6 +63,7 @@ export async function POST(req: Request): Promise<Response> {
       return Response.json({ ok: false, error: "La cotización está incompleta." }, { status: 400 });
     }
 
+    const { parametros } = await leerParametros();
     const { lotes } = await filasDePrecios();
     const lote = lotes.map(toLote).find((l) => l?.id === id) ?? null;
     if (!lote || lote.estado !== "disponible") {
@@ -72,17 +72,25 @@ export async function POST(req: Request): Promise<Response> {
         { status: 409 },
       );
     }
-    const fallas = inconsistenciasExcel(lote);
+    const fallas = inconsistenciasExcel(lote, {
+      tarifa: parametros.tarifaPreventa,
+      separacionCop: parametros.separacionCop,
+    });
     if (fallas.length > 0) {
       return Response.json({ ok: false, error: fallas.join(" ") }, { status: 422 });
     }
 
-    const plan = calcularFinanciacion(lote.valorPreventa, porcentaje, cuotas);
+    const plan = calcularFinanciacion(lote.valorPreventa, porcentaje, cuotas, {
+      separacionCop: parametros.separacionCop,
+      tasaMensual: parametros.tasaMensual,
+      planesMeses: parametros.planesMeses,
+    });
     const cc = String(body.cc ?? "").trim();
     const email = String(body.email ?? "").trim();
     const referido = String(body.referido ?? "").trim();
     const codigo = String(body.codigo ?? "").trim();
     const asunto = codigo || `Cotización lote ${lote.idLote}`;
+    const destino = parametros.emailMercadeo;
 
     await graph(`/users/${encodeURIComponent(env("MAIL_SENDER"))}/sendMail`, {
       method: "POST",
@@ -110,9 +118,10 @@ export async function POST(req: Request): Promise<Response> {
               cuotas,
               cuota: fmtCOP(plan.cuota),
               fecha: fechaLarga(fecha),
+              vigenciaDias: parametros.vigenciaDias,
             }),
           },
-          toRecipients: [{ emailAddress: { address: DESTINO } }],
+          toRecipients: [{ emailAddress: { address: destino } }],
         },
         saveToSentItems: false,
       }),
@@ -134,10 +143,11 @@ export async function alertar(req: Request): Promise<Response> {
     const body = (await req.json().catch(() => ({}))) as { id?: unknown };
     const id = String(body.id ?? "").trim();
     if (!id) return Response.json({ ok: false }, { status: 400 });
+    const { parametros } = await leerParametros();
     const { lotes } = await filasDePrecios();
     const lote = lotes.map(toLote).find((l) => l?.id === id) ?? null;
     if (!lote) return Response.json({ ok: false, error: "Lote no encontrado" }, { status: 404 });
-    const diferencias = diferenciasTarifa(lote);
+    const diferencias = diferenciasTarifa(lote, parametros.tarifaPreventa);
     if (diferencias.length === 0) return Response.json({ ok: true, aviso: false });
     await graph(`/users/${encodeURIComponent(env("MAIL_SENDER"))}/sendMail`, {
       method: "POST",
@@ -153,7 +163,7 @@ export async function alertar(req: Request): Promise<Response> {
 <p style="color:#263746">Aviso de ${esc(sesion.sesion.nombre)} · ${esc(fechaLarga(new Date()))}</p>
 </body></html>`,
           },
-          toRecipients: [{ emailAddress: { address: DESTINO } }],
+          toRecipients: [{ emailAddress: { address: parametros.emailMercadeo } }],
         },
         saveToSentItems: false,
       }),
@@ -184,6 +194,7 @@ function correoHtml(d: {
   cuotas: number;
   cuota: string;
   fecha: string;
+  vigenciaDias: number;
 }): string {
   const fila = (k: string, v: string) =>
     `<tr><td style="padding:6px 10px;color:#263746">${esc(k)}</td><td style="padding:6px 10px;font-weight:700;color:#0e2a47">${esc(v)}</td></tr>`;
@@ -209,7 +220,7 @@ ${fila("A financiar", `${d.porcentaje}% · ${d.financiar}`)}
 ${fila("Cuotas", `${d.cuotas} × ${d.cuota}`)}
 ${fila("Contra entrega", d.contraEntrega)}
 ${fila("Generada", d.fecha)}
-${fila("Vigencia", "5 días calendario")}
+${fila("Vigencia", `${d.vigenciaDias} días calendario`)}
 </table>
 </td></tr></table></td></tr></table></body></html>`;
 }

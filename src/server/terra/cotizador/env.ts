@@ -4,6 +4,10 @@ const defaults: Record<string, string> = {
   SP_SITE_ID:
     "intelecto1.sharepoint.com,e13795b1-6624-4274-9b96-247d755df923,c5470bdd-ca53-41ef-a9f0-b0548bd5da7f",
   SP_VENDEDORES_LIST_ID: "d7c660e1-2b3f-4f09-9b00-36e42bf2f0c6",
+  // Listas admin (crear en SharePoint; ver scripts/setup-terra-cotizador-listas.mjs).
+  // Vacío = fallback a defaults de código / sin historial hasta configurar.
+  SP_PARAMETROS_LIST_ID: "",
+  SP_COTIZACIONES_LIST_ID: "",
   PRECIOS_DRIVE_ID: "b!sZU34SRmdEKbliR9dV35I90LR8VTyu9BqfCwVIvV2n-dkUiHD4vMT7gLhpvaurQJ",
   PRECIOS_ITEM_ID: "014W35K5NBNGKYVUUC2FBI5WLTKZZCI7HQ",
   PRECIOS_TABLE: "TablaPreciosPreVenta",
@@ -23,4 +27,9 @@ export function env(name: string): string {
   const v = process.env[name] ?? process.env[aliases[name] ?? ""] ?? defaults[name];
   if (!v) throw new Error(`Falta la variable de entorno ${name}`);
   return v;
+}
+
+/** Como `env`, pero permite vacío (listas opcionales aún no creadas). */
+export function envOptional(name: string): string {
+  return process.env[name] ?? process.env[aliases[name] ?? ""] ?? defaults[name] ?? "";
 }
