@@ -9,6 +9,7 @@ import { fmtCOP, fmtNum, type Lote } from "@/features/terra-cotizador/lib/lotes"
 import {
   useGuardarParametros,
   useParametros,
+  useSembrarMensajes,
 } from "@/features/terra-cotizador/lib/admin-data";
 import {
   parametrosDesdeItems,
@@ -59,6 +60,7 @@ function AdminParametrosPanel({ onClose }: { onClose: () => void }) {
   const paramsQ = useParametros();
   const lotesQ = useLotes();
   const guardar = useGuardarParametros();
+  const sembrar = useSembrarMensajes();
   const [draft, setDraft] = useState<ParametroItem[]>([]);
   const [tab, setTab] = useState<"params" | "lotes">("params");
 
@@ -174,16 +176,39 @@ function AdminParametrosPanel({ onClose }: { onClose: () => void }) {
         </div>
 
         {tab === "params" && (
-          <footer className="flex items-center justify-between gap-2 border-t border-border px-4 py-3">
+          <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-border px-4 py-3">
             <p className="text-xs text-muted-foreground">
               {dirty ? "Hay cambios sin guardar" : "Sin cambios"}
             </p>
-            <Button onClick={() => void onSave()} disabled={!dirty || guardar.isPending}>
-              {guardar.isPending ? "Guardando…" : "Guardar"}
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={sembrar.isPending || guardar.isPending}
+                onClick={() => {
+                  void sembrar
+                    .mutateAsync(false)
+                    .then((r) => {
+                      const n = r.escritos?.length ?? 0;
+                      toast.success(
+                        n > 0
+                          ? `Mensajes sembrados en Redis (${n}).`
+                          : "Los mensajes ya estaban en Redis.",
+                      );
+                    })
+                    .catch((e) =>
+                      toast.error(e instanceof Error ? e.message : "No se pudo sembrar."),
+                    );
+                }}
+              >
+                {sembrar.isPending ? "Sembrando…" : "Sembrar mensajes"}
+              </Button>
+              <Button onClick={() => void onSave()} disabled={!dirty || guardar.isPending}>
+                {guardar.isPending ? "Guardando…" : "Guardar"}
+              </Button>
+            </div>
           </footer>
-        )}
-      </aside>
+        )}      </aside>
     </div>
   );
 }

@@ -91,6 +91,31 @@ export function useGuardarParametros() {
   });
 }
 
+export function useSembrarMensajes() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (forzar = false) => {
+      const r = await ensureOk(
+        await apiFetch("/api/admin/parametros/seed", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ forzar }),
+        }),
+      );
+      const j = (await r.json().catch(() => ({}))) as {
+        ok?: boolean;
+        error?: string;
+        escritos?: string[];
+      };
+      if (!r.ok || !j.ok) throw new Error(j.error || "No se pudieron sembrar los mensajes.");
+      return j;
+    },
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ["parametros"] });
+    },
+  });
+}
+
 export function useEstadisticas(enabled: boolean) {
   return useQuery({
     queryKey: ["admin-estadisticas"],
