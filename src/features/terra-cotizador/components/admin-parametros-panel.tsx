@@ -168,7 +168,8 @@ export function AdminParametrosPage() {
               </Button>
             </div>
           </footer>
-        )}      </aside>
+        )}
+      </div>
     </div>
   );
 }
