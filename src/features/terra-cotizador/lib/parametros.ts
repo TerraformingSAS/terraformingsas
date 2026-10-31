@@ -1,4 +1,4 @@
-/** Parámetros del cotizador: defaults en código + override desde SharePoint. */
+/** Parámetros del cotizador: defaults en código + override desde Upstash Redis. */
 
 export type TarifaFila = { area: number; valorM2: number; preventa: number };
 
@@ -59,7 +59,7 @@ export const PARAMETROS_DEFAULT: ParametrosCotizador = {
   direccion: "Calle 10 # 4-40, Of. 1001, Edificio Bolsa de Occidente · Cali",
 };
 
-/** Definición canónica de ítems para la lista SharePoint (semilla / UI admin). */
+/** Definición canónica de ítems (semilla / UI admin → Redis). */
 export const PARAMETROS_SEED: ParametroItem[] = [
   {
     clave: "separacion_cop",
@@ -195,7 +195,7 @@ function num(raw: string | undefined, fallback: number): number {
   return Number.isFinite(n) ? n : fallback;
 }
 
-/** Une ítems clave/valor (SharePoint o seed) en el objeto tipado de runtime. */
+/** Une ítems clave/valor (Redis o seed) en el objeto tipado de runtime. */
 export function parametrosDesdeItems(
   items: Pick<ParametroItem, "clave" | "valor">[],
   base: ParametrosCotizador = PARAMETROS_DEFAULT,

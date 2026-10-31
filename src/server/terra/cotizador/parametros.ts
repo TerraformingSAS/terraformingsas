@@ -1,6 +1,5 @@
-// Lectura/escritura de parámetros en lista SharePoint "Parametros Cotizador".
-import { graph } from "./graph.js";
-import { env, envOptional } from "./env.js";
+// Lectura/escritura de parámetros en Upstash Redis.
+import { redis } from "./redis.js";
 import {
   PARAMETROS_DEFAULT,
   PARAMETROS_SEED,
@@ -10,128 +9,85 @@ import {
   type ParametrosCotizador,
 } from "../../../features/terra-cotizador/lib/parametros.js";
 
-type SpItem = {
-  id: string;
-  fields: Record<string, unknown>;
-};
+const REDIS_KEY = "terra:cotizador:parametros";
 
-function listId(): string {
-  return envOptional("SP_PARAMETROS_LIST_ID").trim();
-}
+type StoredMap = Record<string, string>;
 
-function site(): string {
-  return env("SP_SITE_ID");
-}
-
-async function listarItemsSp(): Promise<ParametroItem[]> {
-  const id = listId();
-  if (!id) return [];
-  const out: ParametroItem[] = [];
-  let url: string | undefined =
-    `/sites/${site()}/lists/${id}/items?expand=fields(select=Title,Valor,Tipo,Grupo,Descripcion)&$top=200`;
-  while (url) {
-    const r: { value: SpItem[]; "@odata.nextLink"?: string } = await graph(url);
-    for (const row of r.value) {
-      const f = row.fields;
-      const clave = String(f.Title ?? "").trim();
-      if (!clave) continue;
-      out.push({
-        id: String(row.id),
-        clave,
-        valor: String(f.Valor ?? ""),
-        tipo: (String(f.Tipo ?? "texto") as ParametroItem["tipo"]) || "texto",
-        grupo: (String(f.Grupo ?? "calculo") as ParametroItem["grupo"]) || "calculo",
-        descripcion: String(f.Descripcion ?? ""),
-      });
-    }
-    url = r["@odata.nextLink"]?.replace("https://graph.microsoft.com/v1.0", "");
-  }
-  return out;
-}
-
-/** Fusiona seed + SharePoint (SP gana por clave). */
-export function fusionarItems(sp: ParametroItem[]): ParametroItem[] {
-  const byClave = new Map(sp.map((i) => [i.clave, i]));
+/** Fusiona seed + valores guardados (Redis gana por clave). */
+export function fusionarItems(stored: ParametroItem[]): ParametroItem[] {
+  const byClave = new Map(stored.map((i) => [i.clave, i]));
   return PARAMETROS_SEED.map((seed) => {
     const hit = byClave.get(seed.clave);
     return hit
-      ? { ...seed, ...hit, clave: seed.clave, tipo: seed.tipo, grupo: seed.grupo, descripcion: seed.descripcion }
+      ? {
+          ...seed,
+          valor: hit.valor,
+          id: hit.id,
+        }
       : { ...seed };
   });
+}
+
+async function leerMapa(): Promise<StoredMap | null> {
+  try {
+    const raw = await redis.get<StoredMap>(REDIS_KEY);
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+    return raw;
+  } catch (e) {
+    console.error("parametros redis get", e);
+    return null;
+  }
 }
 
 export async function leerParametros(): Promise<{
   parametros: ParametrosCotizador;
   items: ParametroItem[];
-  fuente: "sharepoint" | "defaults";
+  fuente: "redis" | "defaults";
 }> {
-  try {
-    const sp = await listarItemsSp();
-    if (sp.length === 0) {
-      return {
-        parametros: PARAMETROS_DEFAULT,
-        items: itemsDesdeParametros(PARAMETROS_DEFAULT),
-        fuente: "defaults",
-      };
-    }
-    const items = fusionarItems(sp);
-    return {
-      parametros: parametrosDesdeItems(items),
-      items,
-      fuente: "sharepoint",
-    };
-  } catch (e) {
-    console.error("parametros: fallback defaults", e);
+  const mapa = await leerMapa();
+  if (!mapa || Object.keys(mapa).length === 0) {
     return {
       parametros: PARAMETROS_DEFAULT,
       items: itemsDesdeParametros(PARAMETROS_DEFAULT),
       fuente: "defaults",
     };
   }
+  const stored: ParametroItem[] = Object.entries(mapa).map(([clave, valor]) => ({
+    clave,
+    valor: String(valor ?? ""),
+    tipo: "texto",
+    grupo: "calculo",
+    descripcion: "",
+  }));
+  const items = fusionarItems(stored);
+  return {
+    parametros: parametrosDesdeItems(items),
+    items,
+    fuente: "redis",
+  };
 }
 
 export async function guardarParametros(
   updates: { clave: string; valor: string }[],
 ): Promise<{ ok: true; items: ParametroItem[] } | { ok: false; error: string }> {
-  const id = listId();
-  if (!id) {
-    return {
-      ok: false,
-      error:
-        "Falta SP_PARAMETROS_LIST_ID. Crea la lista Parametros Cotizador y configura el ID.",
-    };
-  }
-
-  const actual = await listarItemsSp();
-  const byClave = new Map(actual.map((i) => [i.clave, i]));
   const seedByClave = new Map(PARAMETROS_SEED.map((s) => [s.clave, s]));
+  const actual = (await leerMapa()) ?? {};
+  const next: StoredMap = { ...actual };
 
   for (const u of updates) {
     const clave = u.clave.trim();
-    if (!clave) continue;
-    const seed = seedByClave.get(clave);
-    if (!seed) continue;
-    const valor = String(u.valor ?? "");
-    const existente = byClave.get(clave);
-    if (existente?.id) {
-      await graph(`/sites/${site()}/lists/${id}/items/${existente.id}/fields`, {
-        method: "PATCH",
-        body: JSON.stringify({ Valor: valor }),
-      });
-    } else {
-      await graph(`/sites/${site()}/lists/${id}/items`, {
-        method: "POST",
-        body: JSON.stringify({
-          fields: {
-            Title: clave,
-            Valor: valor,
-            Tipo: seed.tipo,
-            Grupo: seed.grupo,
-            Descripcion: seed.descripcion,
-          },
-        }),
-      });
-    }
+    if (!clave || !seedByClave.has(clave)) continue;
+    next[clave] = String(u.valor ?? "");
+  }
+
+  try {
+    await redis.set(REDIS_KEY, next);
+  } catch (e) {
+    console.error("parametros redis set", e);
+    return {
+      ok: false,
+      error: "No se pudieron guardar los parámetros en Redis (Upstash).",
+    };
   }
 
   const { items } = await leerParametros();

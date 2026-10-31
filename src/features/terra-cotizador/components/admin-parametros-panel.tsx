@@ -125,9 +125,10 @@ function AdminParametrosPanel({ onClose }: { onClose: () => void }) {
             ) : (
               <div className="space-y-5">
                 <p className="text-xs text-muted-foreground">
-                  Fuente: {paramsQ.data?.fuente === "sharepoint" ? "SharePoint" : "defaults locales"}
-                  {paramsQ.data?.fuente !== "sharepoint" &&
-                    " · configura SP_PARAMETROS_LIST_ID para persistir"}
+                  Fuente:{" "}
+                  {paramsQ.data?.fuente === "redis"
+                    ? "Upstash Redis"
+                    : "defaults locales (aún no hay valores guardados)"}
                 </p>
                 {GRUPOS.map((g) => {
                   const items = draft.filter((i) => i.grupo === g.key);
