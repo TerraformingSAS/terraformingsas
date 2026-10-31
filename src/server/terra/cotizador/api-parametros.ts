@@ -1,6 +1,6 @@
 import { noAutorizado, validarSesion } from "./session.js";
 import { esAdmin, noAdmin } from "./admin.js";
-import { guardarParametros, leerParametros } from "./parametros.js";
+import { guardarParametros, leerParametros, sembrarMensajesCotizacion } from "./parametros.js";
 
 /** GET /api/parametros — cualquier sesión autenticada (lectura). */
 export async function GET(req: Request): Promise<Response> {
@@ -63,5 +63,31 @@ export async function PUT_ADMIN(req: Request): Promise<Response> {
   } catch (e) {
     console.error("api-parametros PUT", e);
     return Response.json({ ok: false, error: "No se pudieron guardar los parámetros." }, { status: 503 });
+  }
+}
+
+/** POST /api/admin/parametros/seed — siembra mensajes de cotización en Redis. */
+export async function POST_SEED(req: Request): Promise<Response> {
+  try {
+    const sesion = await validarSesion(req);
+    if (!sesion.ok) return noAutorizado(sesion.motivo);
+    if (!esAdmin(sesion.sesion)) return noAdmin();
+
+    const body = (await req.json().catch(() => ({}))) as { forzar?: unknown };
+    const forzar = body.forzar === true;
+    const r = await sembrarMensajesCotizacion({ forzar });
+    if (!r.ok) return Response.json({ ok: false, error: r.error }, { status: 503 });
+
+    const data = await leerParametros();
+    return Response.json({
+      ok: true,
+      escritos: r.escritos,
+      parametros: data.parametros,
+      items: data.items,
+      fuente: data.fuente,
+    });
+  } catch (e) {
+    console.error("api-parametros seed", e);
+    return Response.json({ ok: false, error: "No se pudieron sembrar los mensajes." }, { status: 503 });
   }
 }
