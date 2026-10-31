@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { addDays, format } from "date-fns";
 import { es } from "date-fns/locale";
-
-const VIGENCIA_DIAS = 5;
 import { ArrowLeft, Download, FileText, RotateCw, Search } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,11 +36,21 @@ import {
   PLANES_MESES,
   PORCENTAJES,
   calcularFinanciacion,
+  esPlanMeses,
+  esPorcentaje,
   type PlanFinanciacion,
   type PlanMeses,
   type PorcentajeFinanciacion,
 } from "@/features/terra-cotizador/lib/financiacion";
 import { useLotes } from "@/features/terra-cotizador/lib/datos";
+import {
+  registrarCotizacionGenerada,
+  useParametros,
+} from "@/features/terra-cotizador/lib/admin-data";
+import {
+  PARAMETROS_DEFAULT,
+  type ParametrosCotizador,
+} from "@/features/terra-cotizador/lib/parametros";
 
 type Cotizacion = {
   lote: Lote;
@@ -58,6 +67,9 @@ type Cotizacion = {
 export function HomePage() {
   const lotesQuery = useLotes();
   const userQuery = useSesion();
+  const paramsQuery = useParametros();
+  const qc = useQueryClient();
+  const parametros = paramsQuery.data?.parametros ?? PARAMETROS_DEFAULT;
   const vendedor = userQuery.data?.nombre ?? "";
   const [referido, setReferido] = useState("");
   const [busqueda, setBusqueda] = useState("");
@@ -73,7 +85,21 @@ export function HomePage() {
 
   const lotes = useMemo(() => lotesQuery.data?.lotes ?? [], [lotesQuery.data]);
   const lote = lotes.find((l) => l.id === seleccion) ?? null;
-  const plan = lote ? calcularFinanciacion(lote.valorPreventa, porcentaje, meses) : null;
+  const finOpts = {
+    separacionCop: parametros.separacionCop,
+    tasaMensual: parametros.tasaMensual,
+    planesMeses: parametros.planesMeses,
+  };
+  const plan = lote
+    ? calcularFinanciacion(lote.valorPreventa, porcentaje, meses, finOpts)
+    : null;
+  const porcentajesUi = (parametros.porcentajes.filter(esPorcentaje) as PorcentajeFinanciacion[])
+    .length
+    ? (parametros.porcentajes.filter(esPorcentaje) as PorcentajeFinanciacion[])
+    : [...PORCENTAJES];
+  const planesUi = (parametros.planesMeses.filter(esPlanMeses) as PlanMeses[]).length
+    ? (parametros.planesMeses.filter(esPlanMeses) as PlanMeses[])
+    : [...PLANES_MESES];
 
   const errores = {
     vendedor: vendedor ? "" : "No se pudo identificar al vendedor con tu inicio de sesión.",
@@ -97,8 +123,11 @@ export function HomePage() {
       first?.focus();
       return;
     }
-    const deTabla = diferenciasTarifa(lote);
-    const inconsistencias = inconsistenciasExcel(lote);
+    const deTabla = diferenciasTarifa(lote, parametros.tarifaPreventa);
+    const inconsistencias = inconsistenciasExcel(lote, {
+      tarifa: parametros.tarifaPreventa,
+      separacionCop: parametros.separacionCop,
+    });
     if (inconsistencias.length > 0) {
       setExcelError(inconsistencias.join(" "));
       if (deTabla.length > 0) void avisarDiferenciaDeTabla(lote.id);
@@ -106,7 +135,8 @@ export function HomePage() {
     }
     const fecha = new Date();
     const nombreLimpio = nombre.trim();
-    const planElegido = calcularFinanciacion(lote.valorPreventa, porcentaje, meses);
+    const planElegido = calcularFinanciacion(lote.valorPreventa, porcentaje, meses, finOpts);
+    const codigo = codigoCotizacion(nombreLimpio, fecha, lote.idLote, meses);
     setExcelError("");
     setCotizacion({
       lote,
@@ -116,8 +146,23 @@ export function HomePage() {
       vendedor: vendedor.trim(),
       referido: referido.trim(),
       plan: planElegido,
-      codigo: codigoCotizacion(nombreLimpio, fecha, lote.idLote, meses),
+      codigo,
       fecha,
+    });
+    void registrarCotizacionGenerada({
+      codigo,
+      loteId: lote.id,
+      idLote: lote.idLote,
+      nombre: nombreLimpio,
+      cc: cleanCC(cc),
+      email: email.trim(),
+      referido: referido.trim(),
+      porcentaje,
+      cuotas: meses,
+      valorPreventa: lote.valorPreventa,
+      fecha: fecha.toISOString(),
+    }).then(() => {
+      void qc.invalidateQueries({ queryKey: ["admin-estadisticas"] });
     });
     window.scrollTo({ top: 0 });
   }
@@ -137,7 +182,14 @@ export function HomePage() {
   }
 
   if (cotizacion) {
-    return <QuoteView c={cotizacion} onBack={() => setCotizacion(null)} onNew={nuevaCotizacion} />;
+    return (
+      <QuoteView
+        c={cotizacion}
+        parametros={parametros}
+        onBack={() => setCotizacion(null)}
+        onNew={nuevaCotizacion}
+      />
+    );
   }
 
   const showErr = (k: keyof typeof errores) => (intentado ? errores[k] : "");
@@ -277,7 +329,7 @@ export function HomePage() {
             <fieldset className="grid gap-2">
               <legend className="text-sm font-medium">Financiación</legend>
               <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Porcentaje a financiar">
-                {PORCENTAJES.map((p) => (
+                {porcentajesUi.map((p) => (
                   <button
                     key={p}
                     type="button"
@@ -296,7 +348,7 @@ export function HomePage() {
                 ))}
               </div>
               <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Plazo">
-                {PLANES_MESES.map((m) => (
+                {planesUi.map((m) => (
                   <button
                     key={m}
                     type="button"
@@ -654,7 +706,17 @@ async function enviarAMercadeo(c: Cotizacion): Promise<boolean> {
 }
 
 /* ---------- Cotización (documento) ---------- */
-function QuoteView({ c, onBack, onNew }: { c: Cotizacion; onBack: () => void; onNew: () => void }) {
+function QuoteView({
+  c,
+  parametros,
+  onBack,
+  onNew,
+}: {
+  c: Cotizacion;
+  parametros: ParametrosCotizador;
+  onBack: () => void;
+  onNew: () => void;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const fileName = `${c.codigo}.pdf`;
   return (
@@ -689,7 +751,7 @@ function QuoteView({ c, onBack, onNew }: { c: Cotizacion; onBack: () => void; on
         </PdfExportButton>
       </section>
       <div className="-mx-3 overflow-x-auto overscroll-x-contain border-y border-border bg-white shadow-sm sm:mx-0 sm:rounded-xl sm:border">
-        <QuoteDocument ref={ref} c={c} />
+        <QuoteDocument ref={ref} c={c} parametros={parametros} />
       </div>
     </div>
   );
@@ -698,11 +760,19 @@ function QuoteView({ c, onBack, onNew }: { c: Cotizacion; onBack: () => void; on
 const INK = "text-[#0e2a47]";
 const LABEL = "text-[10px] font-bold uppercase tracking-[0.14em] text-[#4b5563]";
 
-function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElement> }) {
+function QuoteDocument({
+  c,
+  parametros,
+  ref,
+}: {
+  c: Cotizacion;
+  parametros: ParametrosCotizador;
+  ref: React.Ref<HTMLDivElement>;
+}) {
   const l = c.lote;
   const p = c.plan;
   const fecha = (d: Date) => format(d, "d 'de' MMMM 'de' yyyy", { locale: es });
-  const fechaLimite = addDays(c.fecha, VIGENCIA_DIAS);
+  const fechaLimite = addDays(c.fecha, parametros.vigenciaDias);
   const proyecto = `TERRA - Etapa ${etapaRomana(l.etapa)}`;
   const descuentoValor = l.valorLote - l.valorPreventa;
   const ccFmt = c.cc ? Number(c.cc).toLocaleString("es-CO") : "";
@@ -729,7 +799,7 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
           <p className={cn("mt-2 text-sm font-bold", INK)}>{proyecto}</p>
           <p className="text-xs text-[#4b5563]">Fecha: {fecha(c.fecha)}</p>
           <p className="text-xs text-[#4b5563]">
-            Vigencia: {VIGENCIA_DIAS} días calendario
+            Vigencia: {parametros.vigenciaDias} días calendario
           </p>
         </div>
       </div>
@@ -828,7 +898,7 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
             <p className={cn("text-xl font-bold", INK)}>{fmtCOP(e.valor)}</p>
             {e.meses !== 12 && (
               <p className="text-[11px] leading-snug text-[#4b5563]">
-                La cuota incluye valorización e IPC
+                {parametros.msgCuotaExtra}
               </p>
             )}
           </div>
@@ -863,7 +933,7 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
       </p>
       <ul className="mt-1 list-disc space-y-0.5 pl-5 text-[11px] leading-snug text-[#374151]">
         <li>
-          Vigencia de cotización: {VIGENCIA_DIAS} días calendario (hasta el{" "}
+          Vigencia de cotización: {parametros.vigenciaDias} días calendario (hasta el{" "}
           {fecha(fechaLimite)}), sujeta a disponibilidad del lote.
         </li>
         <li>
@@ -874,12 +944,8 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
           El saldo es el valor de preventa menos la separación. Se financia el {p.porcentaje}% de
           ese saldo; el resto queda contra entrega.
         </li>
-        <li>
-          En las cuotas a 24 y 36 meses, la cuota incluye valorización e IPC.
-        </li>
-        <li>
-          Esta cotización no implica reserva del lote ni perfecciona por sí sola su compraventa.
-        </li>
+        <li>{parametros.msgCuotasValorizacion}</li>
+        <li>{parametros.msgNoReserva}</li>
       </ul>
 
       {/* Pagos y asesor */}
@@ -887,10 +953,10 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
         <div className="rounded-lg border border-[#e5e7eb] px-5 py-3">
           <p className={LABEL}>Pagos y transferencias</p>
           <p className="mt-1 text-[11px] font-semibold text-[#1f2937]">
-            TERRA FORMING SAS · NIT 9018681500
+            {parametros.empresaNombre} · NIT {parametros.nit}
           </p>
           <p className="text-[11px] text-[#374151]">
-            Banco de Bogotá · Cuenta corriente No. 256708884
+            {parametros.banco} · {parametros.cuenta}
           </p>
         </div>
         <div className="rounded-lg border border-[#e5e7eb] px-5 py-3">
@@ -903,8 +969,10 @@ function QuoteDocument({ c, ref }: { c: Cotizacion; ref: React.Ref<HTMLDivElemen
       </div>
 
       <div className="mt-3 flex justify-between border-t border-[#e5e7eb] pt-2 text-[10px] text-[#374151]">
-        <span className="font-semibold">mercadeo@terraformings.co · 321 423 0090</span>
-        <span>Calle 10 # 4-40, Of. 1001, Edificio Bolsa de Occidente · Cali</span>
+        <span className="font-semibold">
+          {parametros.emailMercadeo} · {parametros.telefono}
+        </span>
+        <span>{parametros.direccion}</span>
       </div>
     </div>
   );

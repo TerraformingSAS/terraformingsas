@@ -1,6 +1,7 @@
 import { apiFetch } from "@/features/terra-cotizador/lib/actividad";
 import { NoAutorizado, leerMotivo } from "@/features/terra-cotizador/lib/auth";
 import { SEPARACION_COP } from "./financiacion";
+import { TARIFA_PREVENTA_DEFAULT, type TarifaFila } from "./parametros";
 
 const COLUMNS = [
   "No",
@@ -54,19 +55,16 @@ export const ESTADOS: { key: Estado; label: string; tile: string; dot: string }[
 ];
 export const estadoInfo = (e: Estado) => ESTADOS.find((x) => x.key === e)!;
 
-/** Tabla oficial de preventa por tamaño. La cotización se niega si el Excel difiere. */
-export const TARIFA_PREVENTA = [
-  { area: 120, valorM2: 617_500, preventa: 74_100_000 },
-  { area: 154, valorM2: 604_500, preventa: 93_093_000 },
-  { area: 165, valorM2: 601_900, preventa: 99_313_500 },
-  { area: 211.75, valorM2: 598_000, preventa: 126_626_500 },
-  { area: 442.75, valorM2: 585_000, preventa: 259_008_750 },
-] as const;
+/** Tabla oficial de preventa por tamaño (default). La cotización se niega si el Excel difiere. */
+export const TARIFA_PREVENTA = TARIFA_PREVENTA_DEFAULT;
 
-export function diferenciasTarifa(lote: Pick<Lote, "idLote" | "area" | "valorM2" | "valorPreventa">): string[] {
-  const fila = TARIFA_PREVENTA.find((t) => Math.abs(lote.area - t.area) <= 0.05);
+export function diferenciasTarifa(
+  lote: Pick<Lote, "idLote" | "area" | "valorM2" | "valorPreventa">,
+  tarifa: TarifaFila[] = TARIFA_PREVENTA,
+): string[] {
+  const fila = tarifa.find((t) => Math.abs(lote.area - t.area) <= 0.05);
   if (!fila) {
-    const tamanos = TARIFA_PREVENTA.map((t) => fmtNum(t.area)).join(", ");
+    const tamanos = tarifa.map((t) => fmtNum(t.area)).join(", ");
     return [
       `El lote ${lote.idLote} mide ${fmtNum(lote.area)} m² y ese tamaño no está en la tabla de preventa (${tamanos}).`,
     ];
@@ -91,8 +89,13 @@ function cuadra(actual: number, esperado: number): boolean {
 }
 
 /** Rechaza la cotización si el Excel no coincide con la tabla de preventa. */
-export function inconsistenciasExcel(lote: Lote): string[] {
-  const mensajes: string[] = [...diferenciasTarifa(lote)];
+export function inconsistenciasExcel(
+  lote: Lote,
+  opts: { tarifa?: TarifaFila[]; separacionCop?: number } = {},
+): string[] {
+  const tarifa = opts.tarifa ?? TARIFA_PREVENTA;
+  const separacion = opts.separacionCop ?? SEPARACION_COP;
+  const mensajes: string[] = [...diferenciasTarifa(lote, tarifa)];
   const montos = [lote.area, lote.valorLote, lote.descuento, lote.valorPreventa, lote.valorM2];
   if (montos.some((n) => !Number.isFinite(n) || n < 0)) {
     mensajes.push("El Excel tiene valores vacíos o no numéricos en este lote.");
@@ -106,9 +109,9 @@ export function inconsistenciasExcel(lote: Lote): string[] {
   if (!(lote.area > 0) || !cuadra(lote.valorM2, lote.valorPreventa / lote.area)) {
     mensajes.push("El valor por m² no coincide con el valor de preventa dividido por el área.");
   }
-  if (Number.isFinite(lote.separacion) && Math.abs(lote.separacion - SEPARACION_COP) > 1) {
+  if (Number.isFinite(lote.separacion) && Math.abs(lote.separacion - separacion) > 1) {
     mensajes.push(
-      `El Excel trae separación de ${fmtCOP(lote.separacion)} y la tabla fija ${fmtCOP(SEPARACION_COP)}.`,
+      `El Excel trae separación de ${fmtCOP(lote.separacion)} y la tabla fija ${fmtCOP(separacion)}.`,
     );
   }
   return mensajes;

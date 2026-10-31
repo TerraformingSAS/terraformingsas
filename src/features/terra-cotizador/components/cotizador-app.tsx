@@ -22,6 +22,9 @@ import {
   marcarActividad,
   ultimaActividad,
 } from "@/features/terra-cotizador/lib/actividad";
+import { esAdminRol } from "@/features/terra-cotizador/lib/parametros";
+import { AdminEstadisticas } from "@/features/terra-cotizador/components/admin-estadisticas";
+import { AdminParametrosTrigger } from "@/features/terra-cotizador/components/admin-parametros-panel";
 
 const THEME_KEY = "terra-cotizador-tema";
 
@@ -111,6 +114,8 @@ function CotizadorShell({ children }: { children: ReactNode }) {
   const { dark, toggle } = useTheme();
   const sesion = useSesion();
   const salir = useCerrarSesion();
+  const admin = esAdminRol(sesion.data?.rol);
+  const [panelParams, setPanelParams] = useState(false);
 
   return (
     <div
@@ -131,9 +136,17 @@ function CotizadorShell({ children }: { children: ReactNode }) {
             Cotizador preventa
           </p>
           <div className="ml-auto flex items-center gap-1 sm:gap-2">
-            <span className="hidden max-w-48 truncate text-sm font-medium text-brand-navy md:inline">
+            <span className="hidden max-w-40 truncate text-sm font-medium text-brand-navy md:inline">
               {sesion.data?.nombre}
             </span>
+            {admin && (
+              <span className="hidden rounded bg-[#0e2a47] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white sm:inline">
+                Admin
+              </span>
+            )}
+            {admin && (
+              <AdminParametrosTrigger open={panelParams} onOpenChange={setPanelParams} />
+            )}
             <button
               type="button"
               onClick={toggle}
@@ -158,6 +171,7 @@ function CotizadorShell({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
+      {admin && <AdminEstadisticas />}
       <main className="flex flex-1 flex-col">{children}</main>
       <div className="pb-36 lg:pb-0">
         <FuenteFooter />
