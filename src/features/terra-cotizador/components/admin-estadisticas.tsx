@@ -7,7 +7,8 @@ import { fmtCOP } from "@/features/terra-cotizador/lib/lotes";
 import { useEstadisticas, type LoteStats } from "@/features/terra-cotizador/lib/admin-data";
 import { LoadingState } from "@/features/terra-cotizador/components/states";
 
-export function AdminEstadisticas() {
+/** Pantalla completa de estadísticas por lote (admin). */
+export function AdminEstadisticasPage() {
   const q = useEstadisticas(true);
   const [abierto, setAbierto] = useState<string | null>(null);
 
@@ -17,43 +18,51 @@ export function AdminEstadisticas() {
   );
 
   return (
-    <section
-      aria-label="Estadísticas de cotizaciones"
-      className="border-b border-border bg-white px-3 py-3 sm:px-4"
-    >
-      <div className="mx-auto w-full max-w-7xl">
-        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-          <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-[#0e2a47]">
-            <BarChart3 className="size-4 text-[#f7941d]" aria-hidden="true" />
-            Estadísticas · cotizaciones por lote
-          </p>
-          <p className="text-xs text-muted-foreground">
-            {q.isPending ? "Cargando…" : `${total} cotización${total === 1 ? "" : "es"} · ${q.data?.length ?? 0} lotes`}
-          </p>
-        </div>
+    <div className="container-tf flex w-full flex-1 flex-col px-4 py-6 sm:px-6">
+      <header className="mb-4">
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
+          Administrador
+        </p>
+        <h1 className="flex items-center gap-2 text-2xl font-semibold text-[#0e2a47]">
+          <BarChart3 className="size-6 text-[#f7941d]" aria-hidden="true" />
+          Estadísticas
+        </h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Cotizaciones generadas por lote ·{" "}
+          {q.isPending
+            ? "cargando…"
+            : `${total} cotización${total === 1 ? "" : "es"} · ${q.data?.length ?? 0} lotes`}
+        </p>
+      </header>
 
-        {q.isPending ? (
-          <LoadingState rows={3} />
-        ) : q.isError ? (
-          <p className="text-sm text-destructive">No se pudieron cargar las estadísticas.</p>
-        ) : !q.data?.length ? (
-          <p className="rounded-lg border border-dashed border-border px-3 py-4 text-sm text-muted-foreground">
-            Aún no hay cotizaciones registradas.
-          </p>
-        ) : (
-          <ul className="max-h-64 space-y-1 overflow-y-auto rounded-lg border border-border">
-            {q.data.map((lote) => (
-              <LoteFila
-                key={lote.idLote}
-                lote={lote}
-                open={abierto === lote.idLote}
-                onToggle={() => setAbierto((a) => (a === lote.idLote ? null : lote.idLote))}
-              />
-            ))}
-          </ul>
-        )}
-      </div>
-    </section>
+      <section
+        aria-label="Estadísticas de cotizaciones"
+        className="flex min-h-0 flex-1 flex-col rounded-lg border border-border bg-white"
+      >
+        <div className="flex-1 overflow-y-auto p-3 sm:p-4">
+          {q.isPending ? (
+            <LoadingState rows={6} />
+          ) : q.isError ? (
+            <p className="text-sm text-destructive">No se pudieron cargar las estadísticas.</p>
+          ) : !q.data?.length ? (
+            <p className="rounded-lg border border-dashed border-border px-3 py-8 text-center text-sm text-muted-foreground">
+              Aún no hay cotizaciones registradas.
+            </p>
+          ) : (
+            <ul className="mx-auto max-w-3xl space-y-1 rounded-lg border border-border">
+              {q.data.map((lote) => (
+                <LoteFila
+                  key={lote.idLote}
+                  lote={lote}
+                  open={abierto === lote.idLote}
+                  onToggle={() => setAbierto((a) => (a === lote.idLote ? null : lote.idLote))}
+                />
+              ))}
+            </ul>
+          )}
+        </div>
+      </section>
+    </div>
   );
 }
 

@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { Settings2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,38 +24,8 @@ const GRUPOS: { key: ParametroItem["grupo"]; label: string }[] = [
   { key: "contacto", label: "Contacto" },
 ];
 
-export function AdminParametrosTrigger({
-  open,
-  onOpenChange,
-}: {
-  open: boolean;
-  onOpenChange: (v: boolean) => void;
-}) {
-  return (
-    <>
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        className="hidden sm:inline-flex"
-        onClick={() => onOpenChange(true)}
-      >
-        <Settings2 aria-hidden="true" /> Parámetros
-      </Button>
-      <button
-        type="button"
-        className="grid size-10 place-items-center rounded-md text-brand-navy transition-colors hover:text-brand-orange sm:hidden"
-        aria-label="Abrir parámetros"
-        onClick={() => onOpenChange(true)}
-      >
-        <Settings2 className="size-5" aria-hidden="true" />
-      </button>
-      {open && <AdminParametrosPanel onClose={() => onOpenChange(false)} />}
-    </>
-  );
-}
-
-function AdminParametrosPanel({ onClose }: { onClose: () => void }) {
+/** Pantalla completa de parámetros (admin). */
+export function AdminParametrosPage() {
   const paramsQ = useParametros();
   const lotesQ = useLotes();
   const guardar = useGuardarParametros();
@@ -80,7 +49,6 @@ function AdminParametrosPanel({ onClose }: { onClose: () => void }) {
 
   async function onSave() {
     try {
-      // Validar JSON de tarifa / arrays antes de enviar.
       const parsed = parametrosDesdeItems(draft);
       if (!parsed.tarifaPreventa.length) throw new Error("La tarifa preventa no puede quedar vacía.");
       await guardar.mutateAsync(draft.map((i) => ({ clave: i.clave, valor: i.valor })));
@@ -91,41 +59,33 @@ function AdminParametrosPanel({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/40" role="dialog" aria-modal="true">
-      <button type="button" className="flex-1 cursor-default" aria-label="Cerrar" onClick={onClose} />
-      <aside className="flex h-full w-full max-w-xl flex-col border-l border-border bg-background shadow-xl">
-        <header className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
-              Administrador
-            </p>
-            <h2 className="text-base font-semibold text-[#0e2a47]">Parámetros del cotizador</h2>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="grid size-9 place-items-center rounded-md hover:bg-muted"
-            aria-label="Cerrar panel"
-          >
-            <X className="size-5" aria-hidden="true" />
-          </button>
-        </header>
+    <div className="container-tf flex w-full flex-1 flex-col px-4 py-6 sm:px-6">
+      <header className="mb-4">
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
+          Administrador
+        </p>
+        <h1 className="text-2xl font-semibold text-[#0e2a47]">Parámetros del cotizador</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Valores editables en Upstash Redis (mensajes PDF, cálculo, pagos y contacto).
+        </p>
+      </header>
 
-        <div className="flex gap-1 border-b border-border px-3 pt-2">
-          <TabBtn active={tab === "params"} onClick={() => setTab("params")}>
-            Parámetros
-          </TabBtn>
-          <TabBtn active={tab === "lotes"} onClick={() => setTab("lotes")}>
-            Valores de lotes
-          </TabBtn>
-        </div>
+      <div className="mb-4 flex gap-1 border-b border-border">
+        <TabBtn active={tab === "params"} onClick={() => setTab("params")}>
+          Parámetros
+        </TabBtn>
+        <TabBtn active={tab === "lotes"} onClick={() => setTab("lotes")}>
+          Valores de lotes
+        </TabBtn>
+      </div>
 
-        <div className="flex-1 overflow-y-auto px-4 py-3">
+      <div className="flex min-h-0 flex-1 flex-col rounded-lg border border-border bg-white">
+        <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-5">
           {tab === "params" ? (
             paramsQ.isPending ? (
               <p className="text-sm text-muted-foreground">Cargando…</p>
             ) : (
-              <div className="space-y-5">
+              <div className="mx-auto max-w-3xl space-y-6">
                 <p className="text-xs text-muted-foreground">
                   Fuente:{" "}
                   {paramsQ.data?.fuente === "redis"
@@ -137,9 +97,9 @@ function AdminParametrosPanel({ onClose }: { onClose: () => void }) {
                   if (!items.length) return null;
                   return (
                     <section key={g.key}>
-                      <h3 className="mb-2 text-xs font-bold uppercase tracking-[0.12em] text-[#0e2a47]">
+                      <h2 className="mb-3 text-xs font-bold uppercase tracking-[0.12em] text-[#0e2a47]">
                         {g.label}
-                      </h3>
+                      </h2>
                       <div className="space-y-3">
                         {items.map((item) => (
                           <div key={item.clave} className="grid gap-1">
@@ -229,7 +189,7 @@ function TabBtn({
       className={cn(
         "rounded-t-md px-3 py-2 text-sm font-medium",
         active
-          ? "border border-b-0 border-border bg-background text-[#0e2a47]"
+          ? "border border-b-0 border-border bg-white text-[#0e2a47]"
           : "text-muted-foreground hover:text-foreground",
       )}
     >
