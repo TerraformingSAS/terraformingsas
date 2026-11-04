@@ -19,28 +19,14 @@ export function LotPreview() {
             <li key={type.area} className="rounded-2xl bg-white px-5 py-6 shadow-sm">
               <p className="text-sm font-medium text-brand-dark/70">Lotes de {type.label}</p>
               <p className="mt-3 font-display text-3xl font-bold leading-none text-brand-orange">
-                {type.fromCop != null ? (
-                  <>
-                    {formatCop(type.fromCop)}
-                    <sup className="text-base text-brand-navy" aria-hidden>
-                      *
-                    </sup>
-                  </>
-                ) : (
-                  <span className="text-2xl text-brand-navy">Precio en cotización</span>
-                )}
+                {formatCop(type.fromCop)}
               </p>
-              {type.fromCop != null ? (
-                <p className="mt-2 text-xs font-semibold uppercase tracking-[0.14em] text-brand-navy">
-                  Desde
-                </p>
-              ) : null}
+              <p className="mt-2 text-xs font-semibold uppercase tracking-[0.14em] text-brand-navy">
+                Desde
+              </p>
             </li>
           ))}
         </ul>
-        <p className="mt-4 text-xs leading-relaxed text-brand-dark/70">
-          <sup>*</sup> Precios de preventa (hasta el 15 de noviembre).
-        </p>
       </div>
     </section>
   );
