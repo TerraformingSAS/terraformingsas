@@ -23,7 +23,7 @@ export function AdminEstadisticasPage() {
         <p className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
           Administrador
         </p>
-        <h1 className="flex items-center gap-2 text-2xl font-semibold text-[#0e2a47]">
+        <h1 className="flex items-center gap-2 text-2xl font-semibold text-foreground">
           <BarChart3 className="size-6 text-[#f7941d]" aria-hidden="true" />
           Estadísticas
         </h1>
@@ -37,7 +37,7 @@ export function AdminEstadisticasPage() {
 
       <section
         aria-label="Estadísticas de cotizaciones"
-        className="flex min-h-0 flex-1 flex-col rounded-lg border border-border bg-white"
+        className="flex min-h-0 flex-1 flex-col rounded-lg border border-border bg-card text-card-foreground"
       >
         <div className="flex-1 overflow-y-auto p-3 sm:p-4">
           {q.isPending ? (
@@ -82,7 +82,7 @@ function LoteFila({
         onClick={onToggle}
         className={cn(
           "flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm transition-colors hover:bg-muted/60",
-          open && "bg-[#fff8ef]",
+          open && "bg-[#fff8ef] text-[#0e2a47]",
         )}
         aria-expanded={open}
       >
@@ -91,7 +91,7 @@ function LoteFila({
         ) : (
           <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
         )}
-        <span className="font-semibold text-[#0e2a47]">Lote {lote.idLote}</span>
+        <span className="font-semibold text-foreground">Lote {lote.idLote}</span>
         <span className="ml-auto rounded-full bg-[#0e2a47] px-2 py-0.5 text-[11px] font-bold text-white">
           {lote.total}
         </span>
@@ -102,14 +102,14 @@ function LoteFila({
             {lote.items.map((c) => (
               <li
                 key={`${c.codigo}-${c.fecha}`}
-                className="rounded-md border border-border bg-white px-3 py-2 text-xs"
+                className="rounded-md border border-border bg-background px-3 py-2 text-xs text-foreground"
               >
-                <p className="font-semibold text-[#0e2a47]">{c.clienteNombre}</p>
+                <p className="font-semibold text-foreground">{c.clienteNombre}</p>
                 <p className="mt-0.5 text-muted-foreground">
                   {c.clienteCC && <>CC {c.clienteCC} · </>}
                   {c.clienteEmail}
                 </p>
-                <p className="mt-1 text-[#263746]">
+                <p className="mt-1 text-foreground">
                   Generó <span className="font-medium">{c.vendedorNombre}</span>
                   {" · "}
                   {format(new Date(c.fecha), "d MMM yyyy · HH:mm", { locale: es })}
