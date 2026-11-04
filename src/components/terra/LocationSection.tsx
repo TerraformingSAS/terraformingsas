@@ -1,12 +1,11 @@
 import mapImg from "@/assets/terra/ubicacion-km1.webp";
-import { TerraLeadForm } from "@/components/terra/TerraLeadForm";
 import { TerraPrimaryLink } from "@/components/terra/primitives";
 import { TERRA_PROJECT } from "@/lib/terra/commercial";
 
 export function LocationSection() {
   return (
     <section id="ubicacion" className="scroll-mt-24 bg-white py-12 sm:py-16">
-      <div className="container-tf grid items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(280px,400px)] lg:gap-10">
+      <div className="container-tf">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-orange">
             Ubicación
@@ -36,9 +35,6 @@ export function LocationSection() {
               loading="lazy"
             />
           </figure>
-        </div>
-        <div id="contacto" className="scroll-mt-28 lg:sticky lg:top-24">
-          <TerraLeadForm compact />
         </div>
       </div>
     </section>

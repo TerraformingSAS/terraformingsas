@@ -2,6 +2,7 @@ const PII_KEYS = /email|correo|phone|telefono|whatsapp|nombre|name|cedula|docume
 
 export const TERRA_WEB_EVENTS = [
   "page_view",
+  "explore_lots",
   "select_lot",
   "view_quote",
   "select_financing_plan",
