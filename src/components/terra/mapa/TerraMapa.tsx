@@ -251,9 +251,9 @@ export function TerraMapa() {
           orbitar, botón derecho para desplazar y la rueda para acercar.
         </p>
         <p className="px-4 pb-6 text-xs leading-relaxed text-[#3d5163]">
-          Las manzanas C, D, E y F siguen los textos del plano, ya puestos sobre este perímetro. A y
-          B no vienen rotuladas ahí y conservan su posición respecto a C. El relieve se muestra al
-          doble para leer la pendiente.{" "}
+          Los lotes forman la franja junto a la vía, al oriente, con el lado largo hacia el sur.
+          Cada polígono lleva su propio borde. El relieve se muestra al doble para leer la
+          pendiente.{" "}
           {commercial
             ? `${joined.lots.length - joined.sinComercial.length} con estado comercial, ${joined.sinComercial.length} sin ficha, ${joined.sinGeometria.length} fichas sin polígono.`
             : "La disponibilidad sale de la misma fuente de /terra/estado."}

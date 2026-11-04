@@ -174,6 +174,8 @@ export async function mountTerrain(
           roughness: 0.55,
           metalness: 0,
           emissive: 0x000000,
+          transparent: true,
+          opacity: 0.82,
           polygonOffset: true,
           polygonOffsetFactor: -2,
           polygonOffsetUnits: -2,
@@ -181,10 +183,7 @@ export async function mountTerrain(
       );
       mesh.visible = lotVisible.has(lot.id);
       lotRoot.add(mesh);
-      const edge = new THREE.LineLoop(
-        new THREE.BufferGeometry().setFromPoints(points),
-        new THREE.LineBasicMaterial({ color: 0x0e2a47 }),
-      );
+      const edge = lotBorder(THREE, points);
       mesh.add(edge);
       lotMeshes.push({ id: lot.id, mesh, geometry });
     }
@@ -256,6 +255,9 @@ export async function mountTerrain(
         const active = item.id === id;
         material.emissive.setHex(active ? 0xe07a2f : 0x000000);
         material.emissiveIntensity = active ? 0.55 : 0;
+        const border = item.mesh.children[0] as Mesh | undefined;
+        const borderMaterial = border?.material as MeshStandardMaterial | undefined;
+        borderMaterial?.color.setHex(active ? 0xe07a2f : 0x0e2a47);
       }
       if (!id) return;
       const mesh = lotMeshes.find((item) => item.id === id)?.mesh;
@@ -278,6 +280,39 @@ export async function mountTerrain(
       renderer.dispose();
     },
   };
+}
+
+function lotBorder(THREE: typeof import("three"), points: import("three").Vector3[]) {
+  const half = 0.9;
+  const positions: number[] = [];
+  for (let index = 0; index < points.length; index += 1) {
+    const start = points[index];
+    const end = points[(index + 1) % points.length];
+    if (!start || !end) continue;
+    const dx = end.x - start.x;
+    const dz = end.z - start.z;
+    const length = Math.hypot(dx, dz) || 1;
+    const px = (-dz / length) * half;
+    const pz = (dx / length) * half;
+    const lift = 0.8;
+    const quad = [
+      [start.x + px, start.y + lift, start.z + pz],
+      [start.x - px, start.y + lift, start.z - pz],
+      [end.x + px, end.y + lift, end.z + pz],
+      [end.x - px, end.y + lift, end.z - pz],
+    ];
+    const triangles = [0, 1, 2, 1, 3, 2];
+    for (const corner of triangles) {
+      const point = quad[corner];
+      if (point) positions.push(point[0], point[1], point[2]);
+    }
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  return new THREE.Mesh(
+    geometry,
+    new THREE.MeshBasicMaterial({ color: 0x0e2a47, depthTest: true }),
+  );
 }
 
 function sampleHeight(terrain: TerrainPayload, x: number, z: number): number {
