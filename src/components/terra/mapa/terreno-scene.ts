@@ -44,9 +44,9 @@ export async function mountTerrain(
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setClearColor(0x9bb87a);
+  renderer.setClearColor(0xc5d5df);
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x9bb87a, 3400, 8200);
+  scene.fog = new THREE.Fog(0xc5d5df, 2800, 7000);
   const camera = new THREE.PerspectiveCamera(42, 1, 1, 12000);
   const controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
@@ -76,22 +76,12 @@ export async function mountTerrain(
 
   const texture = await new THREE.TextureLoader().loadAsync("/terra/mapa/terreno.jpg");
   texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
   const ground = new THREE.Mesh(
     geometry,
     new THREE.MeshStandardMaterial({ map: texture, roughness: 0.92, metalness: 0 }),
   );
   scene.add(ground);
-
-  const backdropTexture = await new THREE.TextureLoader().loadAsync("/terra/mapa/fondo.jpg");
-  backdropTexture.colorSpace = THREE.SRGBColorSpace;
-  const backdropSize = Math.max(terrain.widthM, terrain.depthM) * 4.2;
-  const backdrop = new THREE.Mesh(
-    new THREE.PlaneGeometry(backdropSize, backdropSize),
-    new THREE.MeshStandardMaterial({ map: backdropTexture, roughness: 1, metalness: 0 }),
-  );
-  backdrop.rotation.x = -Math.PI / 2;
-  backdrop.position.y = -2;
-  scene.add(backdrop);
 
   let boundary = perimeterRibbon(THREE, []);
   scene.add(boundary);
@@ -282,9 +272,6 @@ export async function mountTerrain(
       controls.dispose();
       geometry.dispose();
       texture.dispose();
-      backdrop.geometry.dispose();
-      (backdrop.material as Material).dispose();
-      backdropTexture.dispose();
       boundary.geometry.dispose();
       renderer.dispose();
     },

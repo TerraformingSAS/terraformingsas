@@ -29,7 +29,7 @@
   },
   "terreno": {
     "elevacion": "AWS Terrain Tiles, Terrarium, zoom 15",
-    "imagen": "Esri World Imagery, zoom 15",
+    "imagen": "Esri World Imagery, zoom 18",
     "cotaMinM": 1725.57,
     "cotaMaxM": 1789.65,
     "nota": "El relieve cubre el perímetro del KML con margen. Los lotes publicados siguen en coordenadas locales y no se proyectan sobre esa malla."
