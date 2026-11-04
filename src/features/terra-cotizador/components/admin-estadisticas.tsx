@@ -20,14 +20,14 @@ export function AdminEstadisticasPage() {
   return (
     <div className="container-tf flex w-full flex-1 flex-col px-4 py-6 sm:px-6">
       <header className="mb-4">
-        <p className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#0e2a47] dark:text-white">
           Administrador
         </p>
-        <h1 className="flex items-center gap-2 text-2xl font-semibold text-foreground">
+        <h1 className="flex items-center gap-2 text-2xl font-semibold text-[#0e2a47] dark:text-white">
           <BarChart3 className="size-6 text-[#f7941d]" aria-hidden="true" />
           Estadísticas
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-1 text-sm text-[#263746] dark:text-white/80">
           Cotizaciones generadas por lote ·{" "}
           {q.isPending
             ? "cargando…"

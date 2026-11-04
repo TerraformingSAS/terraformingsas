@@ -66,11 +66,13 @@ export function AdminParametrosPage() {
   return (
     <div className="container-tf flex w-full flex-1 flex-col px-4 py-6 sm:px-6">
       <header className="mb-4">
-        <p className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#0e2a47] dark:text-white">
           Administrador
         </p>
-        <h1 className="text-2xl font-semibold text-foreground">Parámetros del cotizador</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <h1 className="text-2xl font-semibold text-[#0e2a47] dark:text-white">
+          Parámetros del cotizador
+        </h1>
+        <p className="mt-1 text-sm text-[#263746] dark:text-white/80">
           Valores editables en Upstash Redis (mensajes PDF, cálculo, pagos y contacto).
         </p>
       </header>
@@ -205,7 +207,7 @@ function TabBtn({
         "rounded-t-md px-3 py-2 text-sm font-medium",
         active
           ? "border border-b-0 border-border bg-card text-card-foreground"
-          : "text-muted-foreground hover:text-foreground",
+          : "text-[#263746] hover:text-[#0e2a47] dark:text-white/75 dark:hover:text-white",
       )}
     >
       {children}

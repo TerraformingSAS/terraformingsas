@@ -136,7 +136,7 @@ export function CotizadorShell({ children }: { children: ReactNode }) {
 
   return (
     <div
-      className={`terra-cotizador-app ${dark ? "dark" : "light"} flex min-h-screen flex-col bg-muted/40 text-foreground`}
+      className={`terra-cotizador-app ${dark ? "dark" : "light"} flex min-h-screen flex-col bg-muted text-foreground dark:bg-background`}
     >
       <a
         href="#trabajo"
