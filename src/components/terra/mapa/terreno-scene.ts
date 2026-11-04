@@ -594,7 +594,7 @@ function floatingArrow(THREE: typeof import("three"), title: string, direction: 
   const group = new THREE.Group();
   const head = new THREE.Mesh(
     new THREE.ConeGeometry(16, 54, 3),
-    new THREE.MeshStandardMaterial({ color: 0xf4f7fb, roughness: 0.35, metalness: 0.05 }),
+    new THREE.MeshStandardMaterial({ color: 0xe07a2f, roughness: 0.35, metalness: 0.05 }),
   );
   head.rotation.z = direction === 1 ? -Math.PI / 2 : Math.PI / 2;
   group.add(head);
@@ -623,8 +623,8 @@ function floatingArrow(THREE: typeof import("three"), title: string, direction: 
       depthWrite: false,
     }),
   );
-  label.position.set(direction * -48, 8, 0);
-  label.scale.set(72, 18, 1);
+  label.position.set(direction * -150, 8, 0);
+  label.scale.set(216, 54, 1);
   label.renderOrder = 25;
   group.add(label);
   return group;
