@@ -8,6 +8,7 @@ import { Differentials } from "@/components/Differentials";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
+import { TerraFeaturedHero } from "@/components/TerraFeaturedHero";
 import { Projects } from "@/components/Projects";
 import { Sectors } from "@/components/Sectors";
 import { Services } from "@/components/Services";
@@ -42,6 +43,7 @@ function Index() {
     <div className="min-h-screen bg-background text-foreground">
       <Header />
       <main>
+        <TerraFeaturedHero />
         <Hero />
         <About />
         <Services />
