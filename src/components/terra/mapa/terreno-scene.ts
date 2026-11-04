@@ -85,7 +85,7 @@ export async function mountTerrain(
 
   const logoTexture = await new THREE.TextureLoader().loadAsync("/terra/mapa/logo-terra.png");
   logoTexture.colorSpace = THREE.SRGBColorSpace;
-  const logoWidth = 400;
+  const logoWidth = 400 / 3;
   const logo = new THREE.Mesh(
     new THREE.PlaneGeometry(logoWidth, logoWidth * (1086 / 1448)),
     new THREE.MeshBasicMaterial({
@@ -471,7 +471,7 @@ function lotLabel(THREE: typeof import("three"), name: string, points: import("t
     .multiplyScalar(1 / Math.max(points.length, 1));
   sprite.position.copy(center);
   sprite.position.y += 0.35;
-  sprite.scale.set(10.5, 5.25, 1);
+  sprite.scale.set(14.7, 7.35, 1);
   sprite.renderOrder = 20;
   return sprite;
 }
