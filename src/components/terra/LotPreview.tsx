@@ -14,20 +14,27 @@ export function LotPreview() {
           </div>
           <TerraPrimaryLink href={TERRA_PROJECT.explorerPath}>Ver plano</TerraPrimaryLink>
         </div>
-        <ul className="mt-8 divide-y divide-brand-navy/10 border-y border-brand-navy/10">
+        <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {TERRA_LOT_TYPES.map((type) => (
-            <li key={type.area} className="flex items-baseline justify-between gap-4 py-4">
-              <p className="text-sm text-brand-navy sm:text-base">Lotes de {type.label}</p>
-              <p className="text-right text-sm font-semibold text-brand-navy sm:text-base">
+            <li key={type.area} className="rounded-2xl bg-white px-5 py-6 shadow-sm">
+              <p className="text-sm font-medium text-brand-dark/70">Lotes de {type.label}</p>
+              <p className="mt-3 font-display text-3xl font-bold leading-none text-brand-orange">
                 {type.fromCop != null ? (
                   <>
-                    Desde {formatCop(type.fromCop)}
-                    <sup aria-hidden>*</sup>
+                    {formatCop(type.fromCop)}
+                    <sup className="text-base text-brand-navy" aria-hidden>
+                      *
+                    </sup>
                   </>
                 ) : (
-                  "Precio en cotización"
+                  <span className="text-2xl text-brand-navy">Precio en cotización</span>
                 )}
               </p>
+              {type.fromCop != null ? (
+                <p className="mt-2 text-xs font-semibold uppercase tracking-[0.14em] text-brand-navy">
+                  Desde
+                </p>
+              ) : null}
             </li>
           ))}
         </ul>

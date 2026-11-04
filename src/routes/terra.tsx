@@ -58,10 +58,10 @@ function TerraPage() {
       <TerraHeader />
       <main id="contenido">
         <TerraHero />
+        <LotPreview />
         <LocationSection />
         <CommercialConditions />
         <ProjectGallery />
-        <LotPreview />
         <ProjectTrust />
         <TerraFAQ />
         <TerraCta />
