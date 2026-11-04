@@ -15,12 +15,12 @@ export function LotPreview() {
           </div>
           <TerraPrimaryLink href={TERRA_PROJECT.explorerPath}>Ver plano</TerraPrimaryLink>
         </div>
-        <div className="mt-8 grid items-start gap-6 lg:grid-cols-2">
-          <ul className="flex flex-col gap-3">
+        <div className="mt-8 grid items-stretch gap-6 lg:grid-cols-2">
+          <ul className="flex flex-col gap-3 lg:h-full">
             {TERRA_LOT_TYPES.map((type) => (
               <li
                 key={type.area}
-                className="flex items-center justify-between gap-4 rounded-2xl bg-white px-5 py-4 shadow-sm"
+                className="flex items-center justify-between gap-4 rounded-2xl bg-white px-5 py-4 shadow-sm lg:flex-1"
               >
                 <p className="text-sm font-medium text-brand-dark/70">Lotes de {type.label}</p>
                 <div className="text-right">
