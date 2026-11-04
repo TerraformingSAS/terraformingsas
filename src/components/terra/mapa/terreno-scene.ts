@@ -257,7 +257,7 @@ export async function mountTerrain(
         material.emissiveIntensity = active ? 0.55 : 0;
         const border = item.mesh.children[0] as Mesh | undefined;
         const borderMaterial = border?.material as MeshStandardMaterial | undefined;
-        borderMaterial?.color.setHex(active ? 0xe07a2f : 0x0e2a47);
+        borderMaterial?.color.setHex(active ? 0xe07a2f : 0x000000);
       }
       if (!id) return;
       const mesh = lotMeshes.find((item) => item.id === id)?.mesh;
@@ -311,7 +311,13 @@ function lotBorder(THREE: typeof import("three"), points: import("three").Vector
   geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
   return new THREE.Mesh(
     geometry,
-    new THREE.MeshBasicMaterial({ color: 0x0e2a47, depthTest: true }),
+    new THREE.MeshBasicMaterial({
+      color: 0x000000,
+      depthTest: true,
+      polygonOffset: true,
+      polygonOffsetFactor: -4,
+      polygonOffsetUnits: -4,
+    }),
   );
 }
 
