@@ -102,7 +102,8 @@ export async function mountTerrain(
   function frameTerrain(view: "3d" | "superior") {
     controls.target.copy(terrainTarget);
     if (view === "superior") {
-      camera.position.set(0, Math.max(terrain.widthM, terrain.depthM) * 0.9, 1);
+      const span = Math.max(terrain.widthM, terrain.depthM);
+      camera.position.set(0, span * 0.95, span * 0.18);
     } else {
       camera.position.set(terrain.widthM * 0.35, 420, terrain.depthM * 0.42);
     }
@@ -189,7 +190,7 @@ export async function mountTerrain(
   }
 
   applyHeights();
-  frameTerrain("3d");
+  frameTerrain("superior");
 
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
@@ -266,7 +267,7 @@ export async function mountTerrain(
     },
     setView: frameTerrain,
     reset() {
-      frameTerrain("3d");
+      frameTerrain("superior");
     },
     setSelected(id) {
       for (const item of lotMeshes) {
