@@ -6,14 +6,16 @@ import {
     Scripts,
     createRootRouteWithContext,
     useRouter,
+    useRouterState,
 } from "@tanstack/react-router";
-import { type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 import { absoluteUrl } from "@/lib/seo";
 import appCss from "../styles.css?url";
 
 const GA_MEASUREMENT_ID = "G-T419MSNEWJ";
 const CLARITY_PROJECT_ID = "yvum2tlvam";
+const META_PIXEL_ID = "2986286885067417";
 
 function NotFoundComponent() {
   return (
@@ -146,6 +148,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           ],
         }),
       },
+      {
+        children: `!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '${META_PIXEL_ID}');
+fbq('track', 'PageView');`,
+      },
     ],
   }),
   shellComponent: RootShell,
@@ -159,6 +173,15 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="es">
       <head>
         <HeadContent />
+        <noscript>
+          <img
+            height="1"
+            width="1"
+            style={{ display: "none" }}
+            alt=""
+            src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`}
+          />
+        </noscript>
       </head>
       <body>
         {children}
@@ -168,13 +191,35 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function MetaPixelPageViews() {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const isFirstView = useRef(true);
+
+  useEffect(() => {
+    if (isFirstView.current) {
+      isFirstView.current = false;
+      return;
+    }
+    window.fbq?.("track", "PageView");
+  }, [pathname]);
+
+  return null;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
     <QueryClientProvider client={queryClient}>
+      <MetaPixelPageViews />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>
   );
+}
+
+declare global {
+  interface Window {
+    fbq?: (...args: unknown[]) => void;
+  }
 }
