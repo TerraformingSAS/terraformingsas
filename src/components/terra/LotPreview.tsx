@@ -38,9 +38,8 @@ export function LotPreview() {
             </li>
           ))}
         </ul>
-        <p className="mt-5 text-xs leading-relaxed text-brand-dark/70">
-          <sup>*</sup> Precios de preventa según la tabla de precios. El valor definitivo se
-          confirma en la cotización del lote.
+        <p className="mt-4 text-xs leading-relaxed text-brand-dark/70">
+          <sup>*</sup> Precios de preventa (hasta el 15 de noviembre).
         </p>
       </div>
     </section>
