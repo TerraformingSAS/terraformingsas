@@ -10,7 +10,7 @@ let lots=[],block='',estado='',areaKey='',chosen='',drag=null,queryApplied=false
 const svg=$('#plano');
 function node(tag,attrs,text){const el=document.createElementNS(NS,tag);for(const[k,v]of Object.entries(attrs))el.setAttribute(k,v);if(text!=null)el.textContent=text;return el;}
 function box(items,pad=12){const pts=items.flatMap(p=>p.puntos),xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);return [Math.min(...xs)-pad,Math.min(...ys)-pad,Math.max(...xs)-Math.min(...xs)+2*pad,Math.max(...ys)-Math.min(...ys)+2*pad];}
-function fit(items){if(!items.length)return;svg.setAttribute('viewBox',box(items,18).join(' '));if(window.terra3d?.isActive())window.terra3d.fitVisible(items);}
+function fit(items,force3D=false){if(!items.length)return;svg.setAttribute('viewBox',box(items,18).join(' '));if(window.terra3d?.isActive()&&(force3D||!chosen))window.terra3d.fitVisible(items);}
 function number(value){return Number(value).toLocaleString('es-CO',{maximumFractionDigits:2});}
 function highlight(lot){chosen=lot.id;if(globalThis.window?.terra3d?.isActive())globalThis.window.terra3d.focusLot(lot);globalThis.window?.terra3d?.sync();document.querySelectorAll('#formas polygon').forEach(p=>p.classList.toggle('selected',p.id==='lote-'+lot.id));$('#lote-activo').textContent=lot.id;$('#estado-activo').textContent=lot.estado;const m=lot.medidas;$('#dimensiones-activas').textContent=m?`${number(m.lado_a_m)} × ${number(m.lado_b_m)} m`:'Por confirmar';$('#area-activa').textContent=m?`${number(m.area_m2)} m²`:'Por confirmar';$('#nota-medidas').textContent='Medidas y área según el Excel.';const manzanaEl=$('#manzana-activa');if(manzanaEl)manzanaEl.textContent=lot.manzana;const quote=$('#cotizar-lote');const canQuote=lot.estado==='Disponible';if(canQuote){quote.href=whatsappQuoteUrl(lot.id);quote.tabIndex=0;}else{quote.removeAttribute('href');quote.tabIndex=-1;}quote.setAttribute('aria-disabled',String(!canQuote));quote.setAttribute('aria-label',canQuote?`Cotizar el lote ${lot.id} por WhatsApp`:`El lote ${lot.id} no está disponible para cotizar`);const web=$('#cotizar-web');if(web&&typeof web.setAttribute==='function'){if(canQuote){web.href='/terra?lote='+encodeURIComponent(lot.id)+'#contacto';web.hidden=false;web.setAttribute('aria-disabled','false');}else{web.removeAttribute('href');web.hidden=true;web.setAttribute('aria-disabled','true');}} $('#seleccion').hidden=false;}
 function setBlock(value){
@@ -36,7 +36,7 @@ function applyFilters(keepSelection){
   el.classList.toggle('dim',!match);
  });
  fit(visible.length?visible:lots);
- if(!keepSelection){$('#seleccion').hidden=true;chosen='';document.querySelectorAll('.selected').forEach(el=>el.classList.remove('selected'));}
+ if(!keepSelection){$('#seleccion').hidden=true;chosen='';document.querySelectorAll('.selected').forEach(el=>el.classList.remove('selected'));if(window.terra3d?.isActive())window.terra3d.fitVisible(visible.length?visible:lots);}
  renderFilterChips();
  window.terra3d?.sync();
 }
@@ -77,7 +77,7 @@ function trackAnalytics(event,params){
 }
 $('#mas').addEventListener('click',()=>zoom(.8));
 $('#menos').addEventListener('click',()=>zoom(1.25));
-$('#ajustar').addEventListener('click',()=>fit(lots.filter(matches)));
+$('#ajustar').addEventListener('click',()=>fit(lots.filter(matches),true));
 $('#cerrar').addEventListener('click',()=>{$('#seleccion').hidden=true;document.querySelectorAll('.selected').forEach(el=>el.classList.remove('selected'));chosen='';window.terra3d?.clearSelection();});
 document.querySelectorAll('[data-block]').forEach(b=>b.addEventListener('click',()=>setBlock(b.dataset.block)));
 $('#buscar').addEventListener('input',e=>{
