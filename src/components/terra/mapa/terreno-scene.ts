@@ -476,11 +476,10 @@ function replaceRoad(
   const uy = dy / length;
   const px = uy;
   const py = -ux;
-  const extend = 36;
   const step = 7;
   const centerOffset = -9.2;
   const center: [number, number, number][] = [];
-  for (let distance = -extend; distance <= length + extend; distance += step) {
+  for (let distance = 20; distance <= length - 4; distance += step) {
     const east = ROAD_A[0] + ux * distance + px * centerOffset;
     const north = ROAD_A[1] + uy * distance + py * centerOffset;
     const y = (sampleHeight(terrain, east, north) - terrain.elevMin) * exaggeration + 1.15;
