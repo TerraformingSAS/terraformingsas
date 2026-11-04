@@ -214,6 +214,11 @@ export function TerraMapa() {
             </p>
           )}
           <canvas ref={canvasRef} className="h-full min-h-[70vh] w-full touch-none" />
+          <img
+            src="/terra/mapa/logo-terra.png"
+            alt="TERRA. Naturaleza que te pertenece."
+            className="pointer-events-none absolute left-4 top-1/2 z-10 w-[min(210px,38%)] -translate-y-1/2 drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)]"
+          />
           <style>{MAPA_SELECTION_CSS}</style>
           <div className="absolute bottom-3 left-3 flex flex-col gap-1">
             <button
