@@ -120,8 +120,12 @@ export async function mountTerrain(
   function frameTerrain(view: "3d" | "superior") {
     controls.target.copy(terrainTarget);
     if (view === "superior") {
-      const span = Math.max(terrain.widthM, terrain.depthM);
-      camera.position.set(0, span * 0.95, span * 0.18);
+      const fov = (camera.fov * Math.PI) / 180;
+      const aspect = camera.aspect > 0 ? camera.aspect : 1;
+      const halfView = Math.tan(fov / 2);
+      const distance =
+        Math.max(terrain.depthM / 2 / halfView, terrain.widthM / 2 / (halfView * aspect)) * 1.16;
+      camera.position.set(0, terrainTarget.y + distance, distance * 0.06);
     } else {
       camera.position.set(terrain.widthM * 0.35, 420, terrain.depthM * 0.42);
     }
@@ -216,7 +220,6 @@ export async function mountTerrain(
   }
 
   applyHeights();
-  frameTerrain("superior");
 
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
@@ -253,6 +256,7 @@ export async function mountTerrain(
   const observer = new ResizeObserver(resize);
   observer.observe(canvas);
   resize();
+  frameTerrain("superior");
 
   const flight = {
     active: false,
