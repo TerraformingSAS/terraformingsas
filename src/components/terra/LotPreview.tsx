@@ -1,10 +1,5 @@
 import { TerraPrimaryLink } from "@/components/terra/primitives";
-import {
-  TERRA_FINANCING,
-  TERRA_LOT_TYPES,
-  TERRA_PROJECT,
-  formatCopMillions,
-} from "@/lib/terra/commercial";
+import { TERRA_LOT_TYPES, TERRA_PROJECT, formatCop } from "@/lib/terra/commercial";
 
 export function LotPreview() {
   return (
@@ -19,18 +14,26 @@ export function LotPreview() {
           </div>
           <TerraPrimaryLink href={TERRA_PROJECT.explorerPath}>Ver plano</TerraPrimaryLink>
         </div>
-        <ul className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        <ul className="mt-8 divide-y divide-brand-navy/10 border-y border-brand-navy/10">
           {TERRA_LOT_TYPES.map((type) => (
-            <li key={type.area} className="bg-white px-4 py-5">
-              <p className="font-display text-2xl font-bold text-brand-navy">{type.label}</p>
-              <p className="mt-1 text-xs uppercase tracking-[0.12em] text-brand-dark/60">Área</p>
+            <li key={type.area} className="flex items-baseline justify-between gap-4 py-4">
+              <p className="text-sm text-brand-navy sm:text-base">Lotes de {type.label}</p>
+              <p className="text-right text-sm font-semibold text-brand-navy sm:text-base">
+                {type.fromCop != null ? (
+                  <>
+                    Desde {formatCop(type.fromCop)}
+                    <sup aria-hidden>*</sup>
+                  </>
+                ) : (
+                  "Precio en cotización"
+                )}
+              </p>
             </li>
           ))}
         </ul>
-        <p className="mt-6 text-sm text-brand-navy">
-          Separación {formatCopMillions(TERRA_FINANCING.separacionCop)} ·{" "}
-          {TERRA_FINANCING.financedPercent}% financiable · {TERRA_FINANCING.deliveryPercent}% a la
-          entrega. El precio de cada lote se confirma en la cotización.
+        <p className="mt-4 text-xs leading-relaxed text-brand-dark/70">
+          <sup>*</sup> Precios de preventa según la tabla de precios. El valor definitivo se
+          confirma en la cotización del lote.
         </p>
       </div>
     </section>

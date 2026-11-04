@@ -122,14 +122,25 @@ export const TERRA_NAV = [
   { id: "contacto", label: "Contacto", href: "/terra#contacto" },
 ] as const;
 
-/** Áreas reales del Excel de disponibilidad. El precio por lote no es público. */
+/**
+ * Precios de preventa por tipología, según la tabla comercial.
+ * El lote de 442,75 m² no figura en ese cuadro.
+ */
 export const TERRA_LOT_TYPES = [
-  { area: 120, label: "120 m²" },
-  { area: 154, label: "154 m²" },
-  { area: 165, label: "165 m²" },
-  { area: 211.75, label: "211,75 m²" },
-  { area: 442.75, label: "442,75 m²" },
+  { area: 120, label: "120 m²", fromCop: 74_100_000 },
+  { area: 154, label: "154 m²", fromCop: 93_093_000 },
+  { area: 165, label: "165 m²", fromCop: 99_313_500 },
+  { area: 211.75, label: "211,75 m²", fromCop: 126_626_500 },
+  { area: 442.75, label: "442,75 m²", fromCop: null },
 ] as const;
+
+export function formatCop(value: number): string {
+  return new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
 
 export const TERRA_TIMELINE = [
   {
