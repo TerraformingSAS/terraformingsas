@@ -1,16 +1,16 @@
-import aerialImg from "@/assets/terra/render-aereo.webp";
+import aerialImg from "@/assets/terra/render-encabezado.webp";
 import { TERRA_PROJECT } from "@/lib/terra/commercial";
 
 export function TerraHero() {
   return (
     <section id="proyecto" className="relative scroll-mt-24">
-      <div className="relative min-h-[72vh] overflow-hidden sm:min-h-[78vh]">
+      <div className="relative min-h-[72vh] overflow-hidden rounded-b-[2rem] sm:min-h-[78vh]">
         <img
           src={aerialImg}
           alt="Render aéreo ilustrativo de TERRA Etapa I, con los lotes, las vías proyectadas y el entorno de Popayán"
-          className="absolute inset-0 h-full w-full object-cover object-[62%_center]"
-          width={1729}
-          height={910}
+          className="absolute inset-0 h-full w-full object-cover object-center"
+          width={1920}
+          height={1011}
           fetchPriority="high"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-brand-navy/75 via-brand-navy/25 to-transparent" />

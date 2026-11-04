@@ -41,7 +41,7 @@ export function ProjectGallery() {
                 <img
                   src={item.image}
                   alt={item.alt}
-                  className="aspect-[4/3] w-full object-cover"
+                  className="aspect-[4/3] w-full rounded-2xl object-cover"
                   width={1600}
                   height={900}
                   loading="lazy"
