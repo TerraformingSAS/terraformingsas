@@ -222,6 +222,45 @@ export function TerraMapa() {
             </p>
           )}
           <canvas ref={canvasRef} className="h-full w-full touch-none" />
+          <div className="pointer-events-none absolute left-3 top-1/2 z-10 flex -translate-y-1/2 items-center gap-1 rounded-full bg-white/90 px-2.5 py-1.5 text-xs font-semibold text-[#0e2a47] shadow-[0_8px_24px_rgba(14,42,71,0.18)]">
+            <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
+              <path
+                d="M14 6l-6 6 6 6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            Vereda Santa Rosa
+          </div>
+          <div className="pointer-events-none absolute right-3 top-[18%] z-10 flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1.5 text-xs font-semibold text-[#0e2a47] shadow-[0_8px_24px_rgba(14,42,71,0.18)]">
+            Complejo deportivo
+            <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
+              <path
+                d="M10 6l6 6-6 6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <div className="pointer-events-none absolute right-3 top-[42%] z-10 flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1.5 text-xs font-semibold text-[#0e2a47] shadow-[0_8px_24px_rgba(14,42,71,0.18)]">
+            Popayán
+            <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
+              <path
+                d="M10 6l6 6-6 6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
           <style>{MAPA_SELECTION_CSS}</style>
           <div className="absolute bottom-3 left-3 flex flex-col gap-1">
             <button
