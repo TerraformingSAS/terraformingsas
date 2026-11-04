@@ -1,0 +1,44 @@
+{
+  "dwg": {
+    "archivo": "SOLICITUD 31-10-26.dwg",
+    "version": "AutoCAD 2018/2019/2020",
+    "conversion": "libredwg 0.13.4 dwg2dxf",
+    "poligonosIndividualesDeLote": 0,
+    "notas": [
+      "El modelo no contiene un polígono cerrado por lote comercializable.",
+      "La capa lote tiene tres polilíneas locales (7, 9 y 187 vértices), no una por lote.",
+      "Hay 56 textos numéricos 01–24 en la capa TEX-M.",
+      "Los rótulos de manzana dicen MZN C 07L, MZN D 24L, MZN E 24L y MZN F 01L.",
+      "No aparecen rótulos de manzana A ni B.",
+      "Hay coordenadas de levantamiento cerca de E 4.599.600, N 1.829.000 y un perímetro de predio, sin puntos de control que amarren el plano local de lotes."
+    ]
+  },
+  "kml": {
+    "archivo": "Terra.kml",
+    "nombre": "Lote 3-B - 200000 m2",
+    "poligono": 1,
+    "vertices": 67,
+    "lotesIndividuales": 0,
+    "bboxWgs84": {
+      "oeste": -76.60633,
+      "este": -76.598266,
+      "sur": 2.48717,
+      "norte": 2.493985
+    },
+    "puntos": ["Centro aproximado", "Torre 1", "Torre 2", "Torre 3", "Torre 4", "Posible lago"]
+  },
+  "alineacion": {
+    "aplicada": false,
+    "motivo": "EPSG:9377 sitúa textos del DWG cerca de Popayán, unos 4,6 km al sur del polígono KML. No hay vértices homólogos entre el plano de lotes y el KML. No se forzó una georreferenciación visual."
+  },
+  "geometriaPublicada": {
+    "fuente": "src/server/terra/lib/geometria.json",
+    "mismaFuenteQue": "/terra/estado",
+    "lotes": 104,
+    "manzanas": { "A": 24, "B": 24, "C": 7, "D": 24, "E": 24, "F": 1 },
+    "idsUnicos": 104,
+    "areaShoelaceMin": 351.59,
+    "areaShoelaceMax": 1595.94,
+    "notaArea": "El área mostrada sale de las medidas comerciales. El área del polígono en unidades de dibujo no se publica como metros cuadrados oficiales."
+  }
+}

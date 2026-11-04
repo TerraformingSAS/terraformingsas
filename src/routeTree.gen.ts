@@ -13,25 +13,26 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as PoliticaDePrivacidadRouteImport } from './routes/politica-de-privacidad'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TerraRouteImport } from './routes/terra'
-import { Route as TerraAvisolegalRouteImport } from './routes/terra_.avisolegal'
 import { Route as ApiLotesRouteImport } from './routes/api.lotes'
+import { Route as ApiParametrosRouteImport } from './routes/api.parametros'
 import { Route as ApiTerraEstadoRouteImport } from './routes/api.terra-estado'
+import { Route as TerraAvisolegalRouteImport } from './routes/terra_.avisolegal'
 import { Route as TerraCotizadorRouteImport } from './routes/terra_.cotizador'
+import { Route as TerraMapaRouteImport } from './routes/terra_.mapa'
+import { Route as ApiAdminAccesosRouteImport } from './routes/api.admin.accesos'
+import { Route as ApiAdminEstadisticasRouteImport } from './routes/api.admin.estadisticas'
+import { Route as ApiAdminParametrosRouteImport } from './routes/api.admin.parametros'
 import { Route as ApiAuthSalirRouteImport } from './routes/api.auth.salir'
 import { Route as ApiAuthSolicitarCodigoRouteImport } from './routes/api.auth.solicitar-codigo'
 import { Route as ApiAuthVerificarCodigoRouteImport } from './routes/api.auth.verificar-codigo'
 import { Route as ApiAuthYoRouteImport } from './routes/api.auth.yo'
-import { Route as ApiCotizacionesEnviarRouteImport } from './routes/api.cotizaciones.enviar'
 import { Route as ApiCotizacionesAlertaRouteImport } from './routes/api.cotizaciones.alerta'
+import { Route as ApiCotizacionesEnviarRouteImport } from './routes/api.cotizaciones.enviar'
 import { Route as ApiCotizacionesRegistrarRouteImport } from './routes/api.cotizaciones.registrar'
-import { Route as ApiParametrosRouteImport } from './routes/api.parametros'
-import { Route as ApiAdminParametrosRouteImport } from './routes/api.admin.parametros'
-import { Route as ApiAdminParametrosSeedRouteImport } from './routes/api.admin.parametros.seed'
-import { Route as ApiAdminEstadisticasRouteImport } from './routes/api.admin.estadisticas'
-import { Route as ApiAdminAccesosRouteImport } from './routes/api.admin.accesos'
+import { Route as TerraCotizadorEstadisticasRouteImport } from './routes/terra_.cotizador_.estadisticas'
 import { Route as TerraCotizadorLoginRouteImport } from './routes/terra_.cotizador_.login'
 import { Route as TerraCotizadorParametrosRouteImport } from './routes/terra_.cotizador_.parametros'
-import { Route as TerraCotizadorEstadisticasRouteImport } from './routes/terra_.cotizador_.estadisticas'
+import { Route as ApiAdminParametrosSeedRouteImport } from './routes/api.admin.parametros.seed'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -53,14 +54,14 @@ const TerraRoute = TerraRouteImport.update({
   path: '/terra',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TerraAvisolegalRoute = TerraAvisolegalRouteImport.update({
-  id: '/terra_/avisolegal',
-  path: '/terra/avisolegal',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiLotesRoute = ApiLotesRouteImport.update({
   id: '/api/lotes',
   path: '/api/lotes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiParametrosRoute = ApiParametrosRouteImport.update({
+  id: '/api/parametros',
+  path: '/api/parametros',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiTerraEstadoRoute = ApiTerraEstadoRouteImport.update({
@@ -68,9 +69,34 @@ const ApiTerraEstadoRoute = ApiTerraEstadoRouteImport.update({
   path: '/api/terra-estado',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TerraAvisolegalRoute = TerraAvisolegalRouteImport.update({
+  id: '/terra_/avisolegal',
+  path: '/terra/avisolegal',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TerraCotizadorRoute = TerraCotizadorRouteImport.update({
   id: '/terra_/cotizador',
   path: '/terra/cotizador',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TerraMapaRoute = TerraMapaRouteImport.update({
+  id: '/terra_/mapa',
+  path: '/terra/mapa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminAccesosRoute = ApiAdminAccesosRouteImport.update({
+  id: '/api/admin/accesos',
+  path: '/api/admin/accesos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminEstadisticasRoute = ApiAdminEstadisticasRouteImport.update({
+  id: '/api/admin/estadisticas',
+  path: '/api/admin/estadisticas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminParametrosRoute = ApiAdminParametrosRouteImport.update({
+  id: '/api/admin/parametros',
+  path: '/api/admin/parametros',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSalirRoute = ApiAuthSalirRouteImport.update({
@@ -103,50 +129,33 @@ const ApiCotizacionesEnviarRoute = ApiCotizacionesEnviarRouteImport.update({
   path: '/api/cotizaciones/enviar',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiCotizacionesRegistrarRoute = ApiCotizacionesRegistrarRouteImport.update({
-  id: '/api/cotizaciones/registrar',
-  path: '/api/cotizaciones/registrar',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiParametrosRoute = ApiParametrosRouteImport.update({
-  id: '/api/parametros',
-  path: '/api/parametros',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminParametrosRoute = ApiAdminParametrosRouteImport.update({
-  id: '/api/admin/parametros',
-  path: '/api/admin/parametros',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminParametrosSeedRoute = ApiAdminParametrosSeedRouteImport.update({
-  id: '/api/admin/parametros/seed',
-  path: '/api/admin/parametros/seed',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminEstadisticasRoute = ApiAdminEstadisticasRouteImport.update({
-  id: '/api/admin/estadisticas',
-  path: '/api/admin/estadisticas',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminAccesosRoute = ApiAdminAccesosRouteImport.update({
-  id: '/api/admin/accesos',
-  path: '/api/admin/accesos',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const ApiCotizacionesRegistrarRoute =
+  ApiCotizacionesRegistrarRouteImport.update({
+    id: '/api/cotizaciones/registrar',
+    path: '/api/cotizaciones/registrar',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const TerraCotizadorEstadisticasRoute =
+  TerraCotizadorEstadisticasRouteImport.update({
+    id: '/terra_/cotizador_/estadisticas',
+    path: '/terra/cotizador/estadisticas',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const TerraCotizadorLoginRoute = TerraCotizadorLoginRouteImport.update({
   id: '/terra_/cotizador_/login',
   path: '/terra/cotizador/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TerraCotizadorParametrosRoute = TerraCotizadorParametrosRouteImport.update({
-  id: '/terra_/cotizador_/parametros',
-  path: '/terra/cotizador/parametros',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TerraCotizadorEstadisticasRoute = TerraCotizadorEstadisticasRouteImport.update({
-  id: '/terra_/cotizador_/estadisticas',
-  path: '/terra/cotizador/estadisticas',
-  getParentRoute: () => rootRouteImport,
+const TerraCotizadorParametrosRoute =
+  TerraCotizadorParametrosRouteImport.update({
+    id: '/terra_/cotizador_/parametros',
+    path: '/terra/cotizador/parametros',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiAdminParametrosSeedRoute = ApiAdminParametrosSeedRouteImport.update({
+  id: '/seed',
+  path: '/seed',
+  getParentRoute: () => ApiAdminParametrosRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -154,10 +163,15 @@ export interface FileRoutesByFullPath {
   '/politica-de-privacidad': typeof PoliticaDePrivacidadRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terra': typeof TerraRoute
-  '/terra/avisolegal': typeof TerraAvisolegalRoute
   '/api/lotes': typeof ApiLotesRoute
+  '/api/parametros': typeof ApiParametrosRoute
   '/api/terra-estado': typeof ApiTerraEstadoRoute
+  '/terra/avisolegal': typeof TerraAvisolegalRoute
   '/terra/cotizador': typeof TerraCotizadorRoute
+  '/terra/mapa': typeof TerraMapaRoute
+  '/api/admin/accesos': typeof ApiAdminAccesosRoute
+  '/api/admin/estadisticas': typeof ApiAdminEstadisticasRoute
+  '/api/admin/parametros': typeof ApiAdminParametrosRouteWithChildren
   '/api/auth/salir': typeof ApiAuthSalirRoute
   '/api/auth/solicitar-codigo': typeof ApiAuthSolicitarCodigoRoute
   '/api/auth/verificar-codigo': typeof ApiAuthVerificarCodigoRoute
@@ -165,24 +179,25 @@ export interface FileRoutesByFullPath {
   '/api/cotizaciones/alerta': typeof ApiCotizacionesAlertaRoute
   '/api/cotizaciones/enviar': typeof ApiCotizacionesEnviarRoute
   '/api/cotizaciones/registrar': typeof ApiCotizacionesRegistrarRoute
-  '/api/parametros': typeof ApiParametrosRoute
-  '/api/admin/parametros': typeof ApiAdminParametrosRoute
-  '/api/admin/parametros/seed': typeof ApiAdminParametrosSeedRoute
-  '/api/admin/estadisticas': typeof ApiAdminEstadisticasRoute
-  '/api/admin/accesos': typeof ApiAdminAccesosRoute
+  '/terra/cotizador/estadisticas': typeof TerraCotizadorEstadisticasRoute
   '/terra/cotizador/login': typeof TerraCotizadorLoginRoute
   '/terra/cotizador/parametros': typeof TerraCotizadorParametrosRoute
-  '/terra/cotizador/estadisticas': typeof TerraCotizadorEstadisticasRoute
+  '/api/admin/parametros/seed': typeof ApiAdminParametrosSeedRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/politica-de-privacidad': typeof PoliticaDePrivacidadRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terra': typeof TerraRoute
-  '/terra/avisolegal': typeof TerraAvisolegalRoute
   '/api/lotes': typeof ApiLotesRoute
+  '/api/parametros': typeof ApiParametrosRoute
   '/api/terra-estado': typeof ApiTerraEstadoRoute
+  '/terra/avisolegal': typeof TerraAvisolegalRoute
   '/terra/cotizador': typeof TerraCotizadorRoute
+  '/terra/mapa': typeof TerraMapaRoute
+  '/api/admin/accesos': typeof ApiAdminAccesosRoute
+  '/api/admin/estadisticas': typeof ApiAdminEstadisticasRoute
+  '/api/admin/parametros': typeof ApiAdminParametrosRouteWithChildren
   '/api/auth/salir': typeof ApiAuthSalirRoute
   '/api/auth/solicitar-codigo': typeof ApiAuthSolicitarCodigoRoute
   '/api/auth/verificar-codigo': typeof ApiAuthVerificarCodigoRoute
@@ -190,14 +205,10 @@ export interface FileRoutesByTo {
   '/api/cotizaciones/alerta': typeof ApiCotizacionesAlertaRoute
   '/api/cotizaciones/enviar': typeof ApiCotizacionesEnviarRoute
   '/api/cotizaciones/registrar': typeof ApiCotizacionesRegistrarRoute
-  '/api/parametros': typeof ApiParametrosRoute
-  '/api/admin/parametros': typeof ApiAdminParametrosRoute
-  '/api/admin/parametros/seed': typeof ApiAdminParametrosSeedRoute
-  '/api/admin/estadisticas': typeof ApiAdminEstadisticasRoute
-  '/api/admin/accesos': typeof ApiAdminAccesosRoute
+  '/terra/cotizador/estadisticas': typeof TerraCotizadorEstadisticasRoute
   '/terra/cotizador/login': typeof TerraCotizadorLoginRoute
   '/terra/cotizador/parametros': typeof TerraCotizadorParametrosRoute
-  '/terra/cotizador/estadisticas': typeof TerraCotizadorEstadisticasRoute
+  '/api/admin/parametros/seed': typeof ApiAdminParametrosSeedRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -205,10 +216,15 @@ export interface FileRoutesById {
   '/politica-de-privacidad': typeof PoliticaDePrivacidadRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terra': typeof TerraRoute
-  '/terra_/avisolegal': typeof TerraAvisolegalRoute
   '/api/lotes': typeof ApiLotesRoute
+  '/api/parametros': typeof ApiParametrosRoute
   '/api/terra-estado': typeof ApiTerraEstadoRoute
+  '/terra_/avisolegal': typeof TerraAvisolegalRoute
   '/terra_/cotizador': typeof TerraCotizadorRoute
+  '/terra_/mapa': typeof TerraMapaRoute
+  '/api/admin/accesos': typeof ApiAdminAccesosRoute
+  '/api/admin/estadisticas': typeof ApiAdminEstadisticasRoute
+  '/api/admin/parametros': typeof ApiAdminParametrosRouteWithChildren
   '/api/auth/salir': typeof ApiAuthSalirRoute
   '/api/auth/solicitar-codigo': typeof ApiAuthSolicitarCodigoRoute
   '/api/auth/verificar-codigo': typeof ApiAuthVerificarCodigoRoute
@@ -216,14 +232,10 @@ export interface FileRoutesById {
   '/api/cotizaciones/alerta': typeof ApiCotizacionesAlertaRoute
   '/api/cotizaciones/enviar': typeof ApiCotizacionesEnviarRoute
   '/api/cotizaciones/registrar': typeof ApiCotizacionesRegistrarRoute
-  '/api/parametros': typeof ApiParametrosRoute
-  '/api/admin/parametros': typeof ApiAdminParametrosRoute
-  '/api/admin/parametros/seed': typeof ApiAdminParametrosSeedRoute
-  '/api/admin/estadisticas': typeof ApiAdminEstadisticasRoute
-  '/api/admin/accesos': typeof ApiAdminAccesosRoute
+  '/terra_/cotizador_/estadisticas': typeof TerraCotizadorEstadisticasRoute
   '/terra_/cotizador_/login': typeof TerraCotizadorLoginRoute
   '/terra_/cotizador_/parametros': typeof TerraCotizadorParametrosRoute
-  '/terra_/cotizador_/estadisticas': typeof TerraCotizadorEstadisticasRoute
+  '/api/admin/parametros/seed': typeof ApiAdminParametrosSeedRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -232,10 +244,15 @@ export interface FileRouteTypes {
     | '/politica-de-privacidad'
     | '/sitemap.xml'
     | '/terra'
-    | '/terra/avisolegal'
     | '/api/lotes'
+    | '/api/parametros'
     | '/api/terra-estado'
+    | '/terra/avisolegal'
     | '/terra/cotizador'
+    | '/terra/mapa'
+    | '/api/admin/accesos'
+    | '/api/admin/estadisticas'
+    | '/api/admin/parametros'
     | '/api/auth/salir'
     | '/api/auth/solicitar-codigo'
     | '/api/auth/verificar-codigo'
@@ -243,24 +260,25 @@ export interface FileRouteTypes {
     | '/api/cotizaciones/alerta'
     | '/api/cotizaciones/enviar'
     | '/api/cotizaciones/registrar'
-    | '/api/parametros'
-    | '/api/admin/parametros'
-    | '/api/admin/parametros/seed'
-    | '/api/admin/estadisticas'
-    | '/api/admin/accesos'
+    | '/terra/cotizador/estadisticas'
     | '/terra/cotizador/login'
     | '/terra/cotizador/parametros'
-    | '/terra/cotizador/estadisticas'
+    | '/api/admin/parametros/seed'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/politica-de-privacidad'
     | '/sitemap.xml'
     | '/terra'
-    | '/terra/avisolegal'
     | '/api/lotes'
+    | '/api/parametros'
     | '/api/terra-estado'
+    | '/terra/avisolegal'
     | '/terra/cotizador'
+    | '/terra/mapa'
+    | '/api/admin/accesos'
+    | '/api/admin/estadisticas'
+    | '/api/admin/parametros'
     | '/api/auth/salir'
     | '/api/auth/solicitar-codigo'
     | '/api/auth/verificar-codigo'
@@ -268,24 +286,25 @@ export interface FileRouteTypes {
     | '/api/cotizaciones/alerta'
     | '/api/cotizaciones/enviar'
     | '/api/cotizaciones/registrar'
-    | '/api/parametros'
-    | '/api/admin/parametros'
-    | '/api/admin/parametros/seed'
-    | '/api/admin/estadisticas'
-    | '/api/admin/accesos'
+    | '/terra/cotizador/estadisticas'
     | '/terra/cotizador/login'
     | '/terra/cotizador/parametros'
-    | '/terra/cotizador/estadisticas'
+    | '/api/admin/parametros/seed'
   id:
     | '__root__'
     | '/'
     | '/politica-de-privacidad'
     | '/sitemap.xml'
     | '/terra'
-    | '/terra_/avisolegal'
     | '/api/lotes'
+    | '/api/parametros'
     | '/api/terra-estado'
+    | '/terra_/avisolegal'
     | '/terra_/cotizador'
+    | '/terra_/mapa'
+    | '/api/admin/accesos'
+    | '/api/admin/estadisticas'
+    | '/api/admin/parametros'
     | '/api/auth/salir'
     | '/api/auth/solicitar-codigo'
     | '/api/auth/verificar-codigo'
@@ -293,14 +312,10 @@ export interface FileRouteTypes {
     | '/api/cotizaciones/alerta'
     | '/api/cotizaciones/enviar'
     | '/api/cotizaciones/registrar'
-    | '/api/parametros'
-    | '/api/admin/parametros'
-    | '/api/admin/parametros/seed'
-    | '/api/admin/estadisticas'
-    | '/api/admin/accesos'
+    | '/terra_/cotizador_/estadisticas'
     | '/terra_/cotizador_/login'
     | '/terra_/cotizador_/parametros'
-    | '/terra_/cotizador_/estadisticas'
+    | '/api/admin/parametros/seed'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -308,10 +323,15 @@ export interface RootRouteChildren {
   PoliticaDePrivacidadRoute: typeof PoliticaDePrivacidadRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TerraRoute: typeof TerraRoute
-  TerraAvisolegalRoute: typeof TerraAvisolegalRoute
   ApiLotesRoute: typeof ApiLotesRoute
+  ApiParametrosRoute: typeof ApiParametrosRoute
   ApiTerraEstadoRoute: typeof ApiTerraEstadoRoute
+  TerraAvisolegalRoute: typeof TerraAvisolegalRoute
   TerraCotizadorRoute: typeof TerraCotizadorRoute
+  TerraMapaRoute: typeof TerraMapaRoute
+  ApiAdminAccesosRoute: typeof ApiAdminAccesosRoute
+  ApiAdminEstadisticasRoute: typeof ApiAdminEstadisticasRoute
+  ApiAdminParametrosRoute: typeof ApiAdminParametrosRouteWithChildren
   ApiAuthSalirRoute: typeof ApiAuthSalirRoute
   ApiAuthSolicitarCodigoRoute: typeof ApiAuthSolicitarCodigoRoute
   ApiAuthVerificarCodigoRoute: typeof ApiAuthVerificarCodigoRoute
@@ -319,14 +339,9 @@ export interface RootRouteChildren {
   ApiCotizacionesAlertaRoute: typeof ApiCotizacionesAlertaRoute
   ApiCotizacionesEnviarRoute: typeof ApiCotizacionesEnviarRoute
   ApiCotizacionesRegistrarRoute: typeof ApiCotizacionesRegistrarRoute
-  ApiParametrosRoute: typeof ApiParametrosRoute
-  ApiAdminParametrosRoute: typeof ApiAdminParametrosRoute
-  ApiAdminParametrosSeedRoute: typeof ApiAdminParametrosSeedRoute
-  ApiAdminEstadisticasRoute: typeof ApiAdminEstadisticasRoute
-  ApiAdminAccesosRoute: typeof ApiAdminAccesosRoute
+  TerraCotizadorEstadisticasRoute: typeof TerraCotizadorEstadisticasRoute
   TerraCotizadorLoginRoute: typeof TerraCotizadorLoginRoute
   TerraCotizadorParametrosRoute: typeof TerraCotizadorParametrosRoute
-  TerraCotizadorEstadisticasRoute: typeof TerraCotizadorEstadisticasRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -359,18 +374,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TerraRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/terra_/avisolegal': {
-      id: '/terra_/avisolegal'
-      path: '/terra/avisolegal'
-      fullPath: '/terra/avisolegal'
-      preLoaderRoute: typeof TerraAvisolegalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/lotes': {
       id: '/api/lotes'
       path: '/api/lotes'
       fullPath: '/api/lotes'
       preLoaderRoute: typeof ApiLotesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/parametros': {
+      id: '/api/parametros'
+      path: '/api/parametros'
+      fullPath: '/api/parametros'
+      preLoaderRoute: typeof ApiParametrosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/terra-estado': {
@@ -380,11 +395,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTerraEstadoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/terra_/avisolegal': {
+      id: '/terra_/avisolegal'
+      path: '/terra/avisolegal'
+      fullPath: '/terra/avisolegal'
+      preLoaderRoute: typeof TerraAvisolegalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terra_/cotizador': {
       id: '/terra_/cotizador'
       path: '/terra/cotizador'
       fullPath: '/terra/cotizador'
       preLoaderRoute: typeof TerraCotizadorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terra_/mapa': {
+      id: '/terra_/mapa'
+      path: '/terra/mapa'
+      fullPath: '/terra/mapa'
+      preLoaderRoute: typeof TerraMapaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/accesos': {
+      id: '/api/admin/accesos'
+      path: '/api/admin/accesos'
+      fullPath: '/api/admin/accesos'
+      preLoaderRoute: typeof ApiAdminAccesosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/estadisticas': {
+      id: '/api/admin/estadisticas'
+      path: '/api/admin/estadisticas'
+      fullPath: '/api/admin/estadisticas'
+      preLoaderRoute: typeof ApiAdminEstadisticasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/parametros': {
+      id: '/api/admin/parametros'
+      path: '/api/admin/parametros'
+      fullPath: '/api/admin/parametros'
+      preLoaderRoute: typeof ApiAdminParametrosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/salir': {
@@ -436,39 +486,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCotizacionesRegistrarRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/parametros': {
-      id: '/api/parametros'
-      path: '/api/parametros'
-      fullPath: '/api/parametros'
-      preLoaderRoute: typeof ApiParametrosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/parametros': {
-      id: '/api/admin/parametros'
-      path: '/api/admin/parametros'
-      fullPath: '/api/admin/parametros'
-      preLoaderRoute: typeof ApiAdminParametrosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/parametros/seed': {
-      id: '/api/admin/parametros/seed'
-      path: '/api/admin/parametros/seed'
-      fullPath: '/api/admin/parametros/seed'
-      preLoaderRoute: typeof ApiAdminParametrosSeedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/estadisticas': {
-      id: '/api/admin/estadisticas'
-      path: '/api/admin/estadisticas'
-      fullPath: '/api/admin/estadisticas'
-      preLoaderRoute: typeof ApiAdminEstadisticasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/accesos': {
-      id: '/api/admin/accesos'
-      path: '/api/admin/accesos'
-      fullPath: '/api/admin/accesos'
-      preLoaderRoute: typeof ApiAdminAccesosRouteImport
+    '/terra_/cotizador_/estadisticas': {
+      id: '/terra_/cotizador_/estadisticas'
+      path: '/terra/cotizador/estadisticas'
+      fullPath: '/terra/cotizador/estadisticas'
+      preLoaderRoute: typeof TerraCotizadorEstadisticasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terra_/cotizador_/login': {
@@ -485,25 +507,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TerraCotizadorParametrosRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/terra_/cotizador_/estadisticas': {
-      id: '/terra_/cotizador_/estadisticas'
-      path: '/terra/cotizador/estadisticas'
-      fullPath: '/terra/cotizador/estadisticas'
-      preLoaderRoute: typeof TerraCotizadorEstadisticasRouteImport
-      parentRoute: typeof rootRouteImport
+    '/api/admin/parametros/seed': {
+      id: '/api/admin/parametros/seed'
+      path: '/seed'
+      fullPath: '/api/admin/parametros/seed'
+      preLoaderRoute: typeof ApiAdminParametrosSeedRouteImport
+      parentRoute: typeof ApiAdminParametrosRoute
     }
   }
 }
+
+interface ApiAdminParametrosRouteChildren {
+  ApiAdminParametrosSeedRoute: typeof ApiAdminParametrosSeedRoute
+}
+
+const ApiAdminParametrosRouteChildren: ApiAdminParametrosRouteChildren = {
+  ApiAdminParametrosSeedRoute: ApiAdminParametrosSeedRoute,
+}
+
+const ApiAdminParametrosRouteWithChildren =
+  ApiAdminParametrosRoute._addFileChildren(ApiAdminParametrosRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PoliticaDePrivacidadRoute: PoliticaDePrivacidadRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TerraRoute: TerraRoute,
-  TerraAvisolegalRoute: TerraAvisolegalRoute,
   ApiLotesRoute: ApiLotesRoute,
+  ApiParametrosRoute: ApiParametrosRoute,
   ApiTerraEstadoRoute: ApiTerraEstadoRoute,
+  TerraAvisolegalRoute: TerraAvisolegalRoute,
   TerraCotizadorRoute: TerraCotizadorRoute,
+  TerraMapaRoute: TerraMapaRoute,
+  ApiAdminAccesosRoute: ApiAdminAccesosRoute,
+  ApiAdminEstadisticasRoute: ApiAdminEstadisticasRoute,
+  ApiAdminParametrosRoute: ApiAdminParametrosRouteWithChildren,
   ApiAuthSalirRoute: ApiAuthSalirRoute,
   ApiAuthSolicitarCodigoRoute: ApiAuthSolicitarCodigoRoute,
   ApiAuthVerificarCodigoRoute: ApiAuthVerificarCodigoRoute,
@@ -511,14 +549,9 @@ const rootRouteChildren: RootRouteChildren = {
   ApiCotizacionesAlertaRoute: ApiCotizacionesAlertaRoute,
   ApiCotizacionesEnviarRoute: ApiCotizacionesEnviarRoute,
   ApiCotizacionesRegistrarRoute: ApiCotizacionesRegistrarRoute,
-  ApiParametrosRoute: ApiParametrosRoute,
-  ApiAdminParametrosRoute: ApiAdminParametrosRoute,
-  ApiAdminParametrosSeedRoute: ApiAdminParametrosSeedRoute,
-  ApiAdminEstadisticasRoute: ApiAdminEstadisticasRoute,
-  ApiAdminAccesosRoute: ApiAdminAccesosRoute,
+  TerraCotizadorEstadisticasRoute: TerraCotizadorEstadisticasRoute,
   TerraCotizadorLoginRoute: TerraCotizadorLoginRoute,
   TerraCotizadorParametrosRoute: TerraCotizadorParametrosRoute,
-  TerraCotizadorEstadisticasRoute: TerraCotizadorEstadisticasRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

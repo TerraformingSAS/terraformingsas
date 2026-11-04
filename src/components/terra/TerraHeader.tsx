@@ -27,7 +27,8 @@ export function TerraHeader({ solid = false }: { solid?: boolean }) {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const navHref = (id: string, href: string) => (onLanding ? `#${id}` : href);
+  const navHref = (id: string, href: string) =>
+    onLanding && href.startsWith("/terra#") ? `#${id}` : href;
 
   return (
     <header
