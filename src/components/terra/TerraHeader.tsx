@@ -27,7 +27,7 @@ export function TerraHeader({ solid = false }: { solid?: boolean }) {
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all duration-300",
-        showSolid ? "border-b border-border bg-white/95 shadow-sm backdrop-blur" : "bg-transparent",
+        showSolid ? "border-b border-border bg-white shadow-sm" : "bg-transparent",
       )}
     >
       <a
