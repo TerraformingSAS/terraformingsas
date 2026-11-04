@@ -18,10 +18,11 @@ Deben estar habilitadas también en **Preview** de Vercel si se prueba allí.
 
 ## Claves Redis
 
-| Clave | Contenido |
-|---|---|
-| `terra:cotizador:parametros` | Objeto JSON `{ [clave]: valor }` |
-| `terra:cotizaciones:log` | Array JSON de cotizaciones generadas (máx. 2000) |
+| Clave                        | Contenido                                                                                                   |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `terra:cotizador:parametros` | Objeto JSON `{ [clave]: valor }`                                                                            |
+| `terra:cotizaciones:log`     | Array JSON de cotizaciones generadas (máx. 2000)                                                            |
+| `terra:accesos:log`          | Array JSON de ingresos al cotizador (login OTP exitoso, máx. 2000). Visible en Parámetros → Log de accesos. |
 
 ## Comportamiento
 
@@ -35,14 +36,14 @@ Deben estar habilitadas también en **Preview** de Vercel si se prueba allí.
 
 Claves bajo `terra:cotizador:parametros`:
 
-| Clave | Uso |
-|---|---|
-| `msg_cuota_extra` | Texto bajo cuotas 24/36 |
-| `msg_cuotas_valorizacion` | Disclaimer de valorización/IPC |
-| `msg_no_reserva` | Disclaimer de no reserva |
-| `empresa_nombre`, `nit`, `banco`, `cuenta` | Bloque de pagos |
-| `email_mercadeo`, `telefono`, `direccion` | Contacto |
-| `vigencia_dias` | Vigencia en días calendario |
+| Clave                                      | Uso                            |
+| ------------------------------------------ | ------------------------------ |
+| `msg_cuota_extra`                          | Texto bajo cuotas 24/36        |
+| `msg_cuotas_valorizacion`                  | Disclaimer de valorización/IPC |
+| `msg_no_reserva`                           | Disclaimer de no reserva       |
+| `empresa_nombre`, `nit`, `banco`, `cuenta` | Bloque de pagos                |
+| `email_mercadeo`, `telefono`, `direccion`  | Contacto                       |
+| `vigencia_dias`                            | Vigencia en días calendario    |
 
 ### Sembrar a mano
 

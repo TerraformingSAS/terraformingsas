@@ -2,6 +2,7 @@
 import { redis } from "./redis.js";
 import { buscarVendedor } from "./vendedores.js";
 import { crearSesion } from "./session.js";
+import { registrarAcceso } from "./accesos-log.js";
 import { OTP_MAX_INTENTOS, hashCodigo, iguales, normalizar } from "./otp.js";
 
 export async function POST(req: Request): Promise<Response> {
@@ -29,6 +30,11 @@ export async function POST(req: Request): Promise<Response> {
     const vendedor = await buscarVendedor(email); // revalida que siga activo
     if (!vendedor) return fallo();
     const cookie = await crearSesion(vendedor);
+    await registrarAcceso({
+      email: vendedor.email,
+      nombre: vendedor.nombre,
+      rol: vendedor.rol,
+    });
     return Response.json(
       { ok: true, nombre: vendedor.nombre },
       { headers: { "Set-Cookie": cookie } },

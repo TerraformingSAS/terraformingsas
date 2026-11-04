@@ -116,6 +116,30 @@ export function useSembrarMensajes() {
   });
 }
 
+export type AccesoRegistro = {
+  email: string;
+  nombre: string;
+  rol: string;
+  fecha: string;
+};
+
+export function useAccesos(enabled: boolean) {
+  return useQuery({
+    queryKey: ["admin-accesos"],
+    enabled,
+    queryFn: async () => {
+      const r = await ensureOk(await apiFetch("/api/admin/accesos"));
+      if (r.status === 403) throw new Error("forbidden");
+      if (!r.ok) throw new Error("accesos");
+      const j = (await r.json()) as { accesos?: AccesoRegistro[] };
+      return j.accesos ?? [];
+    },
+    staleTime: 15_000,
+    refetchInterval: 30_000,
+    retry: (n, e) => !(e instanceof NoAutorizado) && n < 1,
+  });
+}
+
 export function useEstadisticas(enabled: boolean) {
   return useQuery({
     queryKey: ["admin-estadisticas"],
