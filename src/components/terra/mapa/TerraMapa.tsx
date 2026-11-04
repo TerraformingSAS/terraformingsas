@@ -272,7 +272,6 @@ export function TerraMapa() {
                   <dd>{medidas ? `${medida(medidas.area_m2)} m²` : "Por confirmar"}</dd>
                 </div>
               </dl>
-              <p className="mapa-size-note">Medidas y área según el Excel.</p>
               <p className="mapa-size-note">
                 Consulta las condiciones vigentes de separación y financiación en tu cotización.
               </p>
@@ -314,7 +313,7 @@ export function TerraMapa() {
         <p className="px-4 pb-2 text-xs leading-relaxed text-[#3d5163]">
           El relieve y la foto del predio comparten el recorte del KML
           {terrain ? ` (${terrain.elevMin}–${terrain.elevMax} m)` : ""}. El contorno naranja sigue
-          ese perímetro, con el norte de la imagen hacia el fondo de la vista inicial. Arrastra para
+          ese perímetro. La vista inicial es superior, con el norte hacia arriba. Arrastra para
           orbitar, botón derecho para desplazar y la rueda para acercar.
         </p>
         <p className="px-4 pb-6 text-xs leading-relaxed text-[#3d5163]">
