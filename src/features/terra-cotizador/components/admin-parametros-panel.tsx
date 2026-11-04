@@ -15,6 +15,9 @@ import {
   type ParametroItem,
 } from "@/features/terra-cotizador/lib/parametros";
 import { useLotes } from "@/features/terra-cotizador/lib/datos";
+import { useAccesos, type AccesoRegistro } from "@/features/terra-cotizador/lib/admin-data";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 
 const GRUPOS: { key: ParametroItem["grupo"]; label: string }[] = [
   { key: "calculo", label: "Cálculo" },
@@ -31,7 +34,8 @@ export function AdminParametrosPage() {
   const guardar = useGuardarParametros();
   const sembrar = useSembrarMensajes();
   const [draft, setDraft] = useState<ParametroItem[]>([]);
-  const [tab, setTab] = useState<"params" | "lotes">("params");
+  const [tab, setTab] = useState<"params" | "lotes" | "accesos">("params");
+  const accesosQ = useAccesos(tab === "accesos");
 
   useEffect(() => {
     if (paramsQ.data?.items) setDraft(paramsQ.data.items.map((i) => ({ ...i })));
@@ -50,7 +54,8 @@ export function AdminParametrosPage() {
   async function onSave() {
     try {
       const parsed = parametrosDesdeItems(draft);
-      if (!parsed.tarifaPreventa.length) throw new Error("La tarifa preventa no puede quedar vacía.");
+      if (!parsed.tarifaPreventa.length)
+        throw new Error("La tarifa preventa no puede quedar vacía.");
       await guardar.mutateAsync(draft.map((i) => ({ clave: i.clave, valor: i.valor })));
       toast.success("Parámetros guardados.");
     } catch (e) {
@@ -77,11 +82,20 @@ export function AdminParametrosPage() {
         <TabBtn active={tab === "lotes"} onClick={() => setTab("lotes")}>
           Valores de lotes
         </TabBtn>
+        <TabBtn active={tab === "accesos"} onClick={() => setTab("accesos")}>
+          Log de accesos
+        </TabBtn>
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col rounded-lg border border-border bg-white">
         <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-5">
-          {tab === "params" ? (
+          {tab === "accesos" ? (
+            <AccesosTabla
+              accesos={accesosQ.data ?? []}
+              loading={accesosQ.isPending}
+              error={accesosQ.isError}
+            />
+          ) : tab === "params" ? (
             paramsQ.isPending ? (
               <p className="text-sm text-muted-foreground">Cargando…</p>
             ) : (
@@ -196,6 +210,57 @@ function TabBtn({
     >
       {children}
     </button>
+  );
+}
+
+function AccesosTabla({
+  accesos,
+  loading,
+  error,
+}: {
+  accesos: AccesoRegistro[];
+  loading: boolean;
+  error: boolean;
+}) {
+  if (loading) return <p className="text-sm text-muted-foreground">Cargando accesos…</p>;
+  if (error)
+    return <p className="text-sm text-destructive">No se pudo cargar el log de accesos.</p>;
+  if (!accesos.length) {
+    return (
+      <p className="text-sm text-muted-foreground">
+        Aún no hay ingresos registrados. Cada inicio de sesión con código queda en esta lista.
+      </p>
+    );
+  }
+  return (
+    <div className="overflow-x-auto">
+      <p className="mb-2 text-xs text-muted-foreground">
+        {accesos.length} ingreso{accesos.length === 1 ? "" : "s"} · el más reciente primero. Se
+        registra cuando alguien entra con el código de acceso.
+      </p>
+      <table className="w-full min-w-[640px] border-collapse text-left text-xs">
+        <thead>
+          <tr className="border-b border-border text-[10px] uppercase tracking-wide text-muted-foreground">
+            <th className="px-2 py-1.5">Fecha</th>
+            <th className="px-2 py-1.5">Nombre</th>
+            <th className="px-2 py-1.5">Correo</th>
+            <th className="px-2 py-1.5">Rol</th>
+          </tr>
+        </thead>
+        <tbody>
+          {accesos.map((a, i) => (
+            <tr key={`${a.fecha}-${a.email}-${i}`} className="border-b border-border/70">
+              <td className="whitespace-nowrap px-2 py-1.5 tabular-nums">
+                {format(new Date(a.fecha), "d MMM yyyy · HH:mm", { locale: es })}
+              </td>
+              <td className="px-2 py-1.5 font-semibold">{a.nombre}</td>
+              <td className="px-2 py-1.5">{a.email}</td>
+              <td className="px-2 py-1.5">{a.rol}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 

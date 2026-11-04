@@ -28,6 +28,7 @@ import { Route as ApiParametrosRouteImport } from './routes/api.parametros'
 import { Route as ApiAdminParametrosRouteImport } from './routes/api.admin.parametros'
 import { Route as ApiAdminParametrosSeedRouteImport } from './routes/api.admin.parametros.seed'
 import { Route as ApiAdminEstadisticasRouteImport } from './routes/api.admin.estadisticas'
+import { Route as ApiAdminAccesosRouteImport } from './routes/api.admin.accesos'
 import { Route as TerraCotizadorLoginRouteImport } from './routes/terra_.cotizador_.login'
 import { Route as TerraCotizadorParametrosRouteImport } from './routes/terra_.cotizador_.parametros'
 import { Route as TerraCotizadorEstadisticasRouteImport } from './routes/terra_.cotizador_.estadisticas'
@@ -127,6 +128,11 @@ const ApiAdminEstadisticasRoute = ApiAdminEstadisticasRouteImport.update({
   path: '/api/admin/estadisticas',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminAccesosRoute = ApiAdminAccesosRouteImport.update({
+  id: '/api/admin/accesos',
+  path: '/api/admin/accesos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TerraCotizadorLoginRoute = TerraCotizadorLoginRouteImport.update({
   id: '/terra_/cotizador_/login',
   path: '/terra/cotizador/login',
@@ -163,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/api/admin/parametros': typeof ApiAdminParametrosRoute
   '/api/admin/parametros/seed': typeof ApiAdminParametrosSeedRoute
   '/api/admin/estadisticas': typeof ApiAdminEstadisticasRoute
+  '/api/admin/accesos': typeof ApiAdminAccesosRoute
   '/terra/cotizador/login': typeof TerraCotizadorLoginRoute
   '/terra/cotizador/parametros': typeof TerraCotizadorParametrosRoute
   '/terra/cotizador/estadisticas': typeof TerraCotizadorEstadisticasRoute
@@ -187,6 +194,7 @@ export interface FileRoutesByTo {
   '/api/admin/parametros': typeof ApiAdminParametrosRoute
   '/api/admin/parametros/seed': typeof ApiAdminParametrosSeedRoute
   '/api/admin/estadisticas': typeof ApiAdminEstadisticasRoute
+  '/api/admin/accesos': typeof ApiAdminAccesosRoute
   '/terra/cotizador/login': typeof TerraCotizadorLoginRoute
   '/terra/cotizador/parametros': typeof TerraCotizadorParametrosRoute
   '/terra/cotizador/estadisticas': typeof TerraCotizadorEstadisticasRoute
@@ -212,6 +220,7 @@ export interface FileRoutesById {
   '/api/admin/parametros': typeof ApiAdminParametrosRoute
   '/api/admin/parametros/seed': typeof ApiAdminParametrosSeedRoute
   '/api/admin/estadisticas': typeof ApiAdminEstadisticasRoute
+  '/api/admin/accesos': typeof ApiAdminAccesosRoute
   '/terra_/cotizador_/login': typeof TerraCotizadorLoginRoute
   '/terra_/cotizador_/parametros': typeof TerraCotizadorParametrosRoute
   '/terra_/cotizador_/estadisticas': typeof TerraCotizadorEstadisticasRoute
@@ -238,6 +247,7 @@ export interface FileRouteTypes {
     | '/api/admin/parametros'
     | '/api/admin/parametros/seed'
     | '/api/admin/estadisticas'
+    | '/api/admin/accesos'
     | '/terra/cotizador/login'
     | '/terra/cotizador/parametros'
     | '/terra/cotizador/estadisticas'
@@ -262,6 +272,7 @@ export interface FileRouteTypes {
     | '/api/admin/parametros'
     | '/api/admin/parametros/seed'
     | '/api/admin/estadisticas'
+    | '/api/admin/accesos'
     | '/terra/cotizador/login'
     | '/terra/cotizador/parametros'
     | '/terra/cotizador/estadisticas'
@@ -286,6 +297,7 @@ export interface FileRouteTypes {
     | '/api/admin/parametros'
     | '/api/admin/parametros/seed'
     | '/api/admin/estadisticas'
+    | '/api/admin/accesos'
     | '/terra_/cotizador_/login'
     | '/terra_/cotizador_/parametros'
     | '/terra_/cotizador_/estadisticas'
@@ -311,6 +323,7 @@ export interface RootRouteChildren {
   ApiAdminParametrosRoute: typeof ApiAdminParametrosRoute
   ApiAdminParametrosSeedRoute: typeof ApiAdminParametrosSeedRoute
   ApiAdminEstadisticasRoute: typeof ApiAdminEstadisticasRoute
+  ApiAdminAccesosRoute: typeof ApiAdminAccesosRoute
   TerraCotizadorLoginRoute: typeof TerraCotizadorLoginRoute
   TerraCotizadorParametrosRoute: typeof TerraCotizadorParametrosRoute
   TerraCotizadorEstadisticasRoute: typeof TerraCotizadorEstadisticasRoute
@@ -451,6 +464,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminEstadisticasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/accesos': {
+      id: '/api/admin/accesos'
+      path: '/api/admin/accesos'
+      fullPath: '/api/admin/accesos'
+      preLoaderRoute: typeof ApiAdminAccesosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terra_/cotizador_/login': {
       id: '/terra_/cotizador_/login'
       path: '/terra/cotizador/login'
@@ -495,6 +515,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminParametrosRoute: ApiAdminParametrosRoute,
   ApiAdminParametrosSeedRoute: ApiAdminParametrosSeedRoute,
   ApiAdminEstadisticasRoute: ApiAdminEstadisticasRoute,
+  ApiAdminAccesosRoute: ApiAdminAccesosRoute,
   TerraCotizadorLoginRoute: TerraCotizadorLoginRoute,
   TerraCotizadorParametrosRoute: TerraCotizadorParametrosRoute,
   TerraCotizadorEstadisticasRoute: TerraCotizadorEstadisticasRoute,
