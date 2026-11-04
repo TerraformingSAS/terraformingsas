@@ -182,8 +182,10 @@ export async function mountTerrain(
         }),
       );
       mesh.visible = lotVisible.has(lot.id);
+      mesh.renderOrder = 1;
       lotRoot.add(mesh);
       const edge = lotBorder(THREE, points);
+      edge.visible = mesh.visible;
       mesh.add(edge);
       lotMeshes.push({ id: lot.id, mesh, geometry });
     }
@@ -283,7 +285,7 @@ export async function mountTerrain(
 }
 
 function lotBorder(THREE: typeof import("three"), points: import("three").Vector3[]) {
-  const half = 0.9;
+  const half = 1.35;
   const positions: number[] = [];
   for (let index = 0; index < points.length; index += 1) {
     const start = points[index];
@@ -294,7 +296,7 @@ function lotBorder(THREE: typeof import("three"), points: import("three").Vector
     const length = Math.hypot(dx, dz) || 1;
     const px = (-dz / length) * half;
     const pz = (dx / length) * half;
-    const lift = 0.8;
+    const lift = 2.4;
     const quad = [
       [start.x + px, start.y + lift, start.z + pz],
       [start.x - px, start.y + lift, start.z - pz],
@@ -309,16 +311,19 @@ function lotBorder(THREE: typeof import("three"), points: import("three").Vector
   }
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-  return new THREE.Mesh(
+  const border = new THREE.Mesh(
     geometry,
     new THREE.MeshBasicMaterial({
       color: 0x000000,
+      side: THREE.DoubleSide,
       depthTest: true,
       polygonOffset: true,
-      polygonOffsetFactor: -4,
-      polygonOffsetUnits: -4,
+      polygonOffsetFactor: -8,
+      polygonOffsetUnits: -8,
     }),
   );
+  border.renderOrder = 3;
+  return border;
 }
 
 function sampleHeight(terrain: TerrainPayload, x: number, z: number): number {

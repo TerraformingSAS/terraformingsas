@@ -12,7 +12,7 @@ export type PlacedLot = {
 const ETAPA_I = new Set(["C", "D", "E", "F"]);
 
 /** Esquina norte del loteo, en metros del terreno: este y norte. */
-const NORTH_END: [number, number] = [1192.85, 1044.59];
+const NORTH_END: [number, number] = [1170.04, 1173.36];
 /** Eje corto, a lo largo de la vía, hacia el oriente. */
 const ACROSS: [number, number] = [0.99586, 0.09089];
 /** Eje largo, desde la vía hacia el sur. */
