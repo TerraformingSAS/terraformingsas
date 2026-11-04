@@ -15,7 +15,8 @@ const COLORS: Record<string, string> = {
   "No disponible": "#b4b9b4",
 };
 
-const GEOMETRY = geometria as GeomLot[];
+const ETAPA_I = new Set(["C", "D", "E", "F"]);
+const GEOMETRY = (geometria as GeomLot[]).filter((lot) => ETAPA_I.has(lot.manzana));
 
 function referencePrice(area: number | undefined | null): number | null {
   if (area == null) return null;
@@ -251,9 +252,8 @@ export function TerraMapa() {
           orbitar, botón derecho para desplazar y la rueda para acercar.
         </p>
         <p className="px-4 pb-6 text-xs leading-relaxed text-[#3d5163]">
-          Los lotes forman la franja junto a la vía, al oriente, con el lado largo hacia el sur.
-          Cada polígono lleva su propio borde. El relieve se muestra al doble para leer la
-          pendiente.{" "}
+          La etapa I muestra las manzanas C, D, E y F en la franja suroriental, junto a la quebrada.
+          Cada lote lleva su propio borde. El relieve se muestra al doble para leer la pendiente.{" "}
           {commercial
             ? `${joined.lots.length - joined.sinComercial.length} con estado comercial, ${joined.sinComercial.length} sin ficha, ${joined.sinGeometria.length} fichas sin polígono.`
             : "La disponibilidad sale de la misma fuente de /terra/estado."}
