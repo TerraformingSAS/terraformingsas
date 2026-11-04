@@ -138,19 +138,29 @@
         </label>
         <button type="button" id="limpiar-filtros" class="chip">Limpiar filtros</button>
       </div>
+      <div class="view-toggle" role="group" aria-label="Tipo de vista del plano">
+        <button type="button" id="vista-3d" class="chip active" aria-pressed="true">Vista 3D</button>
+        <button type="button" id="vista-2d" class="chip" aria-pressed="false">Vista 2D</button>
+      </div>
       <div class="zoom">
         <button id="menos" aria-label="Alejar">−</button>
         <button id="mas" aria-label="Acercar">+</button>
         <button id="ajustar">Ajustar</button>
+        <button id="vista-general" type="button">Vista general</button>
       </div>
     </div>
     <div id="filtros-activos" class="filter-chips" hidden></div>
-    <div class="map-stage">
-      <svg id="plano" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="Plano TERRA Etapa I, lotes de solo lectura">
-        <g id="formas"></g>
-        <g id="etiquetas"></g>
-        <g id="titulos"></g>
-      </svg>
+    <div class="map-stage" data-view="3d">
+      <div class="map-scene">
+        <div class="map-tilt" id="map-tilt">
+          <svg id="plano" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="Plano TERRA Etapa I, lotes de solo lectura">
+            <g id="suelo"></g>
+            <g id="formas"></g>
+            <g id="etiquetas"></g>
+            <g id="titulos"></g>
+          </svg>
+        </div>
+      </div>
       <p id="carga" role="status">Cargando plano…</p>
       <div id="seleccion" class="selection" aria-live="polite" hidden>
         <div class="selection-head">
@@ -174,6 +184,10 @@
             <dt>Área del lote</dt>
             <dd id="area-activa"></dd>
           </div>
+          <div id="precio-fila" hidden>
+            <dt>Precio</dt>
+            <dd id="precio-activo"></dd>
+          </div>
         </dl>
         <p id="nota-medidas" class="size-note"></p>
         <p id="financiacion-lote" class="size-note">Consulta las condiciones vigentes de separación y financiación en tu cotización.</p>
@@ -187,7 +201,7 @@
       </div>
     </div>
     <div class="map-footer">
-      <p>Selecciona un lote para identificarlo. Amplía el plano con + y −. La rueda del mouse desplaza la página.</p>
+      <p>Selecciona un lote para acercarlo. Arrastra para desplazarte, usa + y −, y dos dedos en el celular. La rueda del mouse desplaza la página.</p>
       <span>104 lotes · 6 manzanas</span>
     </div>
   </section>

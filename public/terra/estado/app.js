@@ -10,9 +10,34 @@ let lots=[],block='',estado='',areaKey='',chosen='',drag=null,queryApplied=false
 const svg=$('#plano');
 function node(tag,attrs,text){const el=document.createElementNS(NS,tag);for(const[k,v]of Object.entries(attrs))el.setAttribute(k,v);if(text!=null)el.textContent=text;return el;}
 function box(items,pad=12){const pts=items.flatMap(p=>p.puntos),xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);return [Math.min(...xs)-pad,Math.min(...ys)-pad,Math.max(...xs)-Math.min(...xs)+2*pad,Math.max(...ys)-Math.min(...ys)+2*pad];}
-function fit(items){if(!items.length)return;svg.setAttribute('viewBox',box(items,18).join(' '));}
+function fit(items){if(!items.length)return;cancelViewAnim();const frame=box(items,18);writeBox(frame[0],frame[1],frame[2],frame[3]);}
+let viewAnim=0;
+function readBox(){const b=svg.viewBox.baseVal;return {x:b.x,y:b.y,w:b.width,h:b.height};}
+function writeBox(x,y,w,h){svg.setAttribute('viewBox',[x,y,w,h].join(' '));}
+function cancelViewAnim(){if(viewAnim){cancelAnimationFrame(viewAnim);viewAnim=0;}}
+function animateView(target){
+ cancelViewAnim();
+ const b=svg.viewBox.baseVal;
+ const from=[b.x||target[0],b.y||target[1],b.width||target[2],b.height||target[3]];
+ const reduced=typeof matchMedia==='function'&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+ if(reduced||!from[2]){writeBox(target[0],target[1],target[2],target[3]);return;}
+ const t0=performance.now();
+ (function step(now){
+  const t=Math.min(1,(now-t0)/720);
+  const e=1-Math.pow(1-t,3);
+  writeBox(from[0]+(target[0]-from[0])*e,from[1]+(target[1]-from[1])*e,from[2]+(target[2]-from[2])*e,from[3]+(target[3]-from[3])*e);
+  if(t<1)viewAnim=requestAnimationFrame(step);
+ })(t0);
+}
+function focusLot(lot){
+ if(!lot||!lot.puntos)return;
+ const [x,y,w,h]=box([lot],0);
+ const span=Math.max(w,h,28);
+ const pad=span*1.35;
+ animateView([x-pad,y-pad,w+pad*2,h+pad*2]);
+}
 function number(value){return Number(value).toLocaleString('es-CO',{maximumFractionDigits:2});}
-function highlight(lot){chosen=lot.id;document.querySelectorAll('#formas polygon').forEach(p=>p.classList.toggle('selected',p.id==='lote-'+lot.id));$('#lote-activo').textContent=lot.id;$('#estado-activo').textContent=lot.estado;const m=lot.medidas;$('#dimensiones-activas').textContent=m?`${number(m.lado_a_m)} × ${number(m.lado_b_m)} m`:'Por confirmar';$('#area-activa').textContent=m?`${number(m.area_m2)} m²`:'Por confirmar';$('#nota-medidas').textContent='Medidas y área según el Excel.';const manzanaEl=$('#manzana-activa');if(manzanaEl)manzanaEl.textContent=lot.manzana;const quote=$('#cotizar-lote');const canQuote=lot.estado==='Disponible';if(canQuote){quote.href=whatsappQuoteUrl(lot.id);quote.tabIndex=0;}else{quote.removeAttribute('href');quote.tabIndex=-1;}quote.setAttribute('aria-disabled',String(!canQuote));quote.setAttribute('aria-label',canQuote?`Cotizar el lote ${lot.id} por WhatsApp`:`El lote ${lot.id} no está disponible para cotizar`);const web=$('#cotizar-web');if(web&&typeof web.setAttribute==='function'){if(canQuote){web.href='/terra?lote='+encodeURIComponent(lot.id)+'#contacto';web.hidden=false;web.setAttribute('aria-disabled','false');}else{web.removeAttribute('href');web.hidden=true;web.setAttribute('aria-disabled','true');}} $('#seleccion').hidden=false;}
+function highlight(lot){chosen=lot.id;document.querySelectorAll('#formas polygon').forEach(p=>p.classList.toggle('selected',p.id==='lote-'+lot.id));$('#lote-activo').textContent=lot.id;$('#estado-activo').textContent=lot.estado;const m=lot.medidas;$('#dimensiones-activas').textContent=m?`${number(m.lado_a_m)} × ${number(m.lado_b_m)} m`:'Por confirmar';$('#area-activa').textContent=m?`${number(m.area_m2)} m²`:'Por confirmar';$('#nota-medidas').textContent='Medidas y área según el Excel.';const manzanaEl=$('#manzana-activa');if(manzanaEl)manzanaEl.textContent=lot.manzana;const quote=$('#cotizar-lote');const canQuote=lot.estado==='Disponible';if(canQuote){quote.href=whatsappQuoteUrl(lot.id);quote.tabIndex=0;}else{quote.removeAttribute('href');quote.tabIndex=-1;}quote.setAttribute('aria-disabled',String(!canQuote));quote.setAttribute('aria-label',canQuote?`Cotizar el lote ${lot.id} por WhatsApp`:`El lote ${lot.id} no está disponible para cotizar`);const web=$('#cotizar-web');if(web&&typeof web.setAttribute==='function'){if(canQuote){web.href='/terra?lote='+encodeURIComponent(lot.id)+'#contacto';web.hidden=false;web.setAttribute('aria-disabled','false');}else{web.removeAttribute('href');web.hidden=true;web.setAttribute('aria-disabled','true');}}const price=lot.precio!=null?lot.precio:(lot.precio_cop!=null?lot.precio_cop:null);const priceEl=$('#precio-activo');const priceRow=$('#precio-fila');if(priceEl)priceEl.textContent=price!=null?new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(Number(price)):'';if(priceRow)priceRow.hidden=price==null;$('#seleccion').hidden=false;}
 function setBlock(value){
  block=value;
  applyFilters(false);
@@ -61,7 +86,7 @@ function renderFilterChips(){
   host.append(el);
  }
 }
-function zoom(factor){const b=svg.viewBox.baseVal,w=b.width*factor;if(w<35||w>1800)return;svg.setAttribute('viewBox',[b.x+b.width*(1-factor)/2,b.y+b.height*(1-factor)/2,w,b.height*factor].join(' '));}
+function zoom(factor){cancelViewAnim();const b=svg.viewBox.baseVal,w=b.width*factor;if(w<35||w>1800)return;svg.setAttribute('viewBox',[b.x+b.width*(1-factor)/2,b.y+b.height*(1-factor)/2,w,b.height*factor].join(' '));}
 function syncLotUrl(lot){
  try{
   const url=new URL(location.href);
@@ -76,13 +101,30 @@ function trackAnalytics(event,params){
 }
 $('#mas').addEventListener('click',()=>zoom(.8));
 $('#menos').addEventListener('click',()=>zoom(1.25));
-$('#ajustar').addEventListener('click',()=>fit(lots.filter(matches)));
+function showAll(){const items=lots.filter(matches);if(!items.length)return;animateView(box(items,18));}
+$('#ajustar').addEventListener('click',showAll);
+const generalBtn=$('#vista-general');
+if(generalBtn)generalBtn.addEventListener('click',showAll);
+function setProjection(mode){
+ const stage=document.querySelector('.map-stage');
+ if(!stage)return;
+ const next=mode==='2d'?'2d':'3d';
+ stage.dataset.view=next;
+ const b3=$('#vista-3d'),b2=$('#vista-2d');
+ if(b3){b3.classList.toggle('active',next==='3d');b3.setAttribute('aria-pressed',String(next==='3d'));}
+ if(b2){b2.classList.toggle('active',next==='2d');b2.setAttribute('aria-pressed',String(next==='2d'));}
+}
+const reduceMotion=typeof matchMedia==='function'&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+setProjection(reduceMotion?'2d':'3d');
+const view3d=$('#vista-3d'),view2d=$('#vista-2d');
+if(view3d)view3d.addEventListener('click',()=>setProjection('3d'));
+if(view2d)view2d.addEventListener('click',()=>setProjection('2d'));
 $('#cerrar').addEventListener('click',()=>{$('#seleccion').hidden=true;document.querySelectorAll('.selected').forEach(el=>el.classList.remove('selected'));chosen='';});
 document.querySelectorAll('[data-block]').forEach(b=>b.addEventListener('click',()=>setBlock(b.dataset.block)));
 $('#buscar').addEventListener('input',e=>{
  const query=e.target.value.trim().toUpperCase().replace(/\s/g,'');
  const found=lots.find(p=>p.id===query||p.id===query.replace(/^([A-F])-?(\d)$/,'$1-0$2'));
- if(found){block=found.manzana;estado='';areaKey='';const st=$('#filtro-estado'),ar=$('#filtro-area');if(st)st.value='';if(ar)ar.value='';applyFilters(true);highlight(found);syncLotUrl(found);}
+ if(found){block=found.manzana;estado='';areaKey='';const st=$('#filtro-estado'),ar=$('#filtro-area');if(st)st.value='';if(ar)ar.value='';applyFilters(true);highlight(found);syncLotUrl(found);focusLot(found);}
  else if(!query)setBlock('');
 });
 const estadoSel=$('#filtro-estado');
@@ -95,9 +137,39 @@ const quoteLink=$('#cotizar-lote');
 if(quoteLink)quoteLink.addEventListener('click',()=>{if(quoteLink.getAttribute('aria-disabled')==='true')return;trackAnalytics('whatsapp_click',{lot_id:chosen,location:'visor'});});
 const webLink=$('#cotizar-web');
 if(webLink)webLink.addEventListener('click',()=>{trackAnalytics('view_quote',{lot_id:chosen,location:'visor'});});
-svg.addEventListener('pointerdown',e=>{if(e.target.closest('polygon'))return;drag={x:e.clientX,y:e.clientY,left:svg.viewBox.baseVal.x,top:svg.viewBox.baseVal.y};svg.setPointerCapture(e.pointerId);});
-svg.addEventListener('pointermove',e=>{if(!drag)return;const m=svg.getScreenCTM();svg.viewBox.baseVal.x=drag.left-(e.clientX-drag.x)/m.a;svg.viewBox.baseVal.y=drag.top-(e.clientY-drag.y)/m.d;});
-svg.addEventListener('pointerup',()=>drag=null);svg.addEventListener('pointercancel',()=>drag=null);
+const pointers=new Map();
+let pinch=null;
+svg.addEventListener('pointerdown',e=>{
+ pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(pointers.size>=2){
+  cancelViewAnim();drag=null;
+  for(const id of pointers.keys()){try{svg.setPointerCapture(id);}catch(err){}}
+  const pts=[...pointers.values()];
+  pinch={dist:Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y)||1,box:readBox()};
+  return;
+ }
+ if(e.target.closest('polygon'))return;
+ cancelViewAnim();
+ drag={x:e.clientX,y:e.clientY,left:svg.viewBox.baseVal.x,top:svg.viewBox.baseVal.y,id:e.pointerId,captured:false};
+});
+svg.addEventListener('pointermove',e=>{
+ if(!pointers.has(e.pointerId))return;
+ pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(pinch&&pointers.size>=2){
+  const pts=[...pointers.values()];
+  const dist=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y)||1;
+  const w=Math.min(1800,Math.max(35,pinch.box.w*(pinch.dist/dist)));
+  const h=pinch.box.h*(w/pinch.box.w);
+  const cx=pinch.box.x+pinch.box.w/2,cy=pinch.box.y+pinch.box.h/2;
+  writeBox(cx-w/2,cy-h/2,w,h);
+  return;
+ }
+ if(!drag||e.pointerId!==drag.id)return;
+ if(!drag.captured&&Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>3){drag.captured=true;try{svg.setPointerCapture(e.pointerId);}catch(err){}}
+ const m=svg.getScreenCTM();if(!m)return;svg.viewBox.baseVal.x=drag.left-(e.clientX-drag.x)/m.a;svg.viewBox.baseVal.y=drag.top-(e.clientY-drag.y)/m.d;
+});
+function endPointer(e){pointers.delete(e.pointerId);if(pointers.size<2)pinch=null;if(!pointers.size)drag=null;}
+svg.addEventListener('pointerup',endPointer);svg.addEventListener('pointercancel',endPointer);
 for(const[state,color]of Object.entries(COLORS)){const el=document.createElement('span'),dot=document.createElement('i');dot.style.background=color;el.append(dot,document.createTextNode(state));$('#leyenda').append(el);}
 function fillSelect(sel,values,current){
  if(!sel)return;
@@ -135,6 +207,7 @@ function selectFromQuery(){
  block=found.manzana;
  applyFilters(true);
  highlight(found);
+ focusLot(found);
 }
 function trackLotInteraction(lot){
  if(typeof window.clarity==='function'){
@@ -147,8 +220,10 @@ function trackLotInteraction(lot){
 function draw(data){
  if(!Array.isArray(data.lotes)||data.lotes.length!==104)throw Error('Datos inválidos');
  const previous=chosen;lots=data.lotes;
- for(const group of ['#formas','#etiquetas','#titulos'])$(group).replaceChildren();
- for(const p of lots){const polygon=node('polygon',{id:'lote-'+p.id,points:p.puntos.map(v=>v.join(',')).join(' '),fill:COLORS[p.estado],'data-block':p.manzana,tabindex:'0',role:'button','aria-label':`Lote ${p.id}, ${p.estado}`});polygon.append(node('title',{},`Lote ${p.id} · ${p.estado} · ${number(p.medidas.area_m2)} m²`));polygon.addEventListener('click',()=>{trackLotInteraction(p);highlight(p);syncLotUrl(p);});polygon.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();trackLotInteraction(p);highlight(p);syncLotUrl(p);}});$('#formas').append(polygon);$('#etiquetas').append(node('text',{x:p.centro[0],y:p.centro[1],'data-block':p.manzana},p.id));}
+ for(const group of ['#suelo','#formas','#etiquetas','#titulos']){const g=$(group);if(g)g.replaceChildren();}
+ const ground=box(lots,26);
+ $('#suelo').append(node('rect',{x:ground[0],y:ground[1],width:ground[2],height:ground[3]}));
+ for(const p of lots){const polygon=node('polygon',{id:'lote-'+p.id,points:p.puntos.map(v=>v.join(',')).join(' '),fill:COLORS[p.estado],'data-block':p.manzana,tabindex:'0',role:'button','aria-label':`Lote ${p.id}, ${p.estado}`});polygon.append(node('title',{},`Lote ${p.id} · ${p.estado} · ${number(p.medidas.area_m2)} m²`));polygon.addEventListener('click',()=>{trackLotInteraction(p);highlight(p);syncLotUrl(p);focusLot(p);});polygon.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();trackLotInteraction(p);highlight(p);syncLotUrl(p);focusLot(p);}});$('#formas').append(polygon);$('#etiquetas').append(node('text',{x:p.centro[0],y:p.centro[1],'data-block':p.manzana},p.id));}
  for(const b of 'ABCDEF'){const bounds=box(lots.filter(p=>p.manzana===b),0);$('#titulos').append(node('text',{x:bounds[0]+2,y:bounds[1]-7},'Manzana '+b));}
  fillSelect($('#filtro-estado'),[...new Set(lots.map(p=>p.estado))],estado);
  fillSelect($('#filtro-area'),[...new Set(lots.map(p=>p.medidas&&p.medidas.area_m2).filter(v=>v!=null))].sort((a,b)=>a-b),areaKey);

@@ -7,10 +7,10 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const folder = join(root, "public", "terra", "estado");
 const files = {
-  "index.html": "cd032a8a3d33b7ccc4680cf2085fa9f1c6d0b8e18a1faf111b4ac5ee821beca7",
-  "estilos.css": "55d6112bde9e2fc255a217e22146eb1765b893746b7310551e51a0176fd378a0",
+  "index.html": "081fcafecddbb34aca4ed853c12407cee3d980f5f11980e8bb8058674aa1f279",
+  "estilos.css": "4360fd299bcc03d1c5df5c4288c3dc7c77dd77c67b08e3f486d52695162559f6",
   "header.js": "633deb77c2e2356dc4942eb4c023574fd843becc4c91c9ad4f5c9c832e646001",
-  "app.js": "6237699bef4fc7e77d7026d33ee8cc36d164fe95e11b34eba3fc4711a25c8501",
+  "app.js": "b7e3ab70e364591f469ea85c94989adfd7816626f954d522b4547bd58296b7a8",
   "logo-terraforming.png": "6ec6eab54659f8d5c89291f7ed2d0c15842adedb69047e9435a3012f9dc681d5",
   "ubicacion-etapa-i.webp": "bfefef7ed5d4910b9c0b2bcccb98fb852b4302c1cf35e84b33fa83fe82923fa5"
 };
