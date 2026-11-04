@@ -142,7 +142,15 @@ footer.corporate-footer{display:block;width:100%;max-width:none;margin:0;padding
 @media (max-width:1023px){
   .site-header__nav{display:none}
   .site-header__toggle{display:inline-flex}
-  .selection{left:8px;right:8px;bottom:8px;transform:none;width:auto;max-width:none;max-height:46%;overflow:auto}
+  .selection{left:8px;right:8px;bottom:max(8px, env(safe-area-inset-bottom));transform:none;width:auto;max-width:none;max-height:min(420px, calc(100% - 12px));overflow:auto;padding:12px 12px 14px}
+  .selection-head{flex-wrap:wrap;gap:6px 8px}
+  .selection strong{font-size:16px}
+  .selection #estado-activo{margin-left:0;border-left:0;padding-left:0}
+  .lot-sizes{gap:8px 12px;margin-top:8px;padding-top:8px}
+  .lot-sizes dd{font-size:15px;overflow-wrap:anywhere}
+  .size-note{margin-top:8px;line-height:1.45}
+  .selection-actions{margin-top:10px}
+  .quote-whatsapp{width:100%}
   .hero__stats{grid-template-columns:1fr}
 }
 @media (max-width:960px){
