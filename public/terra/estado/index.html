@@ -132,6 +132,10 @@
         </label>
         <button type="button" id="limpiar-filtros" class="chip">Limpiar filtros</button>
       </div>
+      <div class="view-switch" role="group" aria-label="Tipo de vista del plano">
+        <button id="vista-3d" type="button" aria-pressed="true">Vista 3D</button>
+        <button id="vista-2d" type="button" aria-pressed="false">Vista 2D</button>
+      </div>
       <div class="zoom">
         <button id="menos" aria-label="Alejar">−</button>
         <button id="mas" aria-label="Acercar">+</button>
@@ -140,6 +144,7 @@
     </div>
     <div id="filtros-activos" class="filter-chips" hidden></div>
     <div class="map-stage">
+      <div id="visor-3d" class="map-3d" hidden></div>
       <svg id="plano" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="Plano TERRA Etapa I, lotes de solo lectura">
         <g id="formas"></g>
         <g id="etiquetas"></g>
@@ -181,7 +186,7 @@
       </div>
     </div>
     <div class="map-footer">
-      <p>Selecciona un lote para identificarlo. Amplía el plano con + y −. La rueda del mouse desplaza la página.</p>
+      <p id="vista-nota" role="status">Selecciona un lote para acercarte y cotizar. La rueda del mouse desplaza la página; el zoom se controla con +, − y con dos dedos.</p>
       <span>104 lotes · 6 manzanas</span>
     </div>
   </section>
@@ -276,5 +281,6 @@
 </script>
 <script src="/terra/estado/header.js" defer></script>
 <script src="/terra/estado/app.js" defer></script>
+<script src="/terra/estado/scene-3d.js" defer></script>
 </body>
 </html>
