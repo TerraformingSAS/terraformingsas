@@ -83,6 +83,24 @@ export async function mountTerrain(
   );
   scene.add(ground);
 
+  const logoTexture = await new THREE.TextureLoader().loadAsync("/terra/mapa/logo-terra.png");
+  logoTexture.colorSpace = THREE.SRGBColorSpace;
+  const logoWidth = 400;
+  const logo = new THREE.Mesh(
+    new THREE.PlaneGeometry(logoWidth, logoWidth * (1086 / 1448)),
+    new THREE.MeshBasicMaterial({
+      map: logoTexture,
+      transparent: true,
+      depthTest: false,
+      depthWrite: false,
+    }),
+  );
+  logo.rotation.x = -Math.PI / 2;
+  logo.renderOrder = 30;
+  scene.add(logo);
+  const logoEast = 840;
+  const logoNorth = 1000;
+
   let boundary = perimeterRibbon(THREE, []);
   scene.add(boundary);
 
@@ -124,6 +142,9 @@ export async function mountTerrain(
     (boundary.material as Material).dispose();
     boundary = next;
     scene.add(boundary);
+    const logoHeight =
+      (sampleHeight(terrain, logoEast, logoNorth) - terrain.elevMin) * exaggeration + 6;
+    logo.position.copy(toScene(logoEast, logoHeight, logoNorth));
     rebuildLots();
   }
 
@@ -142,8 +163,10 @@ export async function mountTerrain(
       lotRoot.remove(item.mesh);
       for (const child of item.mesh.children) {
         const line = child as Line;
-        line.geometry.dispose();
-        (line.material as Material).dispose();
+        line.geometry?.dispose();
+        const material = line.material as Material & { map?: { dispose: () => void } | null };
+        material.map?.dispose();
+        material.dispose();
       }
       item.geometry.dispose();
       (item.mesh.material as Material).dispose();
@@ -185,6 +208,9 @@ export async function mountTerrain(
       const edge = lotBorder(THREE, points);
       edge.visible = mesh.visible;
       mesh.add(edge);
+      const label = lotLabel(THREE, lot.id, points);
+      label.visible = mesh.visible;
+      mesh.add(label);
       lotMeshes.push({ id: lot.id, mesh, geometry });
     }
   }
@@ -300,6 +326,9 @@ export async function mountTerrain(
       controls.dispose();
       geometry.dispose();
       texture.dispose();
+      logo.geometry.dispose();
+      (logo.material as Material).dispose();
+      logoTexture.dispose();
       boundary.geometry.dispose();
       renderer.dispose();
     },
@@ -382,12 +411,11 @@ function lotBorder(THREE: typeof import("three"), points: import("three").Vector
     const length = Math.hypot(dx, dz) || 1;
     const px = (-dz / length) * half;
     const pz = (dx / length) * half;
-    const lift = 2.4;
     const quad = [
-      [start.x + px, start.y + lift, start.z + pz],
-      [start.x - px, start.y + lift, start.z - pz],
-      [end.x + px, end.y + lift, end.z + pz],
-      [end.x - px, end.y + lift, end.z - pz],
+      [start.x + px, start.y, start.z + pz],
+      [start.x - px, start.y, start.z - pz],
+      [end.x + px, end.y, end.z + pz],
+      [end.x - px, end.y, end.z - pz],
     ];
     const triangles = [0, 1, 2, 1, 3, 2];
     for (const corner of triangles) {
@@ -410,6 +438,42 @@ function lotBorder(THREE: typeof import("three"), points: import("three").Vector
   );
   border.renderOrder = 3;
   return border;
+}
+
+function lotLabel(THREE: typeof import("three"), name: string, points: import("three").Vector3[]) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 256;
+  canvas.height = 128;
+  const context = canvas.getContext("2d");
+  if (context) {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.font = "700 72px Inter, sans-serif";
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.lineWidth = 10;
+    context.strokeStyle = "rgba(255,255,255,0.92)";
+    context.strokeText(name, 128, 64);
+    context.fillStyle = "#102033";
+    context.fillText(name, 128, 64);
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const sprite = new THREE.Sprite(
+    new THREE.SpriteMaterial({
+      map: texture,
+      transparent: true,
+      depthTest: false,
+      depthWrite: false,
+    }),
+  );
+  const center = points
+    .reduce((sum, point) => sum.add(point), new THREE.Vector3())
+    .multiplyScalar(1 / Math.max(points.length, 1));
+  sprite.position.copy(center);
+  sprite.position.y += 0.35;
+  sprite.scale.set(10.5, 5.25, 1);
+  sprite.renderOrder = 20;
+  return sprite;
 }
 
 function sampleHeight(terrain: TerrainPayload, x: number, z: number): number {
