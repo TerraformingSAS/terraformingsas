@@ -453,7 +453,7 @@ function lotBorder(THREE: typeof import("three"), points: import("three").Vector
   return border;
 }
 
-/** Borde oriental del predio, de sur a norte. La vía queda recta y por fuera. */
+/** Borde oriental del predio, de sur a norte. La vía queda recta y por dentro. */
 const ROAD_A: [number, number] = [1116.8, 448];
 const ROAD_B: [number, number] = [1321.7, 978.5];
 
@@ -478,7 +478,7 @@ function replaceRoad(
   const py = -ux;
   const extend = 36;
   const step = 7;
-  const centerOffset = 9.2;
+  const centerOffset = -9.2;
   const center: [number, number, number][] = [];
   for (let distance = -extend; distance <= length + extend; distance += step) {
     const east = ROAD_A[0] + ux * distance + px * centerOffset;
