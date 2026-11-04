@@ -12,6 +12,7 @@ import { TerraFeaturedHero } from "@/components/TerraFeaturedHero";
 import { Projects } from "@/components/Projects";
 import { Sectors } from "@/components/Sectors";
 import { Services } from "@/components/Services";
+import { InstagramButton } from "@/components/InstagramButton";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { pageSeo } from "@/lib/seo";
 import { createFileRoute, useRouterState } from "@tanstack/react-router";
@@ -55,8 +56,9 @@ function Index() {
         <Contact />
       </main>
       <Footer />
+      <InstagramButton />
       <WhatsAppButton />
-      <BackToTop />
+      <BackToTop className="bottom-[9.5rem]" />
     </div>
   );
 }
