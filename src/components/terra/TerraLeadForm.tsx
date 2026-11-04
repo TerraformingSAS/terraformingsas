@@ -37,7 +37,7 @@ function lotFromLocation(): string {
   return normalizeLotId(fromQuery || readSelectedLot(window.sessionStorage));
 }
 
-export function TerraLeadForm() {
+export function TerraLeadForm({ compact = false }: { compact?: boolean }) {
   const [values, setValues] = useState<Lead>(initial);
   const [consent, setConsent] = useState(false);
   const [captchaToken, setCaptchaToken] = useState("");
@@ -147,17 +147,29 @@ export function TerraLeadForm() {
       id="preventa-terra"
       className="border border-brand-navy/10 bg-white text-brand-navy shadow-sm"
     >
-      <div className="bg-brand-navy px-5 py-5 text-white sm:px-6">
-        <h2 className="font-display text-xl font-extrabold leading-tight sm:text-2xl">
+      <div
+        className={
+          compact
+            ? "bg-brand-navy px-4 py-3 text-white"
+            : "bg-brand-navy px-5 py-5 text-white sm:px-6"
+        }
+      >
+        <h2 className="font-display text-lg font-extrabold leading-tight sm:text-xl">
           {TERRA_COPY.formTitle}
         </h2>
-        <p className="mt-2 text-sm leading-relaxed text-white/85">
-          Cuéntanos cómo contactarte. Un asesor te comparte las condiciones vigentes del lote de
-          interés.
-        </p>
+        {compact ? null : (
+          <p className="mt-2 text-sm leading-relaxed text-white/85">
+            Cuéntanos cómo contactarte. Un asesor te comparte las condiciones vigentes del lote de
+            interés.
+          </p>
+        )}
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-3 px-4 py-5 sm:px-6" onFocus={markFormStart}>
+      <form
+        onSubmit={handleSubmit}
+        className={compact ? "space-y-2.5 px-4 py-4" : "space-y-3 px-4 py-5 sm:px-6"}
+        onFocus={markFormStart}
+      >
         <div>
           <label className="mb-1 block text-xs font-semibold" htmlFor="terra-nombre">
             Nombre *

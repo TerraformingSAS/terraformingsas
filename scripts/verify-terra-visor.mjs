@@ -115,11 +115,11 @@ for (const required of [
   }
 }
 const terraPage = await readFile(join(root, "src", "routes", "terra.tsx"), "utf8");
-const terraHero = await readFile(join(root, "src", "components", "terra", "TerraHero.tsx"), "utf8");
+const terraLocation = await readFile(join(root, "src", "components", "terra", "LocationSection.tsx"), "utf8");
 if (!terraPage.includes("TerraHero") ||
     !terraPage.includes("LotPreview") ||
     !terraPage.includes("LocationSection") ||
-    !terraHero.includes("TerraLeadForm") ||
+    !terraLocation.includes("TerraLeadForm") ||
     terraPage.includes("Alta valorización")) {
   throw new Error("La landing /terra debe usar la experiencia inmobiliaria de TERRA, sin promesas de valorización.");
 }
