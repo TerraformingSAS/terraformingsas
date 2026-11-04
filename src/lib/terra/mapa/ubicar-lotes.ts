@@ -11,19 +11,20 @@ export type PlacedLot = {
 
 const ETAPA_I = new Set(["C", "D", "E", "F"]);
 
-/** Extremo norte de la etapa, junto a la vía, en metros del terreno. */
-const NORTH_END: [number, number] = [1267.5, 1026.5];
-/** Del norte hacia el sur, siguiendo el costado de la quebrada. */
-const ALONG: [number, number] = [-0.5255, -0.8508];
-/** A través de la franja. El signo evita el espejo del plano. */
-const ACROSS: [number, number] = [-0.8508, 0.5255];
-const SCALE = 0.85;
-const LOCAL_X_MIN = -102.074062;
-const LOCAL_Y_MID = (-39.676557 + 96.229503) / 2;
+/** Esquina norte del loteo, en metros del terreno: este y norte. */
+const NORTH_END: [number, number] = [1192.85, 1044.59];
+/** Eje corto, a lo largo de la vía, hacia el oriente. */
+const ACROSS: [number, number] = [0.99586, 0.09089];
+/** Eje largo, desde la vía hacia el sur. */
+const ALONG: [number, number] = [-0.09089, -0.99586];
+const SCALE = 0.92;
+const LOCAL_X_MIN = -295.191539;
+const LOCAL_Y_MID = (-39.676557 + 96.390132) / 2;
 
 /**
- * Etapa I son las manzanas C, D, E y F.
- * Quedan en la franja suroriental del predio, como en el plano sobre la foto.
+ * La etapa I son las manzanas C, D, E y F.
+ * Conservan el sitio de la franja junto a la vía, con el lado largo hacia el sur.
+ * El eje corto va invertido para no dejar el plano en espejo.
  */
 export function colocarLotes(terrain: TerrainFrame, lots: JoinedLot[]): PlacedLot[] {
   if (lots.length === 0 || terrain.perimetro.length === 0) return [];
@@ -33,7 +34,7 @@ export function colocarLotes(terrain: TerrainFrame, lots: JoinedLot[]): PlacedLo
       id: lot.id,
       anillo: lot.puntos.map(([x, y]) => {
         const along = (x - LOCAL_X_MIN) * SCALE;
-        const across = (y - LOCAL_Y_MID) * SCALE;
+        const across = (LOCAL_Y_MID - y) * SCALE;
         return [
           NORTH_END[0] + ALONG[0] * along + ACROSS[0] * across,
           NORTH_END[1] + ALONG[1] * along + ACROSS[1] * across,
