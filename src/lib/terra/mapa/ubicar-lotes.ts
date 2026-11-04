@@ -29,6 +29,16 @@ const LOCAL_Y_MID = (-39.676557 + 96.390132) / 2;
  * El bloque conserva su tamaño y queda paralelo a la vía, sobre su costado izquierdo.
  * El eje corto va invertido para no dejar el plano en espejo.
  */
+/** Lleva un punto del plano local al terreno, con la misma base que los lotes. */
+export function ubicarPunto(x: number, y: number): [number, number] {
+  const along = (x - LOCAL_X_MIN) * SCALE;
+  const across = (LOCAL_Y_MID - y) * SCALE;
+  return [
+    NORTH_END[0] + ALONG[0] * along + ACROSS[0] * across,
+    NORTH_END[1] + ALONG[1] * along + ACROSS[1] * across,
+  ];
+}
+
 export function colocarLotes(terrain: TerrainFrame, lots: JoinedLot[]): PlacedLot[] {
   if (lots.length === 0 || terrain.perimetro.length === 0) return [];
   return lots
@@ -36,12 +46,7 @@ export function colocarLotes(terrain: TerrainFrame, lots: JoinedLot[]): PlacedLo
     .map((lot) => ({
       id: lot.id,
       anillo: lot.puntos.map(([x, y]) => {
-        const along = (x - LOCAL_X_MIN) * SCALE;
-        const across = (LOCAL_Y_MID - y) * SCALE;
-        return [
-          NORTH_END[0] + ALONG[0] * along + ACROSS[0] * across,
-          NORTH_END[1] + ALONG[1] * along + ACROSS[1] * across,
-        ] as [number, number];
+        return ubicarPunto(x, y);
       }),
     }));
 }

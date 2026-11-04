@@ -39,7 +39,15 @@ const MAPA_SELECTION_CSS = `
   @keyframes mapa-selection-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 }
 @media (max-width:1023px){
-  .mapa-selection{left:8px;right:8px;bottom:8px;transform:none;width:auto;max-width:none;max-height:46%;overflow:auto}
+  .mapa-selection{left:8px;right:8px;bottom:max(8px, env(safe-area-inset-bottom));transform:none;width:auto;max-width:none;max-height:min(420px, calc(100% - 12px));overflow:auto;padding:12px 12px 14px}
+  .mapa-selection-head{flex-wrap:wrap;gap:6px 8px}
+  .mapa-selection strong{font-size:16px}
+  .mapa-estado{margin-left:0;border-left:0;padding-left:0}
+  .mapa-lot-sizes{grid-template-columns:1fr 1fr;gap:8px 12px;margin-top:8px;padding-top:8px}
+  .mapa-lot-sizes dd{font-size:15px;overflow-wrap:anywhere}
+  .mapa-size-note{margin-top:8px;line-height:1.45}
+  .mapa-selection-actions{margin-top:10px}
+  .mapa-quote-whatsapp{width:100%}
   @keyframes mapa-selection-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 }
 `;
