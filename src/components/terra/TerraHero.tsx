@@ -4,17 +4,17 @@ import { TERRA_PROJECT } from "@/lib/terra/commercial";
 export function TerraHero() {
   return (
     <section id="proyecto" className="relative scroll-mt-24">
-      <div className="relative min-h-[72vh] overflow-hidden rounded-b-[2rem] sm:min-h-[78vh]">
+      <div className="relative min-h-[26rem] overflow-hidden rounded-b-[2rem] sm:aspect-[1920/687] sm:max-h-[32rem] sm:min-h-[22rem]">
         <img
           src={aerialImg}
           alt="Render aéreo ilustrativo de TERRA Etapa I, con los lotes, las vías proyectadas y el entorno de Popayán"
           className="absolute inset-0 h-full w-full object-cover object-center"
           width={1920}
-          height={1011}
+          height={687}
           fetchPriority="high"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-brand-navy/75 via-brand-navy/25 to-transparent" />
-        <div className="relative container-tf flex min-h-[72vh] items-end pb-10 pt-28 text-white sm:min-h-[78vh] sm:pb-14">
+        <div className="relative container-tf flex min-h-[26rem] items-end pb-8 pt-24 text-white sm:absolute sm:inset-0 sm:min-h-0 sm:pb-10">
           <div className="max-w-xl">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-orange">
               TERRA · Etapa I
