@@ -105,6 +105,19 @@ export async function mountTerrain(
   scene.add(boundary);
   const road = new THREE.Group();
   scene.add(road);
+  const arrows = new THREE.Group();
+  scene.add(arrows);
+  const arrowDefs: { east: number; north: number; title: string; direction: 1 | -1 }[] = [
+    { east: 70, north: terrain.depthM * 0.62, title: "Vereda Santa Rosa", direction: -1 },
+    {
+      east: terrain.widthM - 90,
+      north: terrain.depthM * 0.72,
+      title: "Complejo deportivo",
+      direction: 1,
+    },
+    { east: terrain.widthM - 90, north: terrain.depthM * 0.4, title: "Popayán", direction: 1 },
+  ];
+  for (const arrow of arrowDefs) arrows.add(floatingArrow(THREE, arrow.title, arrow.direction));
 
   const lotRoot = new THREE.Group();
   scene.add(lotRoot);
@@ -149,6 +162,13 @@ export async function mountTerrain(
     boundary = next;
     scene.add(boundary);
     replaceRoad(THREE, road, terrain, exaggeration);
+    arrowDefs.forEach((arrow, index) => {
+      const marker = arrows.children[index];
+      if (!marker) return;
+      const y =
+        (sampleHeight(terrain, arrow.east, arrow.north) - terrain.elevMin) * exaggeration + 18;
+      marker.position.copy(toScene(arrow.east, y, arrow.north));
+    });
     const logoHeight =
       (sampleHeight(terrain, logoEast, logoNorth) - terrain.elevMin) * exaggeration + 6;
     logo.position.copy(toScene(logoEast, logoHeight, logoNorth));
@@ -336,6 +356,14 @@ export async function mountTerrain(
       logo.geometry.dispose();
       (logo.material as Material).dispose();
       logoTexture.dispose();
+      arrows.traverse((child) => {
+        const mesh = child as Mesh;
+        mesh.geometry?.dispose();
+        const material = mesh.material as
+          (Material & { map?: { dispose: () => void } | null }) | undefined;
+        material?.map?.dispose();
+        material?.dispose();
+      });
       road.traverse((child) => {
         const mesh = child as Mesh;
         mesh.geometry?.dispose();
@@ -560,6 +588,46 @@ function flatRibbon(
   );
   mesh.renderOrder = 6;
   return mesh;
+}
+
+function floatingArrow(THREE: typeof import("three"), title: string, direction: 1 | -1) {
+  const group = new THREE.Group();
+  const head = new THREE.Mesh(
+    new THREE.ConeGeometry(16, 54, 3),
+    new THREE.MeshStandardMaterial({ color: 0xf4f7fb, roughness: 0.35, metalness: 0.05 }),
+  );
+  head.rotation.z = direction === 1 ? -Math.PI / 2 : Math.PI / 2;
+  group.add(head);
+  const canvas = document.createElement("canvas");
+  canvas.width = 640;
+  canvas.height = 160;
+  const context = canvas.getContext("2d");
+  if (context) {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.font = "700 68px Inter, sans-serif";
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.lineWidth = 12;
+    context.strokeStyle = "rgba(255,255,255,0.94)";
+    context.strokeText(title, 320, 80);
+    context.fillStyle = "#102033";
+    context.fillText(title, 320, 80);
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const label = new THREE.Sprite(
+    new THREE.SpriteMaterial({
+      map: texture,
+      transparent: true,
+      depthTest: false,
+      depthWrite: false,
+    }),
+  );
+  label.position.set(direction * -48, 8, 0);
+  label.scale.set(72, 18, 1);
+  label.renderOrder = 25;
+  group.add(label);
+  return group;
 }
 
 function lotLabel(THREE: typeof import("three"), name: string, points: import("three").Vector3[]) {
