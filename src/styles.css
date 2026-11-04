@@ -189,6 +189,40 @@
   transform: translateY(0);
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  .terra-hero__item {
+    animation: terra-hero-rise 0.7s ease both;
+  }
+
+  .terra-hero__item:nth-child(2) {
+    animation-delay: 0.08s;
+  }
+
+  .terra-hero__item:nth-child(3) {
+    animation-delay: 0.16s;
+  }
+
+  .terra-hero__item:nth-child(4) {
+    animation-delay: 0.24s;
+  }
+
+  .terra-hero__item:nth-child(5) {
+    animation-delay: 0.32s;
+  }
+}
+
+@keyframes terra-hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Cotizador interno: misma línea que el sitio (navy, verde, naranja). */
 .terra-cotizador-app {
   --background: #ffffff;
