@@ -122,16 +122,13 @@ export const TERRA_NAV = [
   { id: "contacto", label: "Contacto", href: "/terra#contacto" },
 ] as const;
 
-/**
- * Precios de preventa por tipología, según la tabla comercial.
- * El lote de 442,75 m² no figura en ese cuadro.
- */
+/** Precios publicados por tipología en las tarjetas de /terra. */
 export const TERRA_LOT_TYPES = [
-  { area: 120, label: "120 m²", fromCop: 74_100_000 },
-  { area: 154, label: "154 m²", fromCop: 93_093_000 },
-  { area: 165, label: "165 m²", fromCop: 99_313_500 },
-  { area: 211.75, label: "211,75 m²", fromCop: 126_626_500 },
-  { area: 442.75, label: "442,75 m²", fromCop: null },
+  { area: 120, label: "120 m²", fromCop: 78_000_000 },
+  { area: 154, label: "154 m²", fromCop: 100_100_000 },
+  { area: 165, label: "165 m²", fromCop: 107_250_000 },
+  { area: 211.75, label: "211,75 m²", fromCop: 137_637_500 },
+  { area: 442.75, label: "442,75 m²", fromCop: 287_787_500 },
 ] as const;
 
 export function formatCop(value: number): string {
