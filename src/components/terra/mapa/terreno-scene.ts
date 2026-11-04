@@ -442,7 +442,7 @@ function lotLabel(THREE: typeof import("three"), name: string, points: import("t
     .multiplyScalar(1 / Math.max(points.length, 1));
   sprite.position.copy(center);
   sprite.position.y += 0.35;
-  sprite.scale.set(8, 4, 1);
+  sprite.scale.set(10.5, 5.25, 1);
   sprite.renderOrder = 5;
   return sprite;
 }
