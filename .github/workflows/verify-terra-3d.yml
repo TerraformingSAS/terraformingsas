@@ -1,0 +1,35 @@
+name: Validación independiente visor TERRA 3D
+
+on:
+  push:
+    branches:
+      - feature/terra-visor-3d-20261104
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Instalar dependencias
+        run: npm ci --no-audit --no-fund
+      - name: Comprobar sintaxis de ambos visores
+        run: |
+          node --check public/terra/estado/app.js
+          node --check public/terra/estado/scene-3d.js
+          node --check scripts/verify-terra-visor.mjs
+      - name: Verificar geometría, controles y reglas comerciales
+        run: npm run terra:verify
+      - name: Ejecutar pruebas de TERRA
+        run: npm run terra:test
+      - name: Compilar aplicación
+        run: npm run build
+      - name: Comprobar el servidor
+        run: node scripts/smoke-terra-server.mjs
