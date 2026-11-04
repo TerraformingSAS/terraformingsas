@@ -182,3 +182,20 @@ footer.corporate-footer{display:block;width:100%;max-width:none;margin:0;padding
   .source-update #fecha{text-align:left}
 }
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+/* Visor 3D progresivo. El SVG original permanece como respaldo exacto. */
+.view-switch{display:flex;align-items:center;gap:3px;padding:3px;border:1px solid var(--line);border-radius:8px;background:#f4f7f8}
+.view-switch button{min-height:34px;min-width:68px;padding:5px 11px;border-radius:6px;font-size:11px;font-weight:700;transition:background .15s,color .15s}
+.view-switch button[aria-pressed="true"]{background:#123b4e;color:white;box-shadow:0 1px 5px #0e2a471c}
+.view-switch button:disabled{opacity:.45;cursor:not-allowed}
+.map-3d{position:absolute;inset:0;display:block;overflow:hidden;isolation:isolate;background:radial-gradient(ellipse at 54% 42%,#335b59 0%,#173e46 47%,#0b273a 100%)}
+.map-3d[hidden],#plano[hidden]{display:none!important}
+.map-3d::before{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 38%,transparent 20%,rgba(8,25,40,.22) 100%);z-index:1}
+.map-3d-canvas{position:absolute;inset:0;display:block;width:100%;height:100%;touch-action:none;cursor:grab;user-select:none}
+.map-3d-canvas:active{cursor:grabbing}
+.map-stage{isolation:isolate}
+.map-stage #seleccion{z-index:4}
+#plano{background:#f8fafb}
+#formas polygon[data-block="A"],#formas polygon[data-block="B"]{fill:#b4b9b4}
+@media(max-width:760px){.view-switch{margin-left:auto}.view-switch button{min-width:58px;padding:5px 8px}.map-stage{height:min(70vh,600px)}}
+@media(prefers-reduced-motion:reduce){.view-switch button{transition:none}}
