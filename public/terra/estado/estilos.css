@@ -74,16 +74,14 @@ button{cursor:pointer;font:12px Inter,sans-serif;color:var(--ink);border:0;backg
 .filter-chips[hidden]{display:none}
 .filter-chip{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0 10px;border-radius:999px;background:#eef3f0;color:var(--ink);font-size:12px}
 .filter-chip button{min-width:24px;min-height:24px;font-size:16px;color:var(--muted)}
-.map-stage{height:clamp(420px,72vh,820px);position:relative;overflow:hidden;background:
-  linear-gradient(180deg,rgba(10,33,58,.55),rgba(14,42,71,.72)),
-  url('/terra/estado/ubicacion-etapa-i.webp') center 42%/cover no-repeat}
-.map-scene{position:absolute;inset:0;display:grid;place-items:center}
+.map-stage{height:clamp(420px,72vh,820px);position:relative;overflow:hidden;background:#e7f0e4}
+.map-scene{position:absolute;inset:0}
 .map-tilt{width:100%;height:100%;transform-style:preserve-3d}
-.map-stage[data-view="3d"] .map-scene{perspective:1280px;perspective-origin:50% 28%}
-.map-stage[data-view="3d"] .map-tilt{transform:rotateX(22deg) scale(.9);transform-origin:center 62%;transition:transform .45s ease}
+.map-stage[data-view="3d"] .map-scene{perspective:2200px;perspective-origin:50% 50%}
+.map-stage[data-view="3d"] .map-tilt{height:100%;transform:rotateX(12deg);transform-origin:center center;transition:transform .45s ease}
 .map-stage[data-view="2d"] .map-tilt{transform:none}
 #plano{display:block;width:100%;height:100%;touch-action:none;user-select:none;transform-style:preserve-3d;background:#e7f0e4}
-#suelo rect{fill:#d7e4d4;stroke:#9eb59a;stroke-width:1.2}
+#suelo rect{fill:#e7f0e4;stroke:none}
 #formas{transform-style:preserve-3d}
 #formas polygon{stroke:#fff;stroke-width:1.35;vector-effect:non-scaling-stroke;cursor:pointer;transform-box:fill-box;transform-origin:center;transition:fill-opacity .12s,transform .28s ease,filter .28s ease;filter:drop-shadow(0 1.1px 0 rgba(14,42,71,.22))}
 #formas polygon:hover,#formas polygon:focus{stroke:var(--ink);stroke-width:2.2;outline:none;fill-opacity:1;filter:drop-shadow(0 2.4px 0 rgba(14,42,71,.28)) brightness(1.05)}
@@ -196,5 +194,5 @@ footer.corporate-footer{display:block;width:100%;max-width:none;margin:0;padding
 }
 @media (prefers-reduced-motion:reduce){
   *{scroll-behavior:auto!important;transition:none!important}
-  .map-stage[data-view="3d"] .map-tilt{transform:rotateX(22deg) scale(.9)}
+  .map-stage[data-view="3d"] .map-tilt{transform:rotateX(12deg)}
 }

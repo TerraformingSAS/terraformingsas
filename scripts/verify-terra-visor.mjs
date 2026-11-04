@@ -8,7 +8,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const folder = join(root, "public", "terra", "estado");
 const files = {
   "index.html": "081fcafecddbb34aca4ed853c12407cee3d980f5f11980e8bb8058674aa1f279",
-  "estilos.css": "4360fd299bcc03d1c5df5c4288c3dc7c77dd77c67b08e3f486d52695162559f6",
+  "estilos.css": "faa20db261d59c5888a2eaa8bfd9da50796c9e575c11d73f735fa7b788b2356d",
   "header.js": "633deb77c2e2356dc4942eb4c023574fd843becc4c91c9ad4f5c9c832e646001",
   "app.js": "b7e3ab70e364591f469ea85c94989adfd7816626f954d522b4547bd58296b7a8",
   "logo-terraforming.png": "6ec6eab54659f8d5c89291f7ed2d0c15842adedb69047e9435a3012f9dc681d5",
