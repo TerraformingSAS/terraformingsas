@@ -226,10 +226,11 @@ export function TerraMapa() {
         </div>
 
         <p className="px-4 pb-2 text-xs leading-relaxed text-[#3d5163]">
-          El relieve y la foto comparten el recorte del KML
-          {terrain ? ` (${terrain.elevMin}–${terrain.elevMax} m)` : ""}. El contorno naranja sigue
-          ese perímetro, con el norte de la imagen hacia el fondo de la vista inicial. Arrastra para
-          orbitar, botón derecho para desplazar y la rueda para acercar.
+          El relieve y la foto del predio comparten el recorte del KML
+          {terrain ? ` (${terrain.elevMin}–${terrain.elevMax} m)` : ""}. Alrededor se ve una foto
+          aérea de referencia. El contorno naranja sigue ese perímetro, con el norte de la imagen
+          hacia el fondo de la vista inicial. Arrastra para orbitar, botón derecho para desplazar y
+          la rueda para acercar.
         </p>
         <p className="px-4 pb-6 text-xs leading-relaxed text-[#3d5163]">
           La etapa I muestra las manzanas C, D, E y F en la franja junto a la vía, con el lado largo
