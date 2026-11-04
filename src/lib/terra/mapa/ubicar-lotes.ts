@@ -13,9 +13,9 @@ const ETAPA_I = new Set(["C", "D", "E", "F"]);
 
 /**
  * Esquina norte del loteo, en metros del terreno.
- * Quedó recalculada al girar 12° y correr el bloque 18 m al occidente.
+ * Quedó recalculada al girar 12° y correr el bloque 36 m al occidente.
  */
-const NORTH_END: [number, number] = [1243.4365, 1036.1116];
+const NORTH_END: [number, number] = [1225.4365, 1036.1116];
 /** Eje corto, girado 12° en sentido horario. */
 const ACROSS: [number, number] = [0.99299516, -0.1181471];
 /** Eje largo, girado 12° en sentido horario. */
@@ -26,7 +26,7 @@ const LOCAL_Y_MID = (-39.676557 + 96.390132) / 2;
 
 /**
  * La etapa I son las manzanas C, D, E y F.
- * El bloque gira 12° en sentido horario y queda 18 m más al occidente.
+ * El bloque gira 12° en sentido horario y queda 36 m más al occidente.
  * El eje corto va invertido para no dejar el plano en espejo.
  */
 export function colocarLotes(terrain: TerrainFrame, lots: JoinedLot[]): PlacedLot[] {
