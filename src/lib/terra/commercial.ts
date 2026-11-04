@@ -115,9 +115,6 @@ export const TERRA_COPY = {
 export const TERRA_NAV = [
   { id: "proyecto", label: "Proyecto", href: "/terra#proyecto" },
   { id: "lotes", label: "Lotes", href: "/terra#lotes" },
-  { id: "naturaleza", label: "Naturaleza", href: "/terra#naturaleza" },
-  { id: "financiacion", label: "Financiación", href: "/terra#financiacion" },
-  { id: "cronograma", label: "Cronograma", href: "/terra#cronograma" },
   { id: "ubicacion", label: "Ubicación", href: "/terra#ubicacion" },
   { id: "contacto", label: "Contacto", href: "/terra#contacto" },
 ] as const;
