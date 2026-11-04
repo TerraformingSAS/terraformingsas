@@ -272,7 +272,6 @@ export function TerraMapa() {
                   <dd>{medidas ? `${medida(medidas.area_m2)} m²` : "Por confirmar"}</dd>
                 </div>
               </dl>
-              <p className="mapa-size-note">Medidas y área según el Excel.</p>
               <p className="mapa-size-note">
                 Consulta las condiciones vigentes de separación y financiación en tu cotización.
               </p>
