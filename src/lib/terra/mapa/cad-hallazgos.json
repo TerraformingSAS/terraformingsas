@@ -27,6 +27,13 @@
     },
     "puntos": ["Centro aproximado", "Torre 1", "Torre 2", "Torre 3", "Torre 4", "Posible lago"]
   },
+  "terreno": {
+    "elevacion": "AWS Terrain Tiles, Terrarium, zoom 15",
+    "imagen": "Esri World Imagery, zoom 15",
+    "cotaMinM": 1725.57,
+    "cotaMaxM": 1789.65,
+    "nota": "El relieve cubre el perímetro del KML con margen. Los lotes publicados siguen en coordenadas locales y no se proyectan sobre esa malla."
+  },
   "alineacion": {
     "aplicada": false,
     "motivo": "EPSG:9377 sitúa textos del DWG cerca de Popayán, unos 4,6 km al sur del polígono KML. No hay vértices homólogos entre el plano de lotes y el KML. No se forzó una georreferenciación visual."

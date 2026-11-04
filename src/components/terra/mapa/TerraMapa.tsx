@@ -1,11 +1,11 @@
 import geometria from "@/lib/terra/mapa/geometria.json";
-import hallazgos from "@/lib/terra/mapa/cad-hallazgos.json";
 import { joinLots, type GeomLot, type JoinedLot } from "@/lib/terra/mapa/join";
 import { terraWhatsAppUrl } from "@/lib/terra/contact";
 import { TERRA_PROJECT, formatCop, TERRA_LOT_TYPES } from "@/lib/terra/commercial";
 import { fetchPublicLots, formatArea, isAvailableLot, lotQuoteUrl } from "@/lib/terra/lots";
 import { TerraHeader } from "@/components/terra/TerraHeader";
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { TerrainHandle, TerrainPayload } from "./terreno-scene";
 
 const COLORS: Record<string, string> = {
   Disponible: "#66b48a",
@@ -17,44 +17,6 @@ const COLORS: Record<string, string> = {
 
 const GEOMETRY = geometria as GeomLot[];
 
-type View = { minX: number; minY: number; width: number; height: number };
-
-function boundsOf(lots: { puntos: [number, number][] }[], padRatio = 0.06): View {
-  let minX = Infinity;
-  let minY = Infinity;
-  let maxX = -Infinity;
-  let maxY = -Infinity;
-  for (const lot of lots) {
-    for (const [x, y] of lot.puntos) {
-      minX = Math.min(minX, x);
-      minY = Math.min(minY, y);
-      maxX = Math.max(maxX, x);
-      maxY = Math.max(maxY, y);
-    }
-  }
-  const width = maxX - minX;
-  const height = maxY - minY;
-  const padX = width * padRatio;
-  const padY = height * padRatio;
-  return {
-    minX: minX - padX,
-    minY: minY - padY,
-    width: width + padX * 2,
-    height: height + padY * 2,
-  };
-}
-
-function focusView(lot: JoinedLot, aspect: number): View {
-  const box = boundsOf([lot], 0);
-  const cx = box.minX + box.width / 2;
-  const cy = box.minY + box.height / 2;
-  let width = box.width * 4.2;
-  let height = box.height * 4.2;
-  if (width / height > aspect) height = width / aspect;
-  else width = height * aspect;
-  return { minX: cx - width / 2, minY: cy - height / 2, width, height };
-}
-
 function referencePrice(area: number | undefined | null): number | null {
   if (area == null) return null;
   const match = TERRA_LOT_TYPES.find((type) => Math.abs(type.area - area) < 0.02);
@@ -65,18 +27,17 @@ export function TerraMapa() {
   const [commercial, setCommercial] = useState<Awaited<ReturnType<typeof fetchPublicLots>> | null>(
     null,
   );
+  const [terrain, setTerrain] = useState<TerrainPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [terrainError, setTerrainError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [manzana, setManzana] = useState("");
   const [estado, setEstado] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [hoverId, setHoverId] = useState<string | null>(null);
-  const [mode, setMode] = useState<"2d" | "3d">("2d");
-  const fit = useMemo(() => boundsOf(GEOMETRY), []);
-  const [view, setView] = useState<View>(fit);
-  const frame = useRef<HTMLDivElement>(null);
-  const drag = useRef<{ x: number; y: number; view: View; moved: boolean } | null>(null);
-  const dragged = useRef(false);
+  const [mode, setMode] = useState<"terreno" | "loteo">("terreno");
+  const [exaggeration, setExaggeration] = useState(1);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const handleRef = useRef<TerrainHandle | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -93,13 +54,20 @@ export function TerraMapa() {
       .finally(() => {
         if (!controller.signal.aborted) setLoading(false);
       });
+    fetch("/terra/mapa/terreno.json")
+      .then((response) => {
+        if (!response.ok) throw new Error("No se pudo cargar el terreno.");
+        return response.json() as Promise<TerrainPayload>;
+      })
+      .then(setTerrain)
+      .catch((reason: unknown) => {
+        setTerrainError(reason instanceof Error ? reason.message : "No se pudo cargar el terreno.");
+      });
     return () => controller.abort();
   }, []);
 
   const joined = useMemo(() => joinLots(GEOMETRY, commercial?.lotes ?? []), [commercial]);
-
   const manzanas = useMemo(() => [...new Set(GEOMETRY.map((lot) => lot.manzana))].sort(), []);
-
   const visible = useMemo(
     () =>
       joined.lots.filter((lot) => {
@@ -109,9 +77,18 @@ export function TerraMapa() {
       }),
     [joined.lots, manzana, estado],
   );
-
+  const visibleIds = useMemo(() => new Set(visible.map((lot) => lot.id)), [visible]);
   const selected = joined.lots.find((lot) => lot.id === selectedId) ?? null;
-  const labelMin = Math.min(view.width, view.height) / 90;
+  const lotsRef = useRef(joined.lots);
+  const visibleRef = useRef(visibleIds);
+  const selectedRef = useRef(selectedId);
+  const modeRef = useRef(mode);
+  const exaggerationRef = useRef(exaggeration);
+  lotsRef.current = joined.lots;
+  visibleRef.current = visibleIds;
+  selectedRef.current = selectedId;
+  modeRef.current = mode;
+  exaggerationRef.current = exaggeration;
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -121,52 +98,56 @@ export function TerraMapa() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  function aspect() {
-    const rect = frame.current?.getBoundingClientRect();
-    if (!rect || rect.height === 0) return fit.width / fit.height;
-    return rect.width / rect.height;
-  }
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !terrain) return;
+    let cancelled = false;
+    void import("./terreno-scene").then(async ({ mountTerrain }) => {
+      if (cancelled) return;
+      const handle = await mountTerrain(canvas, terrain, (id) => {
+        setSelectedId(id);
+        setMode("loteo");
+        const url = new URL(window.location.href);
+        url.searchParams.set("lote", id);
+        window.history.replaceState(null, "", url);
+      });
+      if (cancelled) {
+        handle.dispose();
+        return;
+      }
+      handleRef.current = handle;
+      handle.setMode(modeRef.current);
+      handle.setLots(lotsRef.current, visibleRef.current);
+      handle.setSelected(selectedRef.current);
+      handle.setExaggeration(exaggerationRef.current);
+    });
+    return () => {
+      cancelled = true;
+      handleRef.current?.dispose();
+      handleRef.current = null;
+    };
+    // The scene is created once per terrain payload. Later updates go through the handle.
+  }, [terrain]);
+
+  useEffect(() => {
+    handleRef.current?.setMode(mode);
+  }, [mode]);
+
+  useEffect(() => {
+    handleRef.current?.setLots(joined.lots, visibleIds);
+    handleRef.current?.setSelected(selectedId);
+  }, [joined.lots, visibleIds, selectedId]);
+
+  useEffect(() => {
+    handleRef.current?.setExaggeration(exaggeration);
+  }, [exaggeration]);
 
   function selectLot(lot: JoinedLot) {
     setSelectedId(lot.id);
-    setView(focusView(lot, aspect()));
+    setMode("loteo");
     const url = new URL(window.location.href);
     url.searchParams.set("lote", lot.id);
     window.history.replaceState(null, "", url);
-  }
-
-  function onPointerDown(event: React.PointerEvent) {
-    if (event.button !== 0) return;
-    (event.currentTarget as Element).setPointerCapture(event.pointerId);
-    drag.current = { x: event.clientX, y: event.clientY, view, moved: false };
-  }
-
-  function onPointerMove(event: React.PointerEvent) {
-    const current = drag.current;
-    if (!current) return;
-    const dx = event.clientX - current.x;
-    const dy = event.clientY - current.y;
-    if (Math.hypot(dx, dy) > 4) current.moved = true;
-    const rect = frame.current?.getBoundingClientRect();
-    if (!rect) return;
-    setView({
-      ...current.view,
-      minX: current.view.minX - (dx / rect.width) * current.view.width,
-      minY: current.view.minY - (dy / rect.height) * current.view.height,
-    });
-  }
-
-  function onPointerUp() {
-    dragged.current = drag.current?.moved ?? false;
-    drag.current = null;
-  }
-
-  function zoom(factor: number) {
-    const cx = view.minX + view.width / 2;
-    const cy = view.minY + view.height / 2;
-    const width = view.width / factor;
-    const height = view.height / factor;
-    setView({ minX: cx - width / 2, minY: cy - height / 2, width, height });
   }
 
   const canQuote = selected ? isAvailableLot(selected.estado ?? "") : false;
@@ -182,8 +163,28 @@ export function TerraMapa() {
               TERRA · ETAPA I
             </p>
             <h1 className="font-display text-lg font-semibold leading-tight sm:text-xl">
-              Mapa del loteo
+              Terreno del predio
             </h1>
+          </div>
+          <div
+            className="inline-flex rounded-lg bg-white p-0.5 shadow-sm"
+            role="group"
+            aria-label="Escena"
+          >
+            <button
+              type="button"
+              className={`rounded-md px-3 py-1.5 text-sm ${mode === "terreno" ? "bg-[#0e2a47] text-white" : ""}`}
+              onClick={() => setMode("terreno")}
+            >
+              Terreno 3D
+            </button>
+            <button
+              type="button"
+              className={`rounded-md px-3 py-1.5 text-sm ${mode === "loteo" ? "bg-[#0e2a47] text-white" : ""}`}
+              onClick={() => setMode("loteo")}
+            >
+              Loteo 3D
+            </button>
           </div>
           <label className="text-sm">
             <span className="sr-only">Manzana</span>
@@ -215,137 +216,60 @@ export function TerraMapa() {
               ))}
             </select>
           </label>
-          <div
-            className="inline-flex rounded-lg bg-white p-0.5 shadow-sm"
-            role="group"
-            aria-label="Tipo de vista"
-          >
-            {(["2d", "3d"] as const).map((item) => (
-              <button
-                key={item}
-                type="button"
-                className={`rounded-md px-3 py-1.5 text-sm ${mode === item ? "bg-[#0e2a47] text-white" : ""}`}
-                onClick={() => setMode(item)}
-              >
-                Vista {item.toUpperCase()}
-              </button>
-            ))}
-          </div>
         </div>
 
-        <div className="relative mx-3 mb-3 min-h-[70vh] flex-1 overflow-hidden rounded-2xl bg-[#d5e0e6] shadow-[0_8px_30px_rgba(14,42,71,0.12)] sm:mx-4">
+        <div className="relative mx-3 mb-3 min-h-[70vh] flex-1 overflow-hidden rounded-2xl bg-[#c5d5df] shadow-[0_8px_30px_rgba(14,42,71,0.12)] sm:mx-4">
           {loading && (
             <p className="absolute left-3 top-3 z-10 rounded-lg bg-white/90 px-3 py-2 text-sm shadow">
               Cargando disponibilidad…
             </p>
           )}
-          {error && (
+          {(error || terrainError) && (
             <p
               className="absolute left-3 top-3 z-10 max-w-sm rounded-lg bg-white px-3 py-2 text-sm shadow"
               role="alert"
             >
-              {error} El plano sigue visible; el estado comercial no se pudo consultar.
+              {terrainError ?? error}
             </p>
           )}
-          <div
-            ref={frame}
-            className="h-full min-h-[70vh] touch-none"
-            style={{ perspective: mode === "3d" ? "1200px" : undefined }}
-            onPointerDown={onPointerDown}
-            onPointerMove={onPointerMove}
-            onPointerUp={onPointerUp}
-            onPointerCancel={onPointerUp}
-          >
-            <svg
-              className="h-full w-full"
-              viewBox={`${view.minX} ${view.minY} ${view.width} ${view.height}`}
-              role="img"
-              aria-label="Plano de lotes de TERRA"
-              style={{
-                transform: mode === "3d" ? "rotateX(52deg) scale(0.92)" : undefined,
-                transformOrigin: "center center",
-              }}
-            >
-              <rect
-                x={view.minX}
-                y={view.minY}
-                width={view.width}
-                height={view.height}
-                fill="#d7e3dc"
-              />
-              {GEOMETRY.map((lot) => {
-                const shown = visible.some((item) => item.id === lot.id);
-                const data = joined.lots.find((item) => item.id === lot.id);
-                const active = lot.id === selectedId;
-                const hot = lot.id === hoverId;
-                const fill = data?.estado ? (COLORS[data.estado] ?? "#c5ced6") : "#c5ced6";
-                return (
-                  <polygon
-                    key={lot.id}
-                    points={lot.puntos.map((point) => point.join(",")).join(" ")}
-                    fill={shown ? fill : "#e4eaee"}
-                    stroke={active ? "#e07a2f" : "#0e2a47"}
-                    strokeWidth={active ? view.width / 280 : view.width / 900}
-                    opacity={shown ? 1 : 0.45}
-                    className="cursor-pointer"
-                    style={{ filter: active || hot ? "brightness(1.06)" : undefined }}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      if (dragged.current) return;
-                      if (data) selectLot(data);
-                    }}
-                    onPointerEnter={() => setHoverId(lot.id)}
-                    onPointerLeave={() =>
-                      setHoverId((current) => (current === lot.id ? null : current))
-                    }
-                  >
-                    <title>{`${lot.id}${data?.estado ? ` · ${data.estado}` : ""}`}</title>
-                  </polygon>
-                );
-              })}
-              {view.width < fit.width * 0.55 &&
-                visible.map((lot) => (
-                  <text
-                    key={`${lot.id}-label`}
-                    x={lot.centro[0]}
-                    y={lot.centro[1]}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fontSize={labelMin}
-                    fill="#0e2a47"
-                    style={{ pointerEvents: "none" }}
-                  >
-                    {lot.lote}
-                  </text>
-                ))}
-            </svg>
-          </div>
-
+          <canvas ref={canvasRef} className="h-full min-h-[70vh] w-full touch-none" />
           <div className="absolute bottom-3 left-3 flex flex-col gap-1">
             <button
               type="button"
-              className="h-9 w-9 rounded-lg bg-white text-lg shadow"
-              onClick={() => zoom(1.25)}
-              aria-label="Acercar"
+              className="h-9 rounded-lg bg-white px-2 text-xs shadow"
+              onClick={() => handleRef.current?.setView("3d")}
             >
-              +
-            </button>
-            <button
-              type="button"
-              className="h-9 w-9 rounded-lg bg-white text-lg shadow"
-              onClick={() => zoom(0.8)}
-              aria-label="Alejar"
-            >
-              −
+              Vista 3D
             </button>
             <button
               type="button"
               className="h-9 rounded-lg bg-white px-2 text-xs shadow"
-              onClick={() => setView(fit)}
+              onClick={() => handleRef.current?.setView("superior")}
+            >
+              Vista superior
+            </button>
+            <button
+              type="button"
+              className="h-9 rounded-lg bg-white px-2 text-xs shadow"
+              onClick={() => handleRef.current?.reset()}
             >
               Ajustar
             </button>
           </div>
+          {mode === "terreno" && (
+            <label className="absolute right-3 top-3 rounded-xl bg-white/95 px-3 py-2 text-xs shadow">
+              Exageración vertical {exaggeration.toFixed(1)}×
+              <input
+                className="mt-1 block w-36"
+                type="range"
+                min={1}
+                max={3}
+                step={0.5}
+                value={exaggeration}
+                onChange={(event) => setExaggeration(Number(event.target.value))}
+              />
+            </label>
+          )}
           <ul className="absolute bottom-3 right-3 hidden max-w-[220px] flex-wrap gap-x-3 gap-y-1 rounded-xl bg-white/95 px-3 py-2 text-xs shadow sm:flex">
             {Object.entries(COLORS).map(([state, color]) => (
               <li key={state} className="flex items-center gap-1.5">
@@ -359,21 +283,38 @@ export function TerraMapa() {
           </ul>
         </div>
 
-        <p className="px-4 pb-6 text-xs leading-relaxed text-[#3d5163]">
-          {hallazgos.geometriaPublicada.lotes} lotes del plano publicado (manzanas{" "}
-          {Object.entries(hallazgos.geometriaPublicada.manzanas)
-            .map(([block, count]) => `${block} ${count}`)
-            .join(", ")}
-          ). El DWG del 31-10-26 no incluye un polígono por lote y el KML solo trae el perímetro del
-          predio, así que este visor no superpone una imagen satelital.{" "}
-          {commercial
-            ? `${joined.lots.length - joined.sinComercial.length} polígonos con estado comercial. ${joined.sinComercial.length} sin ficha. ${joined.sinGeometria.length} fichas sin polígono.`
-            : "La disponibilidad se consulta en la misma fuente de /terra/estado."}
+        <p className="px-4 pb-2 text-xs leading-relaxed text-[#3d5163]">
+          El relieve usa elevación Terrarium (AWS Terrain Tiles, zoom 15) sobre el perímetro del
+          KML, entre {terrain ? `${terrain.elevMin} y ${terrain.elevMax} m` : "la cota del predio"}.
+          La imagen es Esri World Imagery. Arrastra para orbitar, botón derecho para desplazar y la
+          rueda para acercar.
         </p>
+        <p className="px-4 pb-4 text-xs leading-relaxed text-[#3d5163]">
+          Los 104 lotes del plano publicado no tienen coordenadas geográficas ni puntos de control
+          con el KML, así que no se pegan al relieve. En «Loteo 3D» cada polígono se puede orbitar y
+          seleccionar, en su plano local.{" "}
+          {commercial
+            ? `${joined.lots.length - joined.sinComercial.length} con estado comercial, ${joined.sinComercial.length} sin ficha, ${joined.sinGeometria.length} fichas sin polígono.`
+            : "La disponibilidad sale de la misma fuente de /terra/estado."}
+        </p>
+        {mode === "loteo" && (
+          <div className="flex gap-2 overflow-x-auto px-4 pb-6">
+            {visible.map((lot) => (
+              <button
+                key={lot.id}
+                type="button"
+                className="shrink-0 rounded-full border border-[#d5dee6] bg-white px-3 py-1 text-xs"
+                onClick={() => selectLot(lot)}
+              >
+                {lot.id}
+              </button>
+            ))}
+          </div>
+        )}
       </main>
 
       {selected && (
-        <div className="fixed inset-x-0 bottom-0 z-40 sm:inset-y-auto sm:bottom-6 sm:right-6 sm:left-auto sm:top-24 sm:w-[360px]">
+        <div className="fixed inset-x-0 bottom-0 z-40 sm:inset-y-auto sm:bottom-6 sm:left-auto sm:right-6 sm:top-24 sm:w-[360px]">
           <article className="max-h-[70vh] overflow-auto rounded-t-2xl border border-[#e4ebf1] bg-white/95 p-4 shadow-[0_12px_40px_rgba(14,42,71,0.18)] backdrop-blur sm:max-h-[calc(100vh-8rem)] sm:rounded-2xl">
             <p className="text-[11px] font-semibold tracking-[0.16em] text-[#1d6f8a]">
               TERRA · ETAPA I
