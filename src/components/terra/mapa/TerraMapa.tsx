@@ -35,7 +35,6 @@ export function TerraMapa() {
   const [manzana, setManzana] = useState("");
   const [estado, setEstado] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [exaggeration, setExaggeration] = useState(2);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const handleRef = useRef<TerrainHandle | null>(null);
 
@@ -82,11 +81,9 @@ export function TerraMapa() {
   const lotsRef = useRef(joined.lots);
   const visibleRef = useRef(visibleIds);
   const selectedRef = useRef(selectedId);
-  const exaggerationRef = useRef(exaggeration);
   lotsRef.current = joined.lots;
   visibleRef.current = visibleIds;
   selectedRef.current = selectedId;
-  exaggerationRef.current = exaggeration;
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -115,7 +112,6 @@ export function TerraMapa() {
       handleRef.current = handle;
       handle.setLots(lotsRef.current, visibleRef.current);
       handle.setSelected(selectedRef.current);
-      handle.setExaggeration(exaggerationRef.current);
     });
     return () => {
       cancelled = true;
@@ -129,10 +125,6 @@ export function TerraMapa() {
     handleRef.current?.setLots(joined.lots, visibleIds);
     handleRef.current?.setSelected(selectedId);
   }, [joined.lots, visibleIds, selectedId]);
-
-  useEffect(() => {
-    handleRef.current?.setExaggeration(exaggeration);
-  }, [exaggeration]);
 
   const canQuote = selected ? isAvailableLot(selected.estado ?? "") : false;
   const price = referencePrice(selected?.medidas?.area_m2);
@@ -220,18 +212,6 @@ export function TerraMapa() {
               Ajustar
             </button>
           </div>
-          <label className="absolute right-3 top-3 rounded-xl bg-white/95 px-3 py-2 text-xs shadow">
-            Exageración vertical {exaggeration.toFixed(1)}×
-            <input
-              className="mt-1 block w-36"
-              type="range"
-              min={1}
-              max={3}
-              step={0.5}
-              value={exaggeration}
-              onChange={(event) => setExaggeration(Number(event.target.value))}
-            />
-          </label>
           <ul className="absolute bottom-3 right-3 hidden max-w-[220px] flex-wrap gap-x-3 gap-y-1 rounded-xl bg-white/95 px-3 py-2 text-xs shadow sm:flex">
             {Object.entries(COLORS).map(([state, color]) => (
               <li key={state} className="flex items-center gap-1.5">
@@ -252,8 +232,9 @@ export function TerraMapa() {
           orbitar, botón derecho para desplazar y la rueda para acercar.
         </p>
         <p className="px-4 pb-6 text-xs leading-relaxed text-[#3d5163]">
-          La etapa I muestra las manzanas C, D, E y F en la franja junto a la vía, con el lado largo hacia el sur.
-          Cada lote lleva su propio borde. El relieve se muestra al doble para leer la pendiente.{" "}
+          La etapa I muestra las manzanas C, D, E y F en la franja junto a la vía, con el lado largo
+          hacia el sur. Cada lote lleva su propio borde. El relieve se muestra a 1,5 para leer la
+          pendiente.{" "}
           {commercial
             ? `${joined.lots.length - joined.sinComercial.length} con estado comercial, ${joined.sinComercial.length} sin ficha, ${joined.sinGeometria.length} fichas sin polígono.`
             : "La disponibilidad sale de la misma fuente de /terra/estado."}

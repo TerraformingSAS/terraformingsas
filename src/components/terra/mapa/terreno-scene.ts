@@ -28,7 +28,6 @@ const STATE_COLOR: Record<string, number> = {
 
 export type TerrainHandle = {
   setLots: (lots: JoinedLot[], visible: Set<string>) => void;
-  setExaggeration: (value: number) => void;
   setView: (view: "3d" | "superior") => void;
   reset: () => void;
   setSelected: (id: string | null) => void;
@@ -83,14 +82,7 @@ export async function mountTerrain(
   );
   scene.add(ground);
 
-  const ring = terrain.perimetro.map(([x, z]) => {
-    const y = sampleHeight(terrain, x, z) - terrain.elevMin + 3;
-    return toScene(x, y, z);
-  });
-  const boundary = new THREE.LineLoop(
-    new THREE.BufferGeometry().setFromPoints(ring),
-    new THREE.LineBasicMaterial({ color: 0xe07a2f }),
-  );
+  let boundary = perimeterRibbon(THREE, []);
   scene.add(boundary);
 
   const lotRoot = new THREE.Group();
@@ -99,8 +91,12 @@ export async function mountTerrain(
   let lotSource: JoinedLot[] = [];
   let lotVisible = new Set<string>();
 
-  const terrainTarget = new THREE.Vector3(0, (terrain.elevMax - terrain.elevMin) / 2, 0);
-  let exaggeration = 1;
+  const exaggeration = 1.5;
+  const terrainTarget = new THREE.Vector3(
+    0,
+    ((terrain.elevMax - terrain.elevMin) / 2) * exaggeration,
+    0,
+  );
 
   function frameTerrain(view: "3d" | "superior") {
     controls.target.copy(terrainTarget);
@@ -119,13 +115,13 @@ export async function mountTerrain(
       positions[i * 3 + 1] = originalY[i] * exaggeration;
     geometry.attributes.position.needsUpdate = true;
     geometry.computeVertexNormals();
-    const lift = exaggeration;
-    const points = terrain.perimetro.map(([x, z]) => {
-      const y = (sampleHeight(terrain, x, z) - terrain.elevMin) * lift + 3;
-      return toScene(x, y, z);
-    });
+    const points = drapePerimeter(terrain, exaggeration).map(([x, z, y]) => toScene(x, y, z));
+    const next = perimeterRibbon(THREE, points);
+    scene.remove(boundary);
     boundary.geometry.dispose();
-    boundary.geometry = new THREE.BufferGeometry().setFromPoints(points);
+    (boundary.material as Material).dispose();
+    boundary = next;
+    scene.add(boundary);
     rebuildLots();
   }
 
@@ -191,6 +187,7 @@ export async function mountTerrain(
     }
   }
 
+  applyHeights();
   frameTerrain("3d");
 
   const raycaster = new THREE.Raycaster();
@@ -243,10 +240,6 @@ export async function mountTerrain(
       lotVisible = visible;
       rebuildLots();
     },
-    setExaggeration(value) {
-      exaggeration = value;
-      applyHeights();
-    },
     setView: frameTerrain,
     reset() {
       frameTerrain("3d");
@@ -282,6 +275,70 @@ export async function mountTerrain(
       renderer.dispose();
     },
   };
+}
+
+function drapePerimeter(terrain: TerrainPayload, exaggeration: number): [number, number, number][] {
+  const ring = terrain.perimetro;
+  if (ring.length < 2) return [];
+  const closed =
+    Math.hypot(ring[0][0] - ring[ring.length - 1][0], ring[0][1] - ring[ring.length - 1][1]) < 0.05;
+  const count = closed ? ring.length - 1 : ring.length;
+  const samples: [number, number, number][] = [];
+  const step = 8;
+  for (let index = 0; index < count; index += 1) {
+    const start = ring[index];
+    const end = ring[(index + 1) % count];
+    if (!start || !end) continue;
+    const pieces = Math.max(1, Math.ceil(Math.hypot(end[0] - start[0], end[1] - start[1]) / step));
+    for (let piece = 0; piece < pieces; piece += 1) {
+      const t = piece / pieces;
+      const x = start[0] + (end[0] - start[0]) * t;
+      const z = start[1] + (end[1] - start[1]) * t;
+      const y = (sampleHeight(terrain, x, z) - terrain.elevMin) * exaggeration + 8;
+      samples.push([x, z, y]);
+    }
+  }
+  return samples;
+}
+
+function perimeterRibbon(THREE: typeof import("three"), points: import("three").Vector3[]) {
+  const half = 2.4;
+  const positions: number[] = [];
+  for (let index = 0; index < points.length; index += 1) {
+    const start = points[index];
+    const end = points[(index + 1) % points.length];
+    if (!start || !end) continue;
+    const dx = end.x - start.x;
+    const dz = end.z - start.z;
+    const length = Math.hypot(dx, dz) || 1;
+    const px = (-dz / length) * half;
+    const pz = (dx / length) * half;
+    const quad = [
+      [start.x + px, start.y, start.z + pz],
+      [start.x - px, start.y, start.z - pz],
+      [end.x + px, end.y, end.z + pz],
+      [end.x - px, end.y, end.z - pz],
+    ];
+    for (const corner of [0, 1, 2, 1, 3, 2]) {
+      const point = quad[corner];
+      if (point) positions.push(point[0], point[1], point[2]);
+    }
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  const ribbon = new THREE.Mesh(
+    geometry,
+    new THREE.MeshBasicMaterial({
+      color: 0xe07a2f,
+      side: THREE.DoubleSide,
+      depthTest: true,
+      polygonOffset: true,
+      polygonOffsetFactor: -10,
+      polygonOffsetUnits: -10,
+    }),
+  );
+  ribbon.renderOrder = 4;
+  return ribbon;
 }
 
 function lotBorder(THREE: typeof import("three"), points: import("three").Vector3[]) {
