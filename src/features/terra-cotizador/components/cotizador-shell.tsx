@@ -112,7 +112,7 @@ export function CotizadorGate({
     return (
       <CotizadorShell>
         <div className="container-tf flex flex-1 flex-col items-center justify-center gap-3 px-4 py-16 text-center">
-          <h1 className="text-xl font-semibold text-[#0e2a47]">Acceso restringido</h1>
+          <h1 className="text-xl font-semibold text-foreground">Acceso restringido</h1>
           <p className="max-w-md text-sm text-muted-foreground">
             Esta pantalla es solo para administradores.
           </p>
@@ -136,7 +136,7 @@ export function CotizadorShell({ children }: { children: ReactNode }) {
 
   return (
     <div
-      className={`terra-cotizador-app ${dark ? "dark" : "light"} flex min-h-screen flex-col bg-muted/40 text-foreground`}
+      className={`terra-cotizador-app ${dark ? "dark" : "light"} flex min-h-screen flex-col bg-muted text-foreground dark:bg-background`}
     >
       <a
         href="#trabajo"
@@ -144,7 +144,7 @@ export function CotizadorShell({ children }: { children: ReactNode }) {
       >
         Saltar al cotizador
       </a>
-      <header className="sticky top-0 z-30 border-b border-border bg-white/95 shadow-sm backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-border bg-card/95 text-card-foreground shadow-sm backdrop-blur">
         <div className="container-tf flex h-18 items-center justify-between gap-3 py-3">
           <Link to="/" className="flex shrink-0 items-center gap-3" aria-label="TERRA FORMING inicio">
             <img src={logoColor} alt="TERRA FORMING" className="h-11 w-auto" width={300} height={83} />
@@ -171,12 +171,12 @@ export function CotizadorShell({ children }: { children: ReactNode }) {
               </AdminNavLink>
             </nav>
           ) : (
-            <p className="hidden min-w-0 truncate text-sm font-medium tracking-wide text-brand-navy sm:block">
+            <p className="hidden min-w-0 truncate text-sm font-medium tracking-wide text-foreground sm:block">
               Cotizador preventa
             </p>
           )}
           <div className="ml-auto flex items-center gap-1 sm:gap-2">
-            <span className="hidden max-w-40 truncate text-sm font-medium text-brand-navy md:inline">
+            <span className="hidden max-w-40 truncate text-sm font-medium text-foreground md:inline">
               {sesion.data?.nombre}
             </span>
             {admin && (
@@ -210,7 +210,7 @@ export function CotizadorShell({ children }: { children: ReactNode }) {
               onClick={toggle}
               aria-pressed={dark}
               aria-label={dark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
-              className="grid size-10 shrink-0 place-items-center rounded-md text-brand-navy transition-colors hover:text-brand-orange focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
+              className="grid size-10 shrink-0 place-items-center rounded-md text-foreground transition-colors hover:text-brand-orange focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
               {dark ? (
                 <Sun className="size-5" aria-hidden="true" />
@@ -222,7 +222,7 @@ export function CotizadorShell({ children }: { children: ReactNode }) {
               type="button"
               onClick={() => void salir()}
               aria-label="Cerrar sesión"
-              className="grid size-10 shrink-0 place-items-center rounded-md text-brand-navy transition-colors hover:text-brand-orange focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
+              className="grid size-10 shrink-0 place-items-center rounded-md text-foreground transition-colors hover:text-brand-orange focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
               <LogOut className="size-5" aria-hidden="true" />
             </button>
@@ -259,7 +259,7 @@ function AdminNavLink({
         compact ? "px-2 py-1.5 text-xs" : "px-3 py-1.5 text-sm",
         active
           ? "bg-[#0e2a47] text-white"
-          : "text-brand-navy hover:bg-muted hover:text-brand-orange",
+          : "text-foreground hover:bg-muted hover:text-brand-orange",
       )}
     >
       {children}
@@ -270,7 +270,7 @@ function AdminNavLink({
 function FuenteFooter() {
   const query = useLotes();
   return (
-    <p className="border-t border-border bg-white px-4 py-3 text-center text-xs text-brand-navy/70">
+    <p className="border-t border-border bg-card px-4 py-3 text-center text-xs text-muted-foreground">
       <span className="font-medium">Precios actualizados:</span>{" "}
       {query.isPending ? (
         "consultando…"
