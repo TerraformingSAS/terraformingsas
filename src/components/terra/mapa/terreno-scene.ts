@@ -342,7 +342,7 @@ function perimeterRibbon(THREE: typeof import("three"), points: import("three").
 }
 
 function lotBorder(THREE: typeof import("three"), points: import("three").Vector3[]) {
-  const half = 1.35;
+  const half = 0.9;
   const positions: number[] = [];
   for (let index = 0; index < points.length; index += 1) {
     const start = points[index];
