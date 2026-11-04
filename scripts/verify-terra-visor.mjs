@@ -7,12 +7,12 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const folder = join(root, "public", "terra", "estado");
 const files = {
-  "index.html": "ede0707417580a497de97bb242c8e03a672a7e5f01a4119c46a7c863f9711958",
-  "estilos.css": "6d0511c3b57b7809cab789c04a1a9f166c2b14baeadacc52c06930e089387566",
+  "index.html": "3b8ce2a38a17468defaedd08bfc909d0601ed292d426d797f32b32d5ae0d7705",
+  "estilos.css": "8f12e3262ce16415cf14f6e8f78368d58d3f9f4758e86fd318d1c0dca72b7f5a",
   "header.js": "633deb77c2e2356dc4942eb4c023574fd843becc4c91c9ad4f5c9c832e646001",
-  "app.js": "1241a45a591aa713d681242b0d6fe59ab6c1dd426d7ff43ab7ed052e40adbafe",
+  "app.js": "6237699bef4fc7e77d7026d33ee8cc36d164fe95e11b34eba3fc4711a25c8501",
   "logo-terraforming.png": "6ec6eab54659f8d5c89291f7ed2d0c15842adedb69047e9435a3012f9dc681d5",
-  "ubicacion-etapa-i.webp": "66a34d7c5175c992c50c0d5d3c59032acf722a9cc20a6c6941556d26ee362deb"
+  "ubicacion-etapa-i.webp": "bfefef7ed5d4910b9c0b2bcccb98fb852b4302c1cf35e84b33fa83fe82923fa5"
 };
 
 for (const [name, expected] of Object.entries(files)) {
@@ -80,8 +80,13 @@ if (!headerJs.includes('aria-expanded') || !headerJs.includes('window.scrollY > 
 }
 const generalForm = await readFile(join(root, "src", "components", "Contact.tsx"), "utf8");
 const presaleForm = await readFile(join(root, "src", "components", "terra", "TerraLeadForm.tsx"), "utf8");
-if (!presaleForm.includes('Preventa hasta el <span className="text-brand-orange">15 de noviembre</span>')) {
-  throw new Error("La fecha comercial de preventa del formulario TERRA debe ser 15 de noviembre.");
+const commercialConfig = await readFile(join(root, "src", "lib", "terra", "commercial.ts"), "utf8");
+if (!commercialConfig.includes('endsAt: "2026-10-31T23:59:59-05:00"') ||
+    !commercialConfig.includes("separacionCop: SEPARACION_COP")) {
+  throw new Error("Las condiciones comerciales de TERRA deben centralizarse y no publicar descuentos vencidos como vigentes.");
+}
+if (presaleForm.includes("15 de noviembre") || presaleForm.includes("Quiero mi descuento")) {
+  throw new Error("El formulario de TERRA no debe promover descuentos o fechas comerciales vencidas.");
 }
 
 for (const required of [
@@ -96,19 +101,25 @@ for (const required of [
 }
 for (const required of [
   'data.set("origen", "Preventa TERRA")',
-  'data.set("subject", "TERRA | Nuevo interesado en preventa")',
+  'data.set("subject", "TERRA | Solicitud de cotización")',
   'data.set("referido_por", values.referido_por.trim() || "No informado")',
-  'name="referido_por" type="text"',
-  '¿Quién te contó de nosotros?',
-  'maxLength={100}',
+  'name="referido_por"',
+  "¿Cómo nos conociste?",
+  "maxLength={100}",
+  'data.set("lote_seleccionado"',
+  'data.set("pagina_origen"',
+  'data.set("fecha_solicitud"',
 ]) {
   if (!presaleForm.includes(required)) {
     throw new Error("El formulario de preventa no incluye los datos esperados: " + required);
   }
 }
 const terraPage = await readFile(join(root, "src", "routes", "terra.tsx"), "utf8");
-if (terraPage.includes('Separa tu lote') || !terraPage.includes('Quiero más información')) {
-  throw new Error("El hero de /terra debe conservar solo el botón de información.");
+if (!terraPage.includes("TerraHero") ||
+    !terraPage.includes("LotPreview") ||
+    !terraPage.includes("LeadCaptureSection") ||
+    terraPage.includes("Alta valorización")) {
+  throw new Error("La landing /terra debe usar la experiencia inmobiliaria de TERRA, sin promesas de valorización.");
 }
 if (!js.includes("fetch('/api/terra-estado'")) {
   throw new Error("La ruta de consulta a SharePoint es diferente a la esperada");

@@ -1,13 +1,22 @@
-import { useState, type FormEvent } from "react";
 import { Web3FormsCaptcha } from "@/components/Web3FormsCaptcha";
+import { TerraPrimaryButton } from "@/components/terra/primitives";
 import { sendWeb3Forms } from "@/lib/web3forms";
+import { trackTerraEvent } from "@/lib/terra/analytics";
+import {
+  attributionFormFields,
+  readAttribution,
+  readFinancingPlan,
+  readSelectedLot,
+} from "@/lib/terra/campaign";
+import { TERRA_COPY, TERRA_PROJECT } from "@/lib/terra/commercial";
+import { normalizeLotId } from "@/lib/terra/lots";
+import { useEffect, useState, type FormEvent } from "react";
 
 type Lead = {
   nombre: string;
   whatsapp: string;
   correo: string;
-  tipo_documento: string;
-  numero_documento: string;
+  lote_interes: string;
   referido_por: string;
 };
 
@@ -15,13 +24,18 @@ const initial: Lead = {
   nombre: "",
   whatsapp: "",
   correo: "",
-  tipo_documento: "",
-  numero_documento: "",
+  lote_interes: "",
   referido_por: "",
 };
 
 const baseInput =
-  "w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm text-brand-navy outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20";
+  "w-full rounded-md border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-brand-navy outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20";
+
+function lotFromLocation(): string {
+  if (typeof window === "undefined") return "";
+  const fromQuery = new URLSearchParams(window.location.search).get("lote");
+  return normalizeLotId(fromQuery || readSelectedLot(window.sessionStorage));
+}
 
 export function TerraLeadForm() {
   const [values, setValues] = useState<Lead>(initial);
@@ -31,12 +45,24 @@ export function TerraLeadForm() {
   const [sending, setSending] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [sent, setSent] = useState(false);
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    const lote = lotFromLocation();
+    if (lote) setValues((current) => ({ ...current, lote_interes: current.lote_interes || lote }));
+  }, []);
 
   const set = (key: keyof Lead, value: string) => {
     setValues((previous) => ({ ...previous, [key]: value }));
     setFeedback("");
     setSent(false);
   };
+
+  function markFormStart() {
+    if (started) return;
+    setStarted(true);
+    trackTerraEvent("form_start", { page: "/terra" }, { onceKey: "terra-form-start" });
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -45,16 +71,14 @@ export function TerraLeadForm() {
     const nombre = values.nombre.trim();
     const whatsapp = values.whatsapp.trim();
     const correo = values.correo.trim();
-    const numero = values.numero_documento.trim();
+    const lote = normalizeLotId(values.lote_interes);
 
-    if (
-      !nombre ||
-      !/^[+]?[0-9 ()-]{7,20}$/.test(whatsapp) ||
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo) ||
-      !["CC", "CE", "TI", "PA", "PPT", "OTRO"].includes(values.tipo_documento) ||
-      !/^[a-zA-Z0-9-]{4,20}$/.test(numero)
-    ) {
-      setFeedback("Revisa los campos obligatorios y los datos ingresados.");
+    if (!nombre || !/^[+]?[0-9 ()-]{7,20}$/.test(whatsapp)) {
+      setFeedback("Revisa el nombre y el número de WhatsApp.");
+      return;
+    }
+    if (correo && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+      setFeedback("Revisa el correo electrónico o déjalo en blanco.");
       return;
     }
     if (!consent) {
@@ -69,25 +93,45 @@ export function TerraLeadForm() {
     setSending(true);
     setFeedback("");
     setSent(false);
+    trackTerraEvent("request_quote", { lot_id: lote || "sin_lote", page: "/terra" });
+
+    const attribution = readAttribution(window.sessionStorage);
+    const campaign = attributionFormFields(attribution);
+    const plan = readFinancingPlan(window.sessionStorage);
+    const requestedAt = new Date().toLocaleString("sv-SE", { timeZone: "America/Bogota" });
 
     const data = new FormData();
-    data.set("subject", "TERRA | Nuevo interesado en preventa");
-    data.set("from_name", "Formulario de preventa TERRA");
+    data.set("subject", "TERRA | Solicitud de cotización");
+    data.set("from_name", "Formulario de cotización TERRA");
     data.set("origen", "Preventa TERRA");
     data.set("nombre", nombre);
     data.set("whatsapp", whatsapp);
-    data.set("email", correo);
-    data.set("tipo_documento", values.tipo_documento);
-    data.set("numero_documento", numero);
+    data.set("email", correo || "No informado");
+    data.set("lote_interes", lote || "No informado");
     data.set("referido_por", values.referido_por.trim() || "No informado");
     data.set("autorizacion_tratamiento_datos", "Sí, autorización expresa");
-    data.set("texto_autorizacion", "Autorizo a TERRA FORMING S.A.S. a tratar mis datos personales para atender mi solicitud de información sobre TERRA y contactarme por los medios suministrados.");
+    data.set(
+      "texto_autorizacion",
+      "Autorizo a TERRA FORMING S.A.S. a tratar mis datos personales para atender mi solicitud de información sobre TERRA y contactarme por los medios suministrados.",
+    );
+    data.set("pagina_origen", window.location.pathname);
+    data.set("fecha_solicitud", requestedAt);
+    data.set("plan_financiacion", plan || "No informado");
+    data.set("lote_seleccionado", lote || "No informado");
+    for (const [key, value] of Object.entries(campaign)) {
+      if (value) data.set(key, value);
+    }
 
     try {
       await sendWeb3Forms(data, captchaToken);
       setSent(true);
       setFeedback("Recibimos tus datos correctamente. Pronto nos pondremos en contacto.");
-      setValues(initial);
+      trackTerraEvent(
+        "generate_lead",
+        { lot_id: lote || "sin_lote", page: "/terra", method: "form" },
+        { onceKey: `lead-${requestedAt}` },
+      );
+      setValues({ ...initial, lote_interes: lote });
       setConsent(false);
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : "No se pudo enviar el formulario.");
@@ -99,90 +143,143 @@ export function TerraLeadForm() {
   }
 
   return (
-    <div id="preventa-terra" className="overflow-hidden rounded-[1.6rem] border border-white/60 bg-white text-brand-navy shadow-2xl">
-      <div className="bg-brand-navy px-5 pb-4 pt-5 text-white sm:px-6">
-        <span className="inline-flex rounded-full bg-brand-green px-3 py-1 text-[11px] font-semibold uppercase tracking-wide">
-          Cupos limitados
-        </span>
-        <h2 className="mt-2.5 font-display text-xl font-extrabold leading-tight sm:text-2xl">
-          Recibe tu cotización
+    <div
+      id="preventa-terra"
+      className="border border-brand-navy/10 bg-white text-brand-navy shadow-sm"
+    >
+      <div className="bg-brand-navy px-5 py-5 text-white sm:px-6">
+        <h2 className="font-display text-xl font-extrabold leading-tight sm:text-2xl">
+          {TERRA_COPY.formTitle}
         </h2>
-        <p className="mt-1.5 text-xs leading-relaxed text-white/90 sm:text-sm">
-          Preventa hasta el <span className="font-semibold text-brand-orange">15 de noviembre</span>.
-          Déjanos tus datos para asegurar tu descuento en esta etapa.
+        <p className="mt-2 text-sm leading-relaxed text-white/85">
+          Cuéntanos cómo contactarte. Un asesor te comparte las condiciones vigentes del lote de
+          interés.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-2 px-4 py-4 sm:px-6 sm:py-5">
-        <label className="sr-only" htmlFor="terra-nombre">Nombre completo</label>
-        <input id="terra-nombre" name="nombre" type="text" autoComplete="name" className={baseInput}
-          placeholder="Nombre completo *" aria-label="Nombre completo" value={values.nombre}
-          onChange={(event) => set("nombre", event.target.value)} required minLength={2} maxLength={80} />
-        <label className="sr-only" htmlFor="terra-whatsapp">WhatsApp</label>
-        <input id="terra-whatsapp" name="whatsapp" type="tel" autoComplete="tel" className={baseInput}
-          placeholder="WhatsApp *" aria-label="WhatsApp" value={values.whatsapp}
-          onChange={(event) => set("whatsapp", event.target.value)} required minLength={7} maxLength={20} />
-        <label className="sr-only" htmlFor="terra-correo">Correo electrónico</label>
-        <input id="terra-correo" name="correo" type="email" autoComplete="email" className={baseInput}
-          placeholder="Correo electrónico *" aria-label="Correo electrónico" value={values.correo}
-          onChange={(event) => set("correo", event.target.value)} required maxLength={120} />
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          <div>
-            <label className="sr-only" htmlFor="terra-tipo-documento">Tipo de documento</label>
-            <select id="terra-tipo-documento" name="tipo_documento" value={values.tipo_documento}
-              onChange={(event) => set("tipo_documento", event.target.value)}
-              aria-label="Tipo de documento" className={baseInput} required>
-              <option value="">Tipo de documento *</option>
-              <option value="CC">Cédula de ciudadanía</option>
-              <option value="CE">Cédula de extranjería</option>
-              <option value="TI">Tarjeta de identidad</option>
-              <option value="PA">Pasaporte</option>
-              <option value="PPT">Permiso por Protección Temporal</option>
-              <option value="OTRO">Otro documento</option>
-            </select>
-          </div>
-          <div>
-            <label className="sr-only" htmlFor="terra-documento">Número de documento</label>
-            <input id="terra-documento" name="numero_documento" type="text" autoComplete="off"
-              className={baseInput} placeholder="Número de documento *" aria-label="Número de documento"
-              value={values.numero_documento} onChange={(event) => set("numero_documento", event.target.value)}
-              required minLength={4} maxLength={20} pattern="[a-zA-Z0-9-]{4,20}" />
-          </div>
+      <form onSubmit={handleSubmit} className="space-y-3 px-4 py-5 sm:px-6" onFocus={markFormStart}>
+        <div>
+          <label className="mb-1 block text-xs font-semibold" htmlFor="terra-nombre">
+            Nombre *
+          </label>
+          <input
+            id="terra-nombre"
+            name="nombre"
+            type="text"
+            autoComplete="name"
+            data-clarity-mask="true"
+            className={baseInput}
+            value={values.nombre}
+            onChange={(event) => set("nombre", event.target.value)}
+            required
+            minLength={2}
+            maxLength={80}
+          />
         </div>
         <div>
-          <label htmlFor="terra-referido-por" className="mb-1 block text-xs font-semibold text-brand-navy">
-            ¿Quién te contó de nosotros? <span className="font-normal text-brand-dark/65">(opcional)</span>
+          <label className="mb-1 block text-xs font-semibold" htmlFor="terra-whatsapp">
+            Número de WhatsApp *
           </label>
-          <input id="terra-referido-por" name="referido_por" type="text" autoComplete="off"
-            className={baseInput} placeholder="Nombre de quien te refirió"
-            value={values.referido_por} onChange={(event) => set("referido_por", event.target.value)}
-            maxLength={100} />
+          <input
+            id="terra-whatsapp"
+            name="whatsapp"
+            type="tel"
+            autoComplete="tel"
+            data-clarity-mask="true"
+            className={baseInput}
+            value={values.whatsapp}
+            onChange={(event) => set("whatsapp", event.target.value)}
+            required
+            minLength={7}
+            maxLength={20}
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-semibold" htmlFor="terra-correo">
+            Correo electrónico <span className="font-normal text-brand-dark/65">(opcional)</span>
+          </label>
+          <input
+            id="terra-correo"
+            name="correo"
+            type="email"
+            autoComplete="email"
+            data-clarity-mask="true"
+            className={baseInput}
+            value={values.correo}
+            onChange={(event) => set("correo", event.target.value)}
+            maxLength={120}
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-semibold" htmlFor="terra-lote">
+            Lote de interés <span className="font-normal text-brand-dark/65">(opcional)</span>
+          </label>
+          <input
+            id="terra-lote"
+            name="lote_interes"
+            type="text"
+            autoComplete="off"
+            className={baseInput}
+            placeholder="Ej. C-12"
+            value={values.lote_interes}
+            onChange={(event) => set("lote_interes", event.target.value)}
+            maxLength={16}
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="terra-referido-por"
+            className="mb-1 block text-xs font-semibold text-brand-navy"
+          >
+            ¿Cómo nos conociste? <span className="font-normal text-brand-dark/65">(opcional)</span>
+          </label>
+          <input
+            id="terra-referido-por"
+            name="referido_por"
+            type="text"
+            autoComplete="off"
+            className={baseInput}
+            placeholder="Instagram, un referido, visita al predio…"
+            value={values.referido_por}
+            onChange={(event) => set("referido_por", event.target.value)}
+            maxLength={100}
+          />
         </div>
         <label className="flex items-start gap-2.5 py-1 text-xs leading-relaxed text-brand-dark">
-          <input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)}
-            className="mt-0.5 h-4 w-4 shrink-0 accent-brand-green" required />
+          <input
+            type="checkbox"
+            checked={consent}
+            onChange={(event) => setConsent(event.target.checked)}
+            className="mt-0.5 h-4 w-4 shrink-0 accent-brand-green"
+            required
+          />
           <span>
             Autorizo a TERRA FORMING S.A.S. a tratar mis datos personales para atender mi solicitud
             de información sobre TERRA y contactarme por los medios suministrados. *
           </span>
         </label>
         <Web3FormsCaptcha onTokenChange={setCaptchaToken} resetKey={captchaResetKey} />
-        <button type="submit" disabled={sending || !consent || !captchaToken}
-          className="w-full rounded-xl bg-brand-orange px-5 py-3 text-sm font-bold uppercase text-white shadow-md transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60">
-          {sending ? "Enviando..." : "Quiero mi descuento →"}
-        </button>
+        <TerraPrimaryButton type="submit" disabled={sending || !consent || !captchaToken}>
+          {sending ? "Enviando..." : "Solicitar cotización"}
+        </TerraPrimaryButton>
         <p className="text-center text-xs leading-relaxed text-brand-dark/70">
           Antes de separar o pedir información, lee la{" "}
-          <a href="/terra/avisolegal" className="font-semibold text-brand-navy underline underline-offset-4 hover:text-brand-orange">
+          <a
+            href={TERRA_PROJECT.legalPath}
+            className="font-semibold text-brand-navy underline underline-offset-4 hover:text-brand-orange"
+          >
             Información importante
           </a>
           .
         </p>
-        <p role="status" aria-live="polite" className={"text-center text-sm " + (sent ? "text-green-800" : "text-red-700")}>
+        <p
+          role="status"
+          aria-live="polite"
+          className={
+            "text-center text-sm " + (sent ? "text-green-800" : feedback ? "text-red-700" : "")
+          }
+        >
           {feedback}
-        </p>
-        <p className="rounded-xl bg-green-50 px-3 py-2 text-center text-xs text-green-800">
-          Tus datos se usarán para responder tu solicitud.
         </p>
       </form>
     </div>

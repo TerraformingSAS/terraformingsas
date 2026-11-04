@@ -80,7 +80,10 @@ export function LoginPage() {
       }
       marcarActividad();
       qc.clear();
-      window.location.assign("/terra/cotizador");
+      const lote = new URLSearchParams(window.location.search).get("lote");
+      window.location.assign(
+        lote ? `/terra/cotizador?lote=${encodeURIComponent(lote)}` : "/terra/cotizador",
+      );
     } catch {
       setError("No pudimos verificar el código. Intenta de nuevo.");
     } finally {
@@ -154,7 +157,13 @@ export function LoginPage() {
         <header className="border-b border-border bg-white/95 shadow-sm backdrop-blur lg:hidden">
           <div className="container-tf flex h-18 items-center py-3">
             <Link to="/" aria-label="TERRA FORMING inicio">
-              <img src={logoColor} alt="TERRA FORMING" className="h-11 w-auto" width={300} height={83} />
+              <img
+                src={logoColor}
+                alt="TERRA FORMING"
+                className="h-11 w-auto"
+                width={300}
+                height={83}
+              />
             </Link>
           </div>
         </header>

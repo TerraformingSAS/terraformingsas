@@ -1,10 +1,16 @@
-export function WhatsAppButton() {
+import { trackTerraEvent } from "@/lib/terra/analytics";
+
+const DEFAULT_HREF =
+  "https://wa.me/573214230090?text=Hola%20TERRA%20FORMING%2C%20quiero%20información%20sobre%20sus%20servicios.";
+
+export function WhatsAppButton({ href = DEFAULT_HREF }: { href?: string }) {
   return (
     <a
-      href="https://wa.me/573214230090?text=Hola%20TERRA%20FORMING%2C%20quiero%20información%20sobre%20sus%20servicios."
+      href={href}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Contactar por WhatsApp"
+      onClick={() => trackTerraEvent("whatsapp_click", { location: "floating" })}
       className="fixed bottom-6 right-6 z-40 group flex items-center justify-center h-14 w-14 rounded-full bg-[#25D366] text-white shadow-xl hover:scale-110 transition-transform"
     >
       <span className="absolute inset-0 rounded-full bg-[#25D366] animate-ping opacity-30" />
