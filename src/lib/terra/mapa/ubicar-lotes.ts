@@ -21,7 +21,7 @@ const LOCAL_Y_MID = (-39.676557 + 96.390132) / 2;
 
 /**
  * El loteo es la franja del plano junto a la vía, al oriente del predio.
- * El lado largo del plano (615 m) queda hacia el sur y entra completo en el perímetro.
+ * El lado largo queda hacia el sur. El eje corto va invertido para no dejar el plano en espejo.
  */
 export function colocarLotes(terrain: TerrainFrame, lots: JoinedLot[]): PlacedLot[] {
   if (lots.length === 0 || terrain.perimetro.length === 0) return [];
@@ -29,7 +29,7 @@ export function colocarLotes(terrain: TerrainFrame, lots: JoinedLot[]): PlacedLo
     id: lot.id,
     anillo: lot.puntos.map(([x, y]) => {
       const along = (x - LOCAL_X_MIN) * SCALE;
-      const across = (y - LOCAL_Y_MID) * SCALE;
+      const across = (LOCAL_Y_MID - y) * SCALE;
       return [
         NORTH_END[0] + ALONG[0] * along + ACROSS[0] * across,
         NORTH_END[1] + ALONG[1] * along + ACROSS[1] * across,
