@@ -44,7 +44,7 @@ test("C y F siguen en la franja anterior y A no se dibuja", () => {
   const south = placed[1]?.anillo[0];
   assert.ok(north);
   assert.ok(south);
-  assert.ok(Math.abs(north[0] - 1203.9) < 2);
-  assert.ok(Math.abs(north[1] - 867.1) < 2);
+  assert.ok(Math.abs(north[0] - 1191.2) < 2);
+  assert.ok(Math.abs(north[1] - 866.4) < 2);
   assert.ok(south[1] < north[1] - 300);
 });
