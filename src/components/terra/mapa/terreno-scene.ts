@@ -103,6 +103,8 @@ export async function mountTerrain(
 
   let boundary = perimeterRibbon(THREE, []);
   scene.add(boundary);
+  const road = new THREE.Group();
+  scene.add(road);
 
   const lotRoot = new THREE.Group();
   scene.add(lotRoot);
@@ -146,6 +148,7 @@ export async function mountTerrain(
     (boundary.material as Material).dispose();
     boundary = next;
     scene.add(boundary);
+    replaceRoad(THREE, road, terrain, exaggeration);
     const logoHeight =
       (sampleHeight(terrain, logoEast, logoNorth) - terrain.elevMin) * exaggeration + 6;
     logo.position.copy(toScene(logoEast, logoHeight, logoNorth));
@@ -333,6 +336,12 @@ export async function mountTerrain(
       logo.geometry.dispose();
       (logo.material as Material).dispose();
       logoTexture.dispose();
+      road.traverse((child) => {
+        const mesh = child as Mesh;
+        mesh.geometry?.dispose();
+        const material = mesh.material as Material | undefined;
+        material?.dispose();
+      });
       boundary.geometry.dispose();
       renderer.dispose();
     },
@@ -442,6 +451,116 @@ function lotBorder(THREE: typeof import("three"), points: import("three").Vector
   );
   border.renderOrder = 3;
   return border;
+}
+
+/** Borde oriental del predio, de sur a norte. La vía queda recta y por fuera. */
+const ROAD_A: [number, number] = [1116.8, 448];
+const ROAD_B: [number, number] = [1321.7, 978.5];
+
+function replaceRoad(
+  THREE: typeof import("three"),
+  road: import("three").Group,
+  terrain: TerrainPayload,
+  exaggeration: number,
+) {
+  for (const child of [...road.children]) {
+    const mesh = child as Mesh;
+    road.remove(mesh);
+    mesh.geometry?.dispose();
+    (mesh.material as Material | undefined)?.dispose();
+  }
+  const dx = ROAD_B[0] - ROAD_A[0];
+  const dy = ROAD_B[1] - ROAD_A[1];
+  const length = Math.hypot(dx, dy) || 1;
+  const ux = dx / length;
+  const uy = dy / length;
+  const px = uy;
+  const py = -ux;
+  const extend = 36;
+  const step = 7;
+  const centerOffset = 9.2;
+  const center: [number, number, number][] = [];
+  for (let distance = -extend; distance <= length + extend; distance += step) {
+    const east = ROAD_A[0] + ux * distance + px * centerOffset;
+    const north = ROAD_A[1] + uy * distance + py * centerOffset;
+    const y = (sampleHeight(terrain, east, north) - terrain.elevMin) * exaggeration + 1.15;
+    center.push([east, north, y]);
+  }
+  road.add(flatRibbon(THREE, terrain, center, 5.1, 0x6a645c, 0));
+  road.add(flatRibbon(THREE, terrain, center, 3.6, 0x3a3e42, 0.08));
+  road.add(flatRibbon(THREE, terrain, shiftLine(center, px, py, 3.35), 0.11, 0xf4f6f8, 0.16));
+  road.add(flatRibbon(THREE, terrain, shiftLine(center, px, py, -3.35), 0.11, 0xf4f6f8, 0.16));
+  for (let index = 0; index < center.length - 1; index += 2) {
+    const start = center[index];
+    const end = center[index + 1];
+    if (!start || !end) continue;
+    road.add(flatRibbon(THREE, terrain, [start, end], 0.12, 0xe2b400, 0.22));
+  }
+}
+
+function shiftLine(
+  points: [number, number, number][],
+  px: number,
+  py: number,
+  meters: number,
+): [number, number, number][] {
+  return points.map(([east, north, y]) => [east + px * meters, north + py * meters, y]);
+}
+
+function flatRibbon(
+  THREE: typeof import("three"),
+  terrain: TerrainPayload,
+  points: [number, number, number][],
+  half: number,
+  color: number,
+  lift: number,
+) {
+  const positions: number[] = [];
+  for (let index = 0; index < points.length - 1; index += 1) {
+    const start = points[index];
+    const end = points[index + 1];
+    if (!start || !end) continue;
+    const dx = end[0] - start[0];
+    const dz = end[1] - start[1];
+    const length = Math.hypot(dx, dz) || 1;
+    const px = (-dz / length) * half;
+    const pz = (dx / length) * half;
+    const scene = [start, end].map(([east, north, y]) => {
+      const point = new THREE.Vector3(
+        east - terrain.widthM / 2,
+        y + lift,
+        terrain.depthM / 2 - north,
+      );
+      return point;
+    });
+    const a = scene[0];
+    const b = scene[1];
+    if (!a || !b) continue;
+    const quad = [
+      [a.x + px, a.y, a.z - pz],
+      [a.x - px, a.y, a.z + pz],
+      [b.x + px, b.y, b.z - pz],
+      [b.x - px, b.y, b.z + pz],
+    ];
+    for (const corner of [0, 1, 2, 1, 3, 2]) {
+      const point = quad[corner];
+      if (point) positions.push(point[0], point[1], point[2]);
+    }
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  const mesh = new THREE.Mesh(
+    geometry,
+    new THREE.MeshBasicMaterial({
+      color,
+      side: THREE.DoubleSide,
+      polygonOffset: true,
+      polygonOffsetFactor: -3,
+      polygonOffsetUnits: -3,
+    }),
+  );
+  mesh.renderOrder = 6;
+  return mesh;
 }
 
 function lotLabel(THREE: typeof import("three"), name: string, points: import("three").Vector3[]) {
