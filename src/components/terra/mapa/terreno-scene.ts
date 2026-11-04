@@ -1,6 +1,6 @@
 import type { BufferGeometry, Line, Material, Mesh, MeshStandardMaterial } from "three";
 import type { JoinedLot } from "@/lib/terra/mapa/join";
-import { colocarLotes, ubicarPunto } from "@/lib/terra/mapa/ubicar-lotes";
+import { colocarLotes } from "@/lib/terra/mapa/ubicar-lotes";
 
 export type TerrainPayload = {
   west: number;
@@ -495,81 +495,6 @@ function replaceRoad(
     if (!start || !end) continue;
     road.add(flatRibbon(THREE, terrain, [start, end], 0.12, 0xe2b400, 0.22));
   }
-  for (const segment of BLOCK_STREETS) addStreet(THREE, road, terrain, exaggeration, segment);
-}
-
-/** Vías locales, en metros del plano, alrededor de las manzanas C, D, E y F. */
-const BLOCK_STREETS: [[number, number], [number, number]][] = [
-  [
-    [-108, -44],
-    [-108, 102],
-  ],
-  [
-    [-108, 102],
-    [-10, 102],
-  ],
-  [
-    [-108, 36],
-    [78, 36],
-  ],
-  [
-    [-10, 32],
-    [326, 32],
-  ],
-  [
-    [-108, -44],
-    [326, -44],
-  ],
-  [
-    [82, -44],
-    [82, 36],
-  ],
-  [
-    [273, -44],
-    [273, 32],
-  ],
-  [
-    [326, -44],
-    [326, 32],
-  ],
-];
-
-function addStreet(
-  THREE: typeof import("three"),
-  road: import("three").Group,
-  terrain: TerrainPayload,
-  exaggeration: number,
-  segment: [[number, number], [number, number]],
-) {
-  const [start, end] = segment;
-  const dx = end[0] - start[0];
-  const dy = end[1] - start[1];
-  const length = Math.hypot(dx, dy) || 1;
-  const samples: [number, number, number][] = [];
-  const step = 8;
-  for (let distance = 0; distance <= length; distance += step) {
-    const t = distance / length;
-    const localX = start[0] + dx * t;
-    const localY = start[1] + dy * t;
-    const [east, north] = ubicarPunto(localX, localY);
-    const y = (sampleHeight(terrain, east, north) - terrain.elevMin) * exaggeration + 1.15;
-    samples.push([east, north, y]);
-  }
-  const [east, north] = ubicarPunto(end[0], end[1]);
-  samples.push([
-    east,
-    north,
-    (sampleHeight(terrain, east, north) - terrain.elevMin) * exaggeration + 1.15,
-  ]);
-  const dx0 = (samples[1]?.[0] ?? east) - (samples[0]?.[0] ?? east);
-  const dy0 = (samples[1]?.[1] ?? north) - (samples[0]?.[1] ?? north);
-  const span = Math.hypot(dx0, dy0) || 1;
-  const px = -dy0 / span;
-  const py = dx0 / span;
-  road.add(flatRibbon(THREE, terrain, samples, 4.1, 0x6a645c, 0));
-  road.add(flatRibbon(THREE, terrain, samples, 2.8, 0x4a4f53, 0.08));
-  road.add(flatRibbon(THREE, terrain, shiftLine(samples, px, py, 2.55), 0.09, 0xf4f6f8, 0.16));
-  road.add(flatRibbon(THREE, terrain, shiftLine(samples, px, py, -2.55), 0.09, 0xf4f6f8, 0.16));
 }
 
 function shiftLine(
