@@ -1,46 +1,37 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import anclaje from "./anclaje-lotes.json" with { type: "json" };
 import type { JoinedLot } from "./join.ts";
-import { colocarLotes, escalaMetros } from "./ubicar-lotes.ts";
+import { colocarLotes } from "./ubicar-lotes.ts";
 
 const lot: JoinedLot = {
   id: "C-01",
   manzana: "C",
   lote: "01",
   puntos: [
-    [0, 0],
-    [20, 0],
-    [20, 10],
-    [0, 10],
+    [-61.3, 61.25],
+    [-51.3, 61.25],
+    [-51.3, 71.25],
+    [-61.3, 71.25],
   ],
-  centro: [10, 5],
+  centro: [-56.3, 66.25],
   estado: "Disponible",
-  medidas: { lado_a_m: 10, lado_b_m: 12, area_m2: 50 },
+  medidas: { lado_a_m: 10, lado_b_m: 10, area_m2: 100 },
   matched: true,
 };
 
-test("la escala convierte el área dibujada al área comercial", () => {
-  const scale = escalaMetros([lot]);
-  assert.ok(Math.abs(scale - Math.sqrt(50 / 200)) < 1e-9);
-});
-
-test("el lote queda centrado en el perímetro del predio", () => {
-  const placed = colocarLotes(
-    {
-      widthM: 1000,
-      depthM: 800,
-      perimetro: [
-        [100, 100],
-        [900, 100],
-        [900, 700],
-        [100, 700],
-      ],
-    },
-    [lot],
-  );
+test("la manzana C cae sobre el ancla del plano, no en el centro arbitrario", () => {
+  const perimetro: [number, number][] = [
+    [0, 0],
+    [1000, 0],
+    [1000, 800],
+    [0, 800],
+  ];
+  const placed = colocarLotes({ perimetro }, [lot]);
   const ring = placed[0]?.anillo ?? [];
   const cx = ring.reduce((sum, point) => sum + point[0], 0) / ring.length;
   const cz = ring.reduce((sum, point) => sum + point[1], 0) / ring.length;
-  assert.ok(Math.abs(cx - 500) < 1e-6);
-  assert.ok(Math.abs(cz - 400) < 1e-6);
+  const [destX, destZ] = anclaje.manzanas.C.destino;
+  assert.ok(Math.abs(cx - (500 + destX)) < 8);
+  assert.ok(Math.abs(cz - (400 + destZ)) < 8);
 });

@@ -1,25 +1,17 @@
+import anclaje from "./anclaje-lotes.json" with { type: "json" };
 import type { JoinedLot } from "./join";
 
 type TerrainFrame = {
-  widthM: number;
-  depthM: number;
   perimetro: [number, number][];
 };
 
 export type PlacedLot = {
   id: string;
   anillo: [number, number][];
-  escala: number;
 };
 
-function shoelace(points: [number, number][]) {
-  let area = 0;
-  for (let i = 0; i < points.length; i += 1) {
-    const next = points[(i + 1) % points.length];
-    area += points[i][0] * next[1] - next[0] * points[i][1];
-  }
-  return Math.abs(area) / 2;
-}
+const ROTATION = anclaje.rotation;
+const SCALE = anclaje.scale;
 
 function centroid(points: [number, number][]) {
   let x = 0;
@@ -31,37 +23,25 @@ function centroid(points: [number, number][]) {
   return [x / points.length, y / points.length] as const;
 }
 
-/** Escala lineal para que el área del polígono se acerque al área comercial en m². */
-export function escalaMetros(lots: JoinedLot[]) {
-  const ratios: number[] = [];
-  for (const lot of lots) {
-    const area = lot.medidas?.area_m2;
-    const drawn = shoelace(lot.puntos);
-    if (area == null || area <= 0 || drawn <= 0) continue;
-    ratios.push(Math.sqrt(area / drawn));
-  }
-  if (ratios.length === 0) return 1;
-  ratios.sort((a, b) => a - b);
-  return ratios[Math.floor(ratios.length / 2)];
-}
-
 /**
- * Lleva el plano local al predio del KML.
- * El tamaño sale del área comercial. El ancla es el centro del perímetro:
- * no hay mojones que fijen el desplazamiento ni el giro.
+ * Cada manzana se apoya en los textos del DWG (C, D, E y F), trasladados al
+ * perímetro del KML. A y B no tienen rótulo en ese plano: conservan la misma
+ * rotación y su distancia a C.
  */
 export function colocarLotes(terrain: TerrainFrame, lots: JoinedLot[]): PlacedLot[] {
   if (lots.length === 0 || terrain.perimetro.length === 0) return [];
-  const scale = escalaMetros(lots);
   const [anchorX, anchorZ] = centroid(terrain.perimetro);
-  const flat = lots.flatMap((lot) => lot.puntos);
-  const [originX, originY] = centroid(flat);
-  return lots.map((lot) => ({
-    id: lot.id,
-    escala: scale,
-    anillo: lot.puntos.map(([x, y]) => [
-      anchorX + (x - originX) * scale,
-      anchorZ + (y - originY) * scale,
-    ]),
-  }));
+  return lots.map((lot) => {
+    const block = anclaje.manzanas[lot.manzana as keyof typeof anclaje.manzanas];
+    const [lx, ly] = block.centroLocal;
+    const [dx, dy] = block.destino;
+    const anillo = lot.puntos.map(([x, y]) => {
+      const vx = x - lx;
+      const vy = y - ly;
+      const east = SCALE * (ROTATION[0][0] * vx + ROTATION[0][1] * vy) + dx;
+      const north = SCALE * (ROTATION[1][0] * vx + ROTATION[1][1] * vy) + dy;
+      return [anchorX + east, anchorZ + north] as [number, number];
+    });
+    return { id: lot.id, anillo };
+  });
 }

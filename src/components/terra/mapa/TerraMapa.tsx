@@ -34,7 +34,7 @@ export function TerraMapa() {
   const [manzana, setManzana] = useState("");
   const [estado, setEstado] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [exaggeration, setExaggeration] = useState(1);
+  const [exaggeration, setExaggeration] = useState(2);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const handleRef = useRef<TerrainHandle | null>(null);
 
@@ -251,8 +251,9 @@ export function TerraMapa() {
           orbitar, botón derecho para desplazar y la rueda para acercar.
         </p>
         <p className="px-4 pb-6 text-xs leading-relaxed text-[#3d5163]">
-          Los lotes están sobre el terreno, a la escala del área comercial y centrados en el predio.
-          No hay mojones que fijen el desplazamiento ni la rotación.{" "}
+          Las manzanas C, D, E y F siguen los textos del plano, ya puestos sobre este perímetro. A y
+          B no vienen rotuladas ahí y conservan su posición respecto a C. El relieve se muestra al
+          doble para leer la pendiente.{" "}
           {commercial
             ? `${joined.lots.length - joined.sinComercial.length} con estado comercial, ${joined.sinComercial.length} sin ficha, ${joined.sinGeometria.length} fichas sin polígono.`
             : "La disponibilidad sale de la misma fuente de /terra/estado."}
