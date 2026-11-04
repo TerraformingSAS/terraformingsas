@@ -149,7 +149,7 @@ const terraLocation = await readFile(join(root, "src", "components", "terra", "L
 if (!terraPage.includes("TerraHero") ||
     !terraPage.includes("LotPreview") ||
     !terraPage.includes("LocationSection") ||
-    !terraLocation.includes("TerraLeadForm") ||
+    !terraLocation.includes("TERRA_PROJECT.mapsDirections") ||
     terraPage.includes("Alta valorización")) {
   throw new Error("La landing /terra debe usar la experiencia inmobiliaria de TERRA, sin promesas de valorización.");
 }
