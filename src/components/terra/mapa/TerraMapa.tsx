@@ -157,7 +157,7 @@ export function TerraMapa() {
   return (
     <div className="min-h-screen bg-[#e7eef2] text-[#0e2a47]">
       <TerraHeader solid />
-      <main id="contenido" className="flex min-h-screen flex-col pt-[68px] sm:pt-[72px]">
+      <main id="contenido" className="flex h-dvh flex-col overflow-hidden pt-[68px] sm:pt-[72px]">
         <div className="flex flex-wrap items-center gap-2 px-3 py-2 sm:px-4">
           <div className="mr-auto">
             <p className="text-[11px] font-semibold tracking-[0.16em] text-[#1d6f8a]">
@@ -199,7 +199,7 @@ export function TerraMapa() {
           </label>
         </div>
 
-        <div className="relative mx-3 mb-3 min-h-[70vh] flex-1 overflow-hidden rounded-2xl bg-[#c5d5df] shadow-[0_8px_30px_rgba(14,42,71,0.12)] sm:mx-4">
+        <div className="relative mx-3 mb-3 min-h-0 flex-1 overflow-hidden rounded-2xl bg-[#c5d5df] shadow-[0_8px_30px_rgba(14,42,71,0.12)] sm:mx-4">
           {loading && (
             <p className="absolute left-3 top-3 z-10 rounded-lg bg-white/90 px-3 py-2 text-sm shadow">
               Cargando disponibilidad…
@@ -213,7 +213,7 @@ export function TerraMapa() {
               {terrainError ?? error}
             </p>
           )}
-          <canvas ref={canvasRef} className="h-full min-h-[70vh] w-full touch-none" />
+          <canvas ref={canvasRef} className="h-full w-full touch-none" />
           <style>{MAPA_SELECTION_CSS}</style>
           <div className="absolute bottom-3 left-3 flex flex-col gap-1">
             <button
@@ -297,7 +297,7 @@ export function TerraMapa() {
               </div>
             </div>
           )}
-          <ul className="absolute bottom-3 right-3 hidden max-w-[220px] flex-wrap gap-x-3 gap-y-1 rounded-xl bg-white/95 px-3 py-2 text-xs shadow sm:flex">
+          <ul className="absolute bottom-3 right-3 z-10 flex max-w-[min(100%-5.5rem,560px)] flex-wrap gap-x-3 gap-y-1 rounded-xl bg-white/95 px-3 py-2 text-xs shadow">
             {Object.entries(COLORS).map(([state, color]) => (
               <li key={state} className="flex items-center gap-1.5">
                 <span
@@ -309,21 +309,6 @@ export function TerraMapa() {
             ))}
           </ul>
         </div>
-
-        <p className="px-4 pb-2 text-xs leading-relaxed text-[#3d5163]">
-          El relieve y la foto del predio comparten el recorte del KML
-          {terrain ? ` (${terrain.elevMin}–${terrain.elevMax} m)` : ""}. El contorno naranja sigue
-          ese perímetro. La vista inicial es superior, con el norte hacia arriba. Arrastra para
-          orbitar, botón derecho para desplazar y la rueda para acercar.
-        </p>
-        <p className="px-4 pb-6 text-xs leading-relaxed text-[#3d5163]">
-          La etapa I muestra las manzanas C, D, E y F en la franja junto a la vía, con el lado largo
-          hacia el sur. Cada lote lleva su propio borde. El relieve se muestra a 1,5 para leer la
-          pendiente.{" "}
-          {commercial
-            ? `${joined.lots.length - joined.sinComercial.length} con estado comercial, ${joined.sinComercial.length} sin ficha, ${joined.sinGeometria.length} fichas sin polígono.`
-            : "La disponibilidad sale de la misma fuente de /terra/estado."}
-        </p>
       </main>
     </div>
   );
