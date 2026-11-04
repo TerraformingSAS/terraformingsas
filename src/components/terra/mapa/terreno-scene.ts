@@ -227,9 +227,32 @@ export async function mountTerrain(
   observer.observe(canvas);
   resize();
 
+  const flight = {
+    active: false,
+    fromPos: new THREE.Vector3(),
+    toPos: new THREE.Vector3(),
+    fromTarget: new THREE.Vector3(),
+    toTarget: new THREE.Vector3(),
+    start: 0,
+    duration: 980,
+  };
+
   const tick = () => {
     if (!running) return;
-    controls.update();
+    if (flight.active) {
+      const t = Math.min(1, (performance.now() - flight.start) / flight.duration);
+      const k = t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
+      camera.position.lerpVectors(flight.fromPos, flight.toPos, k);
+      controls.target.lerpVectors(flight.fromTarget, flight.toTarget, k);
+      camera.lookAt(controls.target);
+      if (t >= 1) {
+        flight.active = false;
+        controls.enabled = true;
+        controls.update();
+      }
+    } else {
+      controls.update();
+    }
     renderer.render(scene, camera);
     requestAnimationFrame(tick);
   };
@@ -259,9 +282,13 @@ export async function mountTerrain(
       const mesh = lotMeshes.find((item) => item.id === id)?.mesh;
       if (!mesh) return;
       const center = new THREE.Box3().setFromObject(mesh).getCenter(new THREE.Vector3());
-      controls.target.copy(center);
-      camera.position.set(center.x + 70, center.y + 55, center.z + 70);
-      camera.lookAt(center);
+      flight.fromPos.copy(camera.position);
+      flight.fromTarget.copy(controls.target);
+      flight.toTarget.copy(center);
+      flight.toPos.set(center.x + 70, center.y + 55, center.z + 70);
+      flight.start = performance.now();
+      flight.active = true;
+      controls.enabled = false;
     },
     dispose() {
       running = false;

@@ -1,8 +1,7 @@
 import geometria from "@/lib/terra/mapa/geometria.json";
 import { joinLots, type GeomLot } from "@/lib/terra/mapa/join";
 import { terraWhatsAppUrl } from "@/lib/terra/contact";
-import { TERRA_PROJECT, formatCop, TERRA_LOT_TYPES } from "@/lib/terra/commercial";
-import { fetchPublicLots, formatArea, isAvailableLot, lotQuoteUrl } from "@/lib/terra/lots";
+import { fetchPublicLots, isAvailableLot } from "@/lib/terra/lots";
 import { TerraHeader } from "@/components/terra/TerraHeader";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { TerrainHandle, TerrainPayload } from "./terreno-scene";
@@ -18,10 +17,36 @@ const COLORS: Record<string, string> = {
 const ETAPA_I = new Set(["C", "D", "E", "F"]);
 const GEOMETRY = (geometria as GeomLot[]).filter((lot) => ETAPA_I.has(lot.manzana));
 
-function referencePrice(area: number | undefined | null): number | null {
-  if (area == null) return null;
-  const match = TERRA_LOT_TYPES.find((type) => Math.abs(type.area - area) < 0.02);
-  return match?.fromCop ?? null;
+const MAPA_SELECTION_CSS = `
+.mapa-selection{position:absolute;z-index:20;bottom:18px;left:50%;transform:translateX(-50%);width:440px;max-width:calc(100% - 28px);background:#fff;box-shadow:0 8px 30px #0e2a4722;border:1px solid #cbd5e1;border-top:3px solid #f7941d;border-radius:9px;padding:14px 18px;color:#0e2a47;font:14px/1.6 Inter,system-ui,sans-serif;animation:mapa-selection-in .28s ease}
+.mapa-selection-head{display:flex;align-items:center;gap:12px}
+.mapa-selection-head>div{display:flex;align-items:center;gap:8px}
+.mapa-selection-label{font-size:11px;color:#64748b}
+.mapa-selection strong{font:700 19px Montserrat,sans-serif}
+.mapa-estado{margin-left:auto;font-size:12px;border-left:1px solid #e2e8f0;padding-left:12px}
+.mapa-selection button{flex-shrink:0;font-size:21px;color:#64748b;cursor:pointer;border:0;background:transparent;min-width:36px;min-height:36px}
+.mapa-lot-sizes{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:12px 0 0;padding-top:12px;border-top:1px solid #e2e8f0}
+.mapa-lot-sizes dt{font-size:10px;color:#64748b;margin-bottom:3px}
+.mapa-lot-sizes dd{margin:0;font:600 18px Montserrat,sans-serif;letter-spacing:-.5px}
+.mapa-size-note{font-size:10px;color:#64748b;margin:10px 0 0}
+.mapa-selection-actions{display:flex;align-items:center;justify-content:flex-end;margin-top:12px;gap:8px;flex-wrap:wrap}
+.mapa-quote-whatsapp{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:max-content;min-height:41px;padding:9px 17px 9px 13px;border:0;border-radius:999px;background:#128c58;color:#fff;text-decoration:none;font:700 12px/1.25 Inter,system-ui,sans-serif;box-shadow:0 4px 14px rgba(18,140,88,.20)}
+.mapa-quote-whatsapp svg{display:block;flex:0 0 auto;width:21px;height:21px;fill:currentColor}
+.mapa-quote-whatsapp[aria-disabled="true"]{background:#a7b3bd;color:#fff;opacity:.88;box-shadow:none;cursor:not-allowed;pointer-events:none}
+@keyframes mapa-selection-in{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@media (min-width:1024px){
+  .mapa-selection{top:16px;right:16px;left:auto;bottom:auto;transform:none;width:320px;max-height:calc(100% - 32px);overflow:auto}
+  @keyframes mapa-selection-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+}
+@media (max-width:1023px){
+  .mapa-selection{left:8px;right:8px;bottom:8px;transform:none;width:auto;max-width:none;max-height:46%;overflow:auto}
+  @keyframes mapa-selection-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+}
+`;
+
+function medida(value: number | undefined): string {
+  if (value == null || Number.isNaN(value)) return "Por confirmar";
+  return value.toLocaleString("es-CO", { maximumFractionDigits: 2 });
 }
 
 export function TerraMapa() {
@@ -127,7 +152,7 @@ export function TerraMapa() {
   }, [joined.lots, visibleIds, selectedId]);
 
   const canQuote = selected ? isAvailableLot(selected.estado ?? "") : false;
-  const price = referencePrice(selected?.medidas?.area_m2);
+  const medidas = selected?.medidas;
 
   return (
     <div className="min-h-screen bg-[#e7eef2] text-[#0e2a47]">
@@ -189,6 +214,7 @@ export function TerraMapa() {
             </p>
           )}
           <canvas ref={canvasRef} className="h-full min-h-[70vh] w-full touch-none" />
+          <style>{MAPA_SELECTION_CSS}</style>
           <div className="absolute bottom-3 left-3 flex flex-col gap-1">
             <button
               type="button"
@@ -212,6 +238,66 @@ export function TerraMapa() {
               Ajustar
             </button>
           </div>
+          {selected && (
+            <div className="mapa-selection" role="dialog" aria-label={`Lote ${selected.id}`}>
+              <div className="mapa-selection-head">
+                <div>
+                  <span className="mapa-selection-label">Lote</span>
+                  <strong>{selected.id}</strong>
+                </div>
+                <span className="mapa-estado">{selected.estado ?? "Por confirmar"}</span>
+                <button
+                  type="button"
+                  aria-label="Cerrar selección"
+                  onClick={() => setSelectedId(null)}
+                >
+                  ×
+                </button>
+              </div>
+              <dl className="mapa-lot-sizes">
+                <div>
+                  <dt>Manzana</dt>
+                  <dd>{selected.manzana}</dd>
+                </div>
+                <div>
+                  <dt>Dimensiones</dt>
+                  <dd>
+                    {medidas
+                      ? `${medida(medidas.lado_a_m)} × ${medida(medidas.lado_b_m)} m`
+                      : "Por confirmar"}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Área del lote</dt>
+                  <dd>{medidas ? `${medida(medidas.area_m2)} m²` : "Por confirmar"}</dd>
+                </div>
+              </dl>
+              <p className="mapa-size-note">Medidas y área según el Excel.</p>
+              <p className="mapa-size-note">
+                Consulta las condiciones vigentes de separación y financiación en tu cotización.
+              </p>
+              <div className="mapa-selection-actions">
+                <a
+                  className="mapa-quote-whatsapp"
+                  href={canQuote ? terraWhatsAppUrl(selected.id) : undefined}
+                  aria-disabled={canQuote ? undefined : true}
+                  tabIndex={canQuote ? 0 : -1}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={
+                    canQuote
+                      ? `Cotizar el lote ${selected.id} por WhatsApp`
+                      : `El lote ${selected.id} no está disponible para cotizar`
+                  }
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M20.52 3.48A11.94 11.94 0 0012.06 0C5.5 0 .17 5.33.17 11.9c0 2.1.55 4.15 1.6 5.96L0 24l6.3-1.65a11.9 11.9 0 005.76 1.47h.01c6.56 0 11.9-5.33 11.9-11.9 0-3.18-1.24-6.16-3.45-8.44zM12.07 21.7a9.8 9.8 0 01-5-1.37l-.36-.21-3.74.98 1-3.64-.24-.37a9.8 9.8 0 01-1.5-5.19c0-5.42 4.42-9.83 9.85-9.83 2.63 0 5.1 1.02 6.96 2.88a9.77 9.77 0 012.88 6.96c0 5.42-4.42 9.79-9.85 9.79zm5.4-7.34c-.29-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.66.15-.2.29-.76.96-.94 1.15-.17.2-.35.22-.64.07-.29-.15-1.23-.45-2.34-1.44-.86-.77-1.44-1.72-1.61-2.01-.17-.29-.02-.45.13-.6.13-.13.29-.35.44-.52.15-.17.2-.29.29-.49.1-.2.05-.37-.02-.52-.07-.15-.66-1.6-.9-2.19-.24-.58-.48-.5-.66-.51h-.56c-.2 0-.52.07-.79.36-.27.29-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.08c.15.2 2.1 3.2 5.09 4.49.71.31 1.27.49 1.7.63.72.23 1.37.2 1.88.12.57-.09 1.75-.72 2-1.41.25-.7.25-1.29.17-1.42-.07-.13-.27-.2-.56-.35z" />
+                  </svg>
+                  <span>Cotízame</span>
+                </a>
+              </div>
+            </div>
+          )}
           <ul className="absolute bottom-3 right-3 hidden max-w-[220px] flex-wrap gap-x-3 gap-y-1 rounded-xl bg-white/95 px-3 py-2 text-xs shadow sm:flex">
             {Object.entries(COLORS).map(([state, color]) => (
               <li key={state} className="flex items-center gap-1.5">
@@ -240,75 +326,6 @@ export function TerraMapa() {
             : "La disponibilidad sale de la misma fuente de /terra/estado."}
         </p>
       </main>
-
-      {selected && (
-        <div className="fixed inset-x-0 bottom-0 z-40 sm:inset-y-auto sm:bottom-6 sm:left-auto sm:right-6 sm:top-24 sm:w-[360px]">
-          <article className="max-h-[70vh] overflow-auto rounded-t-2xl border border-[#e4ebf1] bg-white/95 p-4 shadow-[0_12px_40px_rgba(14,42,71,0.18)] backdrop-blur sm:max-h-[calc(100vh-8rem)] sm:rounded-2xl">
-            <p className="text-[11px] font-semibold tracking-[0.16em] text-[#1d6f8a]">
-              TERRA · ETAPA I
-            </p>
-            <h2 className="mt-1 font-display text-xl font-semibold">
-              MANZANA {selected.manzana} · LOTE {selected.lote}
-            </h2>
-            <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
-              <div>
-                <dt className="text-[#5c7284]">Manzana</dt>
-                <dd>{selected.manzana}</dd>
-              </div>
-              <div>
-                <dt className="text-[#5c7284]">Lote</dt>
-                <dd>{selected.lote}</dd>
-              </div>
-              <div>
-                <dt className="text-[#5c7284]">Área</dt>
-                <dd>{formatArea(selected.medidas?.area_m2)}</dd>
-              </div>
-              <div>
-                <dt className="text-[#5c7284]">Estado</dt>
-                <dd>{selected.estado ?? "Por confirmar"}</dd>
-              </div>
-              {price != null && (
-                <div className="col-span-2">
-                  <dt className="text-[#5c7284]">Precio de referencia publicado para esta área</dt>
-                  <dd>Desde {formatCop(price)}</dd>
-                </div>
-              )}
-            </dl>
-            <div className="mt-4 flex flex-col gap-2">
-              {canQuote ? (
-                <>
-                  <a
-                    href={lotQuoteUrl(selected.id)}
-                    className="rounded-xl bg-[#e07a2f] px-4 py-2.5 text-center text-sm font-semibold text-white"
-                  >
-                    Cotizar este lote
-                  </a>
-                  <a
-                    href={terraWhatsAppUrl(selected.id)}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="rounded-xl bg-[#128C7E] px-4 py-2.5 text-center text-sm font-semibold text-white"
-                  >
-                    WhatsApp
-                  </a>
-                </>
-              ) : (
-                <p className="rounded-xl bg-[#f3f6f8] px-3 py-2 text-sm text-[#3d5163]">
-                  Este lote no está disponible para cotizar.
-                </p>
-              )}
-              <button
-                type="button"
-                className="rounded-xl border border-[#d5dee6] px-4 py-2 text-sm"
-                onClick={() => setSelectedId(null)}
-              >
-                Cerrar
-              </button>
-            </div>
-            <p className="mt-3 text-[11px] text-[#5c7284]">{TERRA_PROJECT.locationLine}</p>
-          </article>
-        </div>
-      )}
     </div>
   );
 }
