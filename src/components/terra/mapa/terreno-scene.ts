@@ -69,9 +69,7 @@ export async function mountTerrain(
   for (let row = 0; row < grid; row += 1) {
     for (let col = 0; col < grid; col += 1) {
       const index = row * grid + col;
-      // La fila 0 de PlaneGeometry queda al sur después de rotar el plano.
-      const imageRow = grid - 1 - row;
-      originalY[index] = terrain.heights[imageRow * grid + col] - terrain.elevMin;
+      originalY[index] = terrain.heights[index] - terrain.elevMin;
       base[index * 3 + 1] = originalY[index];
     }
   }
@@ -79,8 +77,6 @@ export async function mountTerrain(
 
   const texture = await new THREE.TextureLoader().loadAsync("/terra/mapa/terreno.jpg");
   texture.colorSpace = THREE.SRGBColorSpace;
-  texture.flipY = false;
-  texture.needsUpdate = true;
   const ground = new THREE.Mesh(
     geometry,
     new THREE.MeshStandardMaterial({ map: texture, roughness: 0.92, metalness: 0 }),
@@ -89,7 +85,7 @@ export async function mountTerrain(
 
   const ring = terrain.perimetro.map(([x, z]) => {
     const y = sampleHeight(terrain, x, z) - terrain.elevMin + 3;
-    return new THREE.Vector3(x - terrain.widthM / 2, y, z - terrain.depthM / 2);
+    return toScene(x, y, z);
   });
   const boundary = new THREE.LineLoop(
     new THREE.BufferGeometry().setFromPoints(ring),
@@ -126,7 +122,7 @@ export async function mountTerrain(
     const lift = exaggeration;
     const points = terrain.perimetro.map(([x, z]) => {
       const y = (sampleHeight(terrain, x, z) - terrain.elevMin) * lift + 3;
-      return new THREE.Vector3(x - terrain.widthM / 2, y, z - terrain.depthM / 2);
+      return toScene(x, y, z);
     });
     boundary.geometry.dispose();
     boundary.geometry = new THREE.BufferGeometry().setFromPoints(points);
@@ -135,7 +131,12 @@ export async function mountTerrain(
 
   function meshPoint(x: number, z: number) {
     const y = (sampleHeight(terrain, x, z) - terrain.elevMin) * exaggeration + 1.6;
-    return new THREE.Vector3(x - terrain.widthM / 2, y, z - terrain.depthM / 2);
+    return toScene(x, y, z);
+  }
+
+  function toScene(x: number, y: number, z: number) {
+    // La foto queda con el norte en −Z. El perímetro y los lotes usan ese mismo eje.
+    return new THREE.Vector3(x - terrain.widthM / 2, y, terrain.depthM / 2 - z);
   }
 
   function rebuildLots() {
