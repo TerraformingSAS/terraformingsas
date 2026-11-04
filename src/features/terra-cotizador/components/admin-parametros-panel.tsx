@@ -69,7 +69,7 @@ export function AdminParametrosPage() {
         <p className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
           Administrador
         </p>
-        <h1 className="text-2xl font-semibold text-[#0e2a47]">Parámetros del cotizador</h1>
+        <h1 className="text-2xl font-semibold text-foreground">Parámetros del cotizador</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Valores editables en Upstash Redis (mensajes PDF, cálculo, pagos y contacto).
         </p>
@@ -87,7 +87,7 @@ export function AdminParametrosPage() {
         </TabBtn>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col rounded-lg border border-border bg-white">
+      <div className="flex min-h-0 flex-1 flex-col rounded-lg border border-border bg-card text-card-foreground">
         <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-5">
           {tab === "accesos" ? (
             <AccesosTabla
@@ -111,7 +111,7 @@ export function AdminParametrosPage() {
                   if (!items.length) return null;
                   return (
                     <section key={g.key}>
-                      <h2 className="mb-3 text-xs font-bold uppercase tracking-[0.12em] text-[#0e2a47]">
+                      <h2 className="mb-3 text-xs font-bold uppercase tracking-[0.12em] text-foreground">
                         {g.label}
                       </h2>
                       <div className="space-y-3">
@@ -123,7 +123,7 @@ export function AdminParametrosPage() {
                             {item.tipo === "texto" || item.clave.startsWith("msg_") ? (
                               <textarea
                                 id={`p-${item.clave}`}
-                                className="min-h-16 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                className="min-h-16 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
                                 value={item.valor}
                                 onChange={(e) => setValor(item.clave, e.target.value)}
                               />
@@ -204,7 +204,7 @@ function TabBtn({
       className={cn(
         "rounded-t-md px-3 py-2 text-sm font-medium",
         active
-          ? "border border-b-0 border-border bg-white text-[#0e2a47]"
+          ? "border border-b-0 border-border bg-card text-card-foreground"
           : "text-muted-foreground hover:text-foreground",
       )}
     >

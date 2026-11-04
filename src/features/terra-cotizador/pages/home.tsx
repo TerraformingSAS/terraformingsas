@@ -711,7 +711,9 @@ function LoteResumen({ lote, plan }: { lote: Lote | null; plan: PlanFinanciacion
           {plan.cuotas.map((e) => (
             <div
               key={e.meses}
-              className={cn(e.meses === plan.meses && "rounded-md bg-[#fff8ef] py-1")}
+              className={cn(
+                e.meses === plan.meses && "rounded-md bg-[#fff8ef] py-1 text-[#0e2a47]",
+              )}
             >
               <dt className="text-xs">{e.meses} meses</dt>
               <dd className="font-semibold tabular-nums">{fmtCOP(e.valor)}</dd>
