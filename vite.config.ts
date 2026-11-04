@@ -1,9 +1,29 @@
+import type { Plugin } from "vite";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import react from "@vitejs/plugin-react";
 import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 import tsConfigPaths from "vite-tsconfig-paths";
+
+function rewriteTerraVisor(): Plugin {
+  const middleware = (req: { url?: string }, _res: unknown, next: () => void) => {
+    const [pathname, search = ""] = (req.url ?? "").split("?");
+    if (pathname === "/terra/estado" || pathname === "/terra/estado/") {
+      req.url = "/terra/estado/index.html" + (search ? `?${search}` : "");
+    }
+    next();
+  };
+  return {
+    name: "terra-visor-rewrite",
+    configureServer(server) {
+      server.middlewares.use(middleware);
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use(middleware);
+    },
+  };
+}
 
 export default defineConfig(({ command }) => ({
   resolve: {
@@ -26,6 +46,7 @@ export default defineConfig(({ command }) => ({
     port: 8080,
   },
   plugins: [
+    rewriteTerraVisor(),
     tailwindcss(),
     tsConfigPaths({ projects: ["./tsconfig.json"] }),
     tanstackStart({
@@ -38,9 +59,7 @@ export default defineConfig(({ command }) => ({
       },
       server: { entry: "server" },
     }),
-    command === "build"
-      ? nitro({ noExternals: ["fflate", "fast-xml-parser"] })
-      : null,
+    command === "build" ? nitro({ noExternals: ["fflate", "fast-xml-parser"] }) : null,
     react(),
   ],
 }));

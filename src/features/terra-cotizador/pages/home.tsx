@@ -51,6 +51,9 @@ import {
   PARAMETROS_DEFAULT,
   type ParametrosCotizador,
 } from "@/features/terra-cotizador/lib/parametros";
+import { trackTerraEvent } from "@/lib/terra/analytics";
+import { persistSelectedLot, readSelectedLot } from "@/lib/terra/campaign";
+import { normalizeLotId } from "@/lib/terra/lots";
 
 type Cotizacion = {
   lote: Lote;
@@ -85,14 +88,30 @@ export function HomePage() {
 
   const lotes = useMemo(() => lotesQuery.data?.lotes ?? [], [lotesQuery.data]);
   const lote = lotes.find((l) => l.id === seleccion) ?? null;
+
+  useEffect(() => {
+    if (!lotes.length || seleccion) return;
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get("lote") || readSelectedLot(window.sessionStorage);
+    const code = normalizeLotId(raw);
+    if (!code) return;
+    const found = lotes.find(
+      (item) =>
+        item.idLote.toUpperCase() === code ||
+        item.id.toUpperCase() === code ||
+        item.id.toUpperCase().endsWith(`-${code}`),
+    );
+    if (found) {
+      setSeleccion(found.id);
+      persistSelectedLot(found.idLote, window.sessionStorage);
+    }
+  }, [lotes, seleccion]);
   const finOpts = {
     separacionCop: parametros.separacionCop,
     tasaMensual: parametros.tasaMensual,
     planesMeses: parametros.planesMeses,
   };
-  const plan = lote
-    ? calcularFinanciacion(lote.valorPreventa, porcentaje, meses, finOpts)
-    : null;
+  const plan = lote ? calcularFinanciacion(lote.valorPreventa, porcentaje, meses, finOpts) : null;
   const porcentajesUi = (parametros.porcentajes.filter(esPorcentaje) as PorcentajeFinanciacion[])
     .length
     ? (parametros.porcentajes.filter(esPorcentaje) as PorcentajeFinanciacion[])
@@ -149,6 +168,7 @@ export function HomePage() {
       codigo,
       fecha,
     });
+    trackTerraEvent("view_quote", { lot_id: lote.idLote, location: "cotizador" });
     void registrarCotizacionGenerada({
       codigo,
       loteId: lote.id,
@@ -240,7 +260,24 @@ export function HomePage() {
           ) : lotes.length === 0 ? (
             <EmptyState title="No hay lotes en la tabla de precios" />
           ) : (
-            <LotMap lotes={lotes} filtro={busqueda} seleccion={seleccion} onSelect={setSeleccion} />
+            <LotMap
+              lotes={lotes}
+              filtro={busqueda}
+              seleccion={seleccion}
+              onSelect={(id) => {
+                setSeleccion(id);
+                const selected = lotes.find((item) => item.id === id);
+                if (selected) {
+                  persistSelectedLot(selected.idLote, window.sessionStorage);
+                  trackTerraEvent("select_lot", {
+                    lot_id: selected.idLote,
+                    manzana: selected.manzana,
+                    status: selected.estado,
+                    location: "cotizador",
+                  });
+                }
+              }}
+            />
           )}
         </div>
 
@@ -328,14 +365,25 @@ export function HomePage() {
             )}
             <fieldset className="grid gap-2">
               <legend className="text-sm font-medium">Financiación</legend>
-              <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Porcentaje a financiar">
+              <div
+                className="grid grid-cols-2 gap-2"
+                role="radiogroup"
+                aria-label="Porcentaje a financiar"
+              >
                 {porcentajesUi.map((p) => (
                   <button
                     key={p}
                     type="button"
                     role="radio"
                     aria-checked={porcentaje === p}
-                    onClick={() => setPorcentaje(p)}
+                    onClick={() => {
+                      setPorcentaje(p);
+                      trackTerraEvent("select_financing_plan", {
+                        plan: `${p}%`,
+                        months: meses,
+                        location: "cotizador",
+                      });
+                    }}
                     className={cn(
                       "rounded-lg border px-3 py-2 text-sm font-semibold",
                       porcentaje === p
@@ -354,7 +402,14 @@ export function HomePage() {
                     type="button"
                     role="radio"
                     aria-checked={meses === m}
-                    onClick={() => setMeses(m)}
+                    onClick={() => {
+                      setMeses(m);
+                      trackTerraEvent("select_financing_plan", {
+                        plan: `${m} meses`,
+                        months: m,
+                        location: "cotizador",
+                      });
+                    }}
                     className={cn(
                       "rounded-lg border px-3 py-2 text-sm font-semibold",
                       meses === m
@@ -866,8 +921,12 @@ function QuoteDocument({
           <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-white/75">
             A financiar {p.porcentaje}%
           </p>
-          <p className="text-lg font-extrabold leading-tight text-[#f7941d]">{fmtCOP(p.valorFinanciar)}</p>
-          <p className="text-[10px] text-white/80">{p.meses} meses · {fmtCOP(p.cuota)}</p>
+          <p className="text-lg font-extrabold leading-tight text-[#f7941d]">
+            {fmtCOP(p.valorFinanciar)}
+          </p>
+          <p className="text-[10px] text-white/80">
+            {p.meses} meses · {fmtCOP(p.cuota)}
+          </p>
         </div>
         <div className="rounded-lg border border-[#f6d7a8] bg-[#fff8ef] px-4 py-2.5">
           <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#c56a00]">
@@ -876,7 +935,9 @@ function QuoteDocument({
           <p className="text-lg font-extrabold leading-tight text-[#0e2a47]">
             {fmtCOP(p.saldoContraEntrega)}
           </p>
-          <p className="text-[10px] text-[#263746]">{p.porcentaje === 100 ? "Sin saldo restante" : "30% del saldo"}</p>
+          <p className="text-[10px] text-[#263746]">
+            {p.porcentaje === 100 ? "Sin saldo restante" : "30% del saldo"}
+          </p>
         </div>
       </div>
 
@@ -897,9 +958,7 @@ function QuoteDocument({
             </p>
             <p className={cn("text-xl font-bold", INK)}>{fmtCOP(e.valor)}</p>
             {e.meses !== 12 && (
-              <p className="text-[11px] leading-snug text-[#4b5563]">
-                {parametros.msgCuotaExtra}
-              </p>
+              <p className="text-[11px] leading-snug text-[#4b5563]">{parametros.msgCuotaExtra}</p>
             )}
           </div>
         ))}

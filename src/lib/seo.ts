@@ -12,14 +12,16 @@ export function pageSeo({
   description,
   path,
   robots = "index, follow, max-image-preview:large",
+  imagePath = SHARE_IMAGE,
 }: {
   title: string;
   description: string;
   path: string;
   robots?: string;
+  imagePath?: string;
 }) {
   const url = absoluteUrl(path);
-  const image = absoluteUrl(SHARE_IMAGE);
+  const image = absoluteUrl(imagePath);
 
   return {
     meta: [
@@ -33,7 +35,10 @@ export function pageSeo({
       { property: "og:description", content: description },
       { property: "og:url", content: url },
       { property: "og:image", content: image },
-      { name: "twitter:card", content: "summary" },
+      {
+        name: "twitter:card",
+        content: imagePath === SHARE_IMAGE ? "summary" : "summary_large_image",
+      },
       { name: "twitter:title", content: title },
       { name: "twitter:description", content: description },
       { name: "twitter:image", content: image },

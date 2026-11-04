@@ -5,8 +5,9 @@ Esta rama integra todo en el único proyecto asociado a
 
 ## Sitio público
 
-- `/` y `/terra`: permanecen sin modificaciones.
-- `/terra/estado`: visor original con sus recursos estáticos en `public/terra/estado/`.
+- `/`: la página corporativa permanece sin este rediseño.
+- `/terra`: experiencia inmobiliaria del proyecto. Ver `docs/terra-experiencia-comercial.md`.
+- `/terra/estado`: explorador de lotes con recursos estáticos en `public/terra/estado/`. La geometría y `/api/terra-estado` no cambian.
 - `/api/terra-estado`: ruta de servidor de TanStack Start que llama al
   handler del ZIP, ubicado en `src/server/terra/api/terra-estado.cjs`.
 - `src/server/terra/lib/`: conserva el código original para Microsoft Graph,
