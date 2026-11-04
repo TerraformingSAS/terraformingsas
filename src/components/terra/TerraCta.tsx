@@ -8,7 +8,7 @@ import { terraWhatsAppUrl } from "@/lib/terra/contact";
 
 export function TerraCta() {
   return (
-    <section className="relative overflow-hidden py-20 text-white sm:py-24">
+    <section className="relative mx-4 overflow-hidden rounded-3xl py-20 text-white sm:mx-6 sm:py-24">
       <img
         src={cierreImg}
         alt=""

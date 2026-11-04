@@ -10,6 +10,7 @@ import { TerraFAQ } from "@/components/terra/TerraFAQ";
 import { TerraFooter } from "@/components/terra/TerraFooter";
 import { TerraHeader } from "@/components/terra/TerraHeader";
 import { TerraHero } from "@/components/terra/TerraHero";
+import { InstagramButton } from "@/components/InstagramButton";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { terraWhatsAppUrl } from "@/lib/terra/contact";
 import { absoluteUrl, pageSeo } from "@/lib/seo";
@@ -66,8 +67,9 @@ function TerraPage() {
         <TerraCta />
       </main>
       <TerraFooter />
+      <InstagramButton />
       <WhatsAppButton href={terraWhatsAppUrl()} />
-      <BackToTop />
+      <BackToTop className="bottom-[9.5rem]" />
     </div>
   );
 }

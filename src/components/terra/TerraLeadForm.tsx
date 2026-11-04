@@ -145,7 +145,7 @@ export function TerraLeadForm({ compact = false }: { compact?: boolean }) {
   return (
     <div
       id="preventa-terra"
-      className="border border-brand-navy/10 bg-white text-brand-navy shadow-sm"
+      className="overflow-hidden rounded-2xl border border-brand-navy/10 bg-white text-brand-navy shadow-sm"
     >
       <div
         className={

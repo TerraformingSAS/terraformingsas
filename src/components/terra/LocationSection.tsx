@@ -1,6 +1,6 @@
 import mapImg from "@/assets/terra/ubicacion-km1.webp";
 import { TerraLeadForm } from "@/components/terra/TerraLeadForm";
-import { TerraPrimaryLink, TerraSecondaryLink } from "@/components/terra/primitives";
+import { TerraPrimaryLink } from "@/components/terra/primitives";
 import { TERRA_PROJECT } from "@/lib/terra/commercial";
 
 export function LocationSection() {
@@ -25,20 +25,12 @@ export function LocationSection() {
             >
               Cómo llegar
             </TerraPrimaryLink>
-            <TerraSecondaryLink
-              href={TERRA_PROJECT.mapsShare}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-brand-navy"
-            >
-              Ver mapa
-            </TerraSecondaryLink>
           </div>
           <figure className="mt-6">
             <img
               src={mapImg}
               alt="Plano de ubicación de TERRA en el km 1 de la vía Popayán–Santa Rosa, con la ruta hacia Popayán"
-              className="h-auto w-full object-contain"
+              className="h-auto w-full rounded-2xl object-contain"
               width={1600}
               height={847}
               loading="lazy"

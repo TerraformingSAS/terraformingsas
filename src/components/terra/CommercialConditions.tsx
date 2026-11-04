@@ -2,7 +2,7 @@ import { Reveal } from "@/components/Reveal";
 import { TerraKicker, TerraPrimaryLink } from "@/components/terra/primitives";
 import { trackTerraEvent } from "@/lib/terra/analytics";
 import { persistFinancingPlan, readFinancingPlan } from "@/lib/terra/campaign";
-import { TERRA_FINANCING, formatCopMillions } from "@/lib/terra/commercial";
+import { TERRA_FINANCING, TERRA_PROJECT, formatCopMillions } from "@/lib/terra/commercial";
 import { useEffect, useState } from "react";
 
 const STEPS = [
@@ -117,7 +117,7 @@ export function CommercialConditions() {
               lote y el valor vigentes; no se publican montos genéricos.
             </p>
             <TerraPrimaryLink
-              href="#contacto"
+              href={TERRA_PROJECT.explorerPath}
               className="mt-6"
               onClick={() => trackTerraEvent("view_quote", { location: "financing" })}
             >
