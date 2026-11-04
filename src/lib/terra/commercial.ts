@@ -114,12 +114,21 @@ export const TERRA_COPY = {
 
 export const TERRA_NAV = [
   { id: "proyecto", label: "Proyecto", href: "/terra#proyecto" },
-  { id: "lotes", label: "Lotes", href: "/terra#lotes" },
-  { id: "naturaleza", label: "Naturaleza", href: "/terra#naturaleza" },
-  { id: "financiacion", label: "Financiación", href: "/terra#financiacion" },
-  { id: "cronograma", label: "Cronograma", href: "/terra#cronograma" },
   { id: "ubicacion", label: "Ubicación", href: "/terra#ubicacion" },
+  { id: "financiacion", label: "Financiación", href: "/terra#financiacion" },
+  { id: "naturaleza", label: "Naturaleza", href: "/terra#naturaleza" },
+  { id: "lotes", label: "Lotes", href: "/terra#lotes" },
+  { id: "desarrollo", label: "Desarrollo", href: "/terra#desarrollo" },
   { id: "contacto", label: "Contacto", href: "/terra#contacto" },
+] as const;
+
+/** Áreas reales del Excel de disponibilidad. El precio por lote no es público. */
+export const TERRA_LOT_TYPES = [
+  { area: 120, label: "120 m²" },
+  { area: 154, label: "154 m²" },
+  { area: 165, label: "165 m²" },
+  { area: 211.75, label: "211,75 m²" },
+  { area: 442.75, label: "442,75 m²" },
 ] as const;
 
 export const TERRA_TIMELINE = [

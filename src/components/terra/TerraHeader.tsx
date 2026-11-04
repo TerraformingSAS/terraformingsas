@@ -42,15 +42,8 @@ export function TerraHeader({ solid = false }: { solid?: boolean }) {
           className="min-w-0 shrink-0"
           aria-label="TERRA, proyecto de TERRA FORMING S.A.S."
         >
-          <TerraMark light={!showSolid} className="scale-90 origin-left sm:scale-100" />
-          <span
-            className={cn(
-              "mt-0.5 block text-[10px] font-medium tracking-[0.12em] uppercase",
-              showSolid ? "text-brand-navy/70" : "text-white/80",
-            )}
-          >
-            {TERRA_PROJECT.company}
-          </span>
+          <TerraMark light={!showSolid} />
+          <span className="sr-only">{TERRA_PROJECT.company}</span>
         </Link>
 
         <nav

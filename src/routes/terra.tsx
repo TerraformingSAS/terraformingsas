@@ -1,13 +1,10 @@
 import { BackToTop } from "@/components/BackToTop";
 import { CampaignCapture } from "@/components/terra/CampaignCapture";
 import { CommercialConditions } from "@/components/terra/CommercialConditions";
-import { DeveloperInformation } from "@/components/terra/DeveloperInformation";
-import { DevelopmentTimeline } from "@/components/terra/DevelopmentTimeline";
-import { LeadCaptureSection } from "@/components/terra/LeadCaptureSection";
 import { LocationSection } from "@/components/terra/LocationSection";
 import { LotPreview } from "@/components/terra/LotPreview";
 import { ProjectGallery } from "@/components/terra/ProjectGallery";
-import { ProjectOverview } from "@/components/terra/ProjectOverview";
+import { ProjectTrust } from "@/components/terra/ProjectTrust";
 import { TerraCta } from "@/components/terra/TerraCta";
 import { TerraFAQ } from "@/components/terra/TerraFAQ";
 import { TerraFooter } from "@/components/terra/TerraFooter";
@@ -60,14 +57,11 @@ function TerraPage() {
       <TerraHeader />
       <main id="contenido">
         <TerraHero />
-        <ProjectOverview />
-        <LotPreview />
-        <ProjectGallery />
-        <CommercialConditions />
-        <DevelopmentTimeline />
         <LocationSection />
-        <DeveloperInformation />
-        <LeadCaptureSection />
+        <CommercialConditions />
+        <ProjectGallery />
+        <LotPreview />
+        <ProjectTrust />
         <TerraFAQ />
         <TerraCta />
       </main>
