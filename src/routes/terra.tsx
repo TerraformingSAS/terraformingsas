@@ -7,7 +7,6 @@ import { ProjectGallery } from "@/components/terra/ProjectGallery";
 import { ProjectTrust } from "@/components/terra/ProjectTrust";
 import { TerraCta } from "@/components/terra/TerraCta";
 import { TerraFAQ } from "@/components/terra/TerraFAQ";
-import { TerraLeadForm } from "@/components/terra/TerraLeadForm";
 import { TerraFooter } from "@/components/terra/TerraFooter";
 import { TerraHeader } from "@/components/terra/TerraHeader";
 import { TerraHero } from "@/components/terra/TerraHero";
@@ -63,11 +62,6 @@ function TerraPage() {
         <LocationSection />
         <CommercialConditions />
         <ProjectGallery />
-        <section id="contacto" className="scroll-mt-24 bg-brand-cream py-14 sm:py-20">
-          <div className="container-tf mx-auto max-w-xl">
-            <TerraLeadForm />
-          </div>
-        </section>
         <ProjectTrust />
         <TerraFAQ />
         <TerraCta />

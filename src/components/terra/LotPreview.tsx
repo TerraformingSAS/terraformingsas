@@ -1,3 +1,4 @@
+import { TerraLeadForm } from "@/components/terra/TerraLeadForm";
 import { TerraPrimaryLink } from "@/components/terra/primitives";
 import { TERRA_LOT_TYPES, TERRA_PROJECT, formatCop } from "@/lib/terra/commercial";
 
@@ -14,7 +15,8 @@ export function LotPreview() {
           </div>
           <TerraPrimaryLink href={TERRA_PROJECT.explorerPath}>Ver plano</TerraPrimaryLink>
         </div>
-        <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(280px,380px)]">
+          <ul className="grid gap-4 sm:grid-cols-2">
           {TERRA_LOT_TYPES.map((type) => (
             <li key={type.area} className="rounded-2xl bg-white px-5 py-6 shadow-sm">
               <p className="text-sm font-medium text-brand-dark/70">Lotes de {type.label}</p>
@@ -26,7 +28,11 @@ export function LotPreview() {
               </p>
             </li>
           ))}
-        </ul>
+          </ul>
+          <div id="contacto" className="scroll-mt-28">
+            <TerraLeadForm compact />
+          </div>
+        </div>
       </div>
     </section>
   );
