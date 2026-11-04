@@ -1,5 +1,5 @@
 import mapImg from "@/assets/terra/ubicacion-km1.webp";
-import { TerraPrimaryLink } from "@/components/terra/primitives";
+import { TerraPrimaryLink, TerraSecondaryLink } from "@/components/terra/primitives";
 import { TERRA_PROJECT } from "@/lib/terra/commercial";
 
 export function LocationSection() {
@@ -24,6 +24,7 @@ export function LocationSection() {
             >
               Cómo llegar
             </TerraPrimaryLink>
+            <TerraSecondaryLink href="/terra/mapa">Mapa interactivo</TerraSecondaryLink>
           </div>
           <figure className="mt-6">
             <img
