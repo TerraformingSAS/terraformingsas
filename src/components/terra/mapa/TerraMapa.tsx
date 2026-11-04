@@ -1,5 +1,5 @@
 import geometria from "@/lib/terra/mapa/geometria.json";
-import { joinLots, type GeomLot, type JoinedLot } from "@/lib/terra/mapa/join";
+import { joinLots, type GeomLot } from "@/lib/terra/mapa/join";
 import { terraWhatsAppUrl } from "@/lib/terra/contact";
 import { TERRA_PROJECT, formatCop, TERRA_LOT_TYPES } from "@/lib/terra/commercial";
 import { fetchPublicLots, formatArea, isAvailableLot, lotQuoteUrl } from "@/lib/terra/lots";
@@ -34,7 +34,6 @@ export function TerraMapa() {
   const [manzana, setManzana] = useState("");
   const [estado, setEstado] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [mode, setMode] = useState<"terreno" | "loteo">("terreno");
   const [exaggeration, setExaggeration] = useState(1);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const handleRef = useRef<TerrainHandle | null>(null);
@@ -82,12 +81,10 @@ export function TerraMapa() {
   const lotsRef = useRef(joined.lots);
   const visibleRef = useRef(visibleIds);
   const selectedRef = useRef(selectedId);
-  const modeRef = useRef(mode);
   const exaggerationRef = useRef(exaggeration);
   lotsRef.current = joined.lots;
   visibleRef.current = visibleIds;
   selectedRef.current = selectedId;
-  modeRef.current = mode;
   exaggerationRef.current = exaggeration;
 
   useEffect(() => {
@@ -106,7 +103,6 @@ export function TerraMapa() {
       if (cancelled) return;
       const handle = await mountTerrain(canvas, terrain, (id) => {
         setSelectedId(id);
-        setMode("loteo");
         const url = new URL(window.location.href);
         url.searchParams.set("lote", id);
         window.history.replaceState(null, "", url);
@@ -116,7 +112,6 @@ export function TerraMapa() {
         return;
       }
       handleRef.current = handle;
-      handle.setMode(modeRef.current);
       handle.setLots(lotsRef.current, visibleRef.current);
       handle.setSelected(selectedRef.current);
       handle.setExaggeration(exaggerationRef.current);
@@ -130,10 +125,6 @@ export function TerraMapa() {
   }, [terrain]);
 
   useEffect(() => {
-    handleRef.current?.setMode(mode);
-  }, [mode]);
-
-  useEffect(() => {
     handleRef.current?.setLots(joined.lots, visibleIds);
     handleRef.current?.setSelected(selectedId);
   }, [joined.lots, visibleIds, selectedId]);
@@ -141,14 +132,6 @@ export function TerraMapa() {
   useEffect(() => {
     handleRef.current?.setExaggeration(exaggeration);
   }, [exaggeration]);
-
-  function selectLot(lot: JoinedLot) {
-    setSelectedId(lot.id);
-    setMode("loteo");
-    const url = new URL(window.location.href);
-    url.searchParams.set("lote", lot.id);
-    window.history.replaceState(null, "", url);
-  }
 
   const canQuote = selected ? isAvailableLot(selected.estado ?? "") : false;
   const price = referencePrice(selected?.medidas?.area_m2);
@@ -165,26 +148,6 @@ export function TerraMapa() {
             <h1 className="font-display text-lg font-semibold leading-tight sm:text-xl">
               Terreno del predio
             </h1>
-          </div>
-          <div
-            className="inline-flex rounded-lg bg-white p-0.5 shadow-sm"
-            role="group"
-            aria-label="Escena"
-          >
-            <button
-              type="button"
-              className={`rounded-md px-3 py-1.5 text-sm ${mode === "terreno" ? "bg-[#0e2a47] text-white" : ""}`}
-              onClick={() => setMode("terreno")}
-            >
-              Terreno 3D
-            </button>
-            <button
-              type="button"
-              className={`rounded-md px-3 py-1.5 text-sm ${mode === "loteo" ? "bg-[#0e2a47] text-white" : ""}`}
-              onClick={() => setMode("loteo")}
-            >
-              Loteo 3D
-            </button>
           </div>
           <label className="text-sm">
             <span className="sr-only">Manzana</span>
@@ -256,20 +219,18 @@ export function TerraMapa() {
               Ajustar
             </button>
           </div>
-          {mode === "terreno" && (
-            <label className="absolute right-3 top-3 rounded-xl bg-white/95 px-3 py-2 text-xs shadow">
-              Exageración vertical {exaggeration.toFixed(1)}×
-              <input
-                className="mt-1 block w-36"
-                type="range"
-                min={1}
-                max={3}
-                step={0.5}
-                value={exaggeration}
-                onChange={(event) => setExaggeration(Number(event.target.value))}
-              />
-            </label>
-          )}
+          <label className="absolute right-3 top-3 rounded-xl bg-white/95 px-3 py-2 text-xs shadow">
+            Exageración vertical {exaggeration.toFixed(1)}×
+            <input
+              className="mt-1 block w-36"
+              type="range"
+              min={1}
+              max={3}
+              step={0.5}
+              value={exaggeration}
+              onChange={(event) => setExaggeration(Number(event.target.value))}
+            />
+          </label>
           <ul className="absolute bottom-3 right-3 hidden max-w-[220px] flex-wrap gap-x-3 gap-y-1 rounded-xl bg-white/95 px-3 py-2 text-xs shadow sm:flex">
             {Object.entries(COLORS).map(([state, color]) => (
               <li key={state} className="flex items-center gap-1.5">
@@ -284,33 +245,18 @@ export function TerraMapa() {
         </div>
 
         <p className="px-4 pb-2 text-xs leading-relaxed text-[#3d5163]">
-          El relieve usa elevación Terrarium (AWS Terrain Tiles, zoom 15) sobre el perímetro del
-          KML, entre {terrain ? `${terrain.elevMin} y ${terrain.elevMax} m` : "la cota del predio"}.
-          La imagen es Esri World Imagery. Arrastra para orbitar, botón derecho para desplazar y la
-          rueda para acercar.
+          El relieve y la foto comparten el recorte del KML
+          {terrain ? ` (${terrain.elevMin}–${terrain.elevMax} m)` : ""}. El contorno naranja sigue
+          ese perímetro, con el norte de la imagen hacia el fondo de la vista inicial. Arrastra para
+          orbitar, botón derecho para desplazar y la rueda para acercar.
         </p>
-        <p className="px-4 pb-4 text-xs leading-relaxed text-[#3d5163]">
-          Los 104 lotes del plano publicado no tienen coordenadas geográficas ni puntos de control
-          con el KML, así que no se pegan al relieve. En «Loteo 3D» cada polígono se puede orbitar y
-          seleccionar, en su plano local.{" "}
+        <p className="px-4 pb-6 text-xs leading-relaxed text-[#3d5163]">
+          Los lotes están sobre el terreno, a la escala del área comercial y centrados en el predio.
+          No hay mojones que fijen el desplazamiento ni la rotación.{" "}
           {commercial
             ? `${joined.lots.length - joined.sinComercial.length} con estado comercial, ${joined.sinComercial.length} sin ficha, ${joined.sinGeometria.length} fichas sin polígono.`
             : "La disponibilidad sale de la misma fuente de /terra/estado."}
         </p>
-        {mode === "loteo" && (
-          <div className="flex gap-2 overflow-x-auto px-4 pb-6">
-            {visible.map((lot) => (
-              <button
-                key={lot.id}
-                type="button"
-                className="shrink-0 rounded-full border border-[#d5dee6] bg-white px-3 py-1 text-xs"
-                onClick={() => selectLot(lot)}
-              >
-                {lot.id}
-              </button>
-            ))}
-          </div>
-        )}
       </main>
 
       {selected && (

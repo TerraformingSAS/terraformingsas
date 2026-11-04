@@ -1,5 +1,6 @@
-import type { Material, Mesh, MeshStandardMaterial } from "three";
+import type { BufferGeometry, Line, Material, Mesh, MeshStandardMaterial } from "three";
 import type { JoinedLot } from "@/lib/terra/mapa/join";
+import { colocarLotes } from "@/lib/terra/mapa/ubicar-lotes";
 
 export type TerrainPayload = {
   west: number;
@@ -17,8 +18,6 @@ export type TerrainPayload = {
   fuenteImagen: string;
 };
 
-type Mode = "terreno" | "loteo";
-
 const STATE_COLOR: Record<string, number> = {
   Disponible: 0x66b48a,
   Reservado: 0xebcb6a,
@@ -28,7 +27,6 @@ const STATE_COLOR: Record<string, number> = {
 };
 
 export type TerrainHandle = {
-  setMode: (mode: Mode) => void;
   setLots: (lots: JoinedLot[], visible: Set<string>) => void;
   setExaggeration: (value: number) => void;
   setView: (view: "3d" | "superior") => void;
@@ -71,7 +69,9 @@ export async function mountTerrain(
   for (let row = 0; row < grid; row += 1) {
     for (let col = 0; col < grid; col += 1) {
       const index = row * grid + col;
-      originalY[index] = terrain.heights[index] - terrain.elevMin;
+      // La fila 0 de PlaneGeometry queda al sur después de rotar el plano.
+      const imageRow = grid - 1 - row;
+      originalY[index] = terrain.heights[imageRow * grid + col] - terrain.elevMin;
       base[index * 3 + 1] = originalY[index];
     }
   }
@@ -79,6 +79,8 @@ export async function mountTerrain(
 
   const texture = await new THREE.TextureLoader().loadAsync("/terra/mapa/terreno.jpg");
   texture.colorSpace = THREE.SRGBColorSpace;
+  texture.flipY = false;
+  texture.needsUpdate = true;
   const ground = new THREE.Mesh(
     geometry,
     new THREE.MeshStandardMaterial({ map: texture, roughness: 0.92, metalness: 0 }),
@@ -96,13 +98,12 @@ export async function mountTerrain(
   scene.add(boundary);
 
   const lotRoot = new THREE.Group();
-  lotRoot.visible = false;
   scene.add(lotRoot);
-  const lotMeshes: { id: string; mesh: Mesh }[] = [];
+  const lotMeshes: { id: string; mesh: Mesh; geometry: BufferGeometry }[] = [];
+  let lotSource: JoinedLot[] = [];
+  let lotVisible = new Set<string>();
 
   const terrainTarget = new THREE.Vector3(0, (terrain.elevMax - terrain.elevMin) / 2, 0);
-  const lotTarget = new THREE.Vector3(0, 0, 0);
-  let mode: Mode = "terreno";
   let exaggeration = 1;
 
   function frameTerrain(view: "3d" | "superior") {
@@ -113,19 +114,6 @@ export async function mountTerrain(
       camera.position.set(terrain.widthM * 0.35, 420, terrain.depthM * 0.42);
     }
     camera.lookAt(terrainTarget);
-    controls.update();
-  }
-
-  function frameLots(view: "3d" | "superior") {
-    const box = new THREE.Box3().setFromObject(lotRoot);
-    const center = box.getCenter(new THREE.Vector3());
-    const size = box.getSize(new THREE.Vector3());
-    const span = Math.max(size.x, size.z, 80);
-    lotTarget.copy(center);
-    controls.target.copy(center);
-    if (view === "superior") camera.position.set(center.x, span * 1.4, center.z + 1);
-    else camera.position.set(center.x + span * 0.7, span * 0.55, center.z + span * 0.7);
-    camera.lookAt(center);
     controls.update();
   }
 
@@ -142,6 +130,63 @@ export async function mountTerrain(
     });
     boundary.geometry.dispose();
     boundary.geometry = new THREE.BufferGeometry().setFromPoints(points);
+    rebuildLots();
+  }
+
+  function meshPoint(x: number, z: number) {
+    const y = (sampleHeight(terrain, x, z) - terrain.elevMin) * exaggeration + 1.6;
+    return new THREE.Vector3(x - terrain.widthM / 2, y, z - terrain.depthM / 2);
+  }
+
+  function rebuildLots() {
+    for (const item of lotMeshes) {
+      lotRoot.remove(item.mesh);
+      for (const child of item.mesh.children) {
+        const line = child as Line;
+        line.geometry.dispose();
+        (line.material as Material).dispose();
+      }
+      item.geometry.dispose();
+      (item.mesh.material as Material).dispose();
+    }
+    lotMeshes.length = 0;
+    const placed = colocarLotes(terrain, lotSource);
+    for (const lot of placed) {
+      const source = lotSource.find((item) => item.id === lot.id);
+      const contour = lot.anillo.map(([x, z]) => new THREE.Vector2(x, z));
+      const faces = THREE.ShapeUtils.triangulateShape(contour, []);
+      const vertices: number[] = [];
+      const points = lot.anillo.map(([x, z]) => meshPoint(x, z));
+      for (const face of faces) {
+        for (const index of face) {
+          const point = points[index];
+          vertices.push(point.x, point.y, point.z);
+        }
+      }
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
+      geometry.computeVertexNormals();
+      const mesh = new THREE.Mesh(
+        geometry,
+        new THREE.MeshStandardMaterial({
+          color: STATE_COLOR[source?.estado ?? ""] ?? 0xc5ced6,
+          roughness: 0.55,
+          metalness: 0,
+          emissive: 0x000000,
+          polygonOffset: true,
+          polygonOffsetFactor: -2,
+          polygonOffsetUnits: -2,
+        }),
+      );
+      mesh.visible = lotVisible.has(lot.id);
+      lotRoot.add(mesh);
+      const edge = new THREE.LineLoop(
+        new THREE.BufferGeometry().setFromPoints(points),
+        new THREE.LineBasicMaterial({ color: 0x0e2a47 }),
+      );
+      mesh.add(edge);
+      lotMeshes.push({ id: lot.id, mesh, geometry });
+    }
   }
 
   frameTerrain("3d");
@@ -156,7 +201,7 @@ export async function mountTerrain(
     if (event.buttons) moved = true;
   };
   const onClick = (event: MouseEvent) => {
-    if (moved || mode !== "loteo") return;
+    if (moved) return;
     const rect = canvas.getBoundingClientRect();
     pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
@@ -191,67 +236,32 @@ export async function mountTerrain(
   tick();
 
   return {
-    setMode(next) {
-      mode = next;
-      ground.visible = next === "terreno";
-      boundary.visible = next === "terreno";
-      lotRoot.visible = next === "loteo";
-      if (next === "terreno") frameTerrain("3d");
-      else frameLots("3d");
-    },
     setLots(lots, visible) {
-      for (const item of lotMeshes) {
-        lotRoot.remove(item.mesh);
-        item.mesh.geometry.dispose();
-        (item.mesh.material as Material).dispose();
-      }
-      lotMeshes.length = 0;
-      for (const lot of lots) {
-        const shape = new THREE.Shape();
-        lot.puntos.forEach(([x, y], index) => {
-          if (index === 0) shape.moveTo(x, y);
-          else shape.lineTo(x, y);
-        });
-        const mesh = new THREE.Mesh(
-          new THREE.ExtrudeGeometry(shape, { depth: 1.6, bevelEnabled: false }),
-          new THREE.MeshStandardMaterial({
-            color: STATE_COLOR[lot.estado ?? ""] ?? 0xc5ced6,
-            roughness: 0.72,
-            emissive: 0x000000,
-          }),
-        );
-        mesh.rotation.x = -Math.PI / 2;
-        mesh.visible = visible.has(lot.id);
-        lotRoot.add(mesh);
-        lotMeshes.push({ id: lot.id, mesh });
-      }
-      if (mode === "loteo") frameLots("3d");
+      lotSource = lots;
+      lotVisible = visible;
+      rebuildLots();
     },
     setExaggeration(value) {
       exaggeration = value;
       applyHeights();
     },
-    setView(view) {
-      if (mode === "terreno") frameTerrain(view);
-      else frameLots(view);
-    },
+    setView: frameTerrain,
     reset() {
-      if (mode === "terreno") frameTerrain("3d");
-      else frameLots("3d");
+      frameTerrain("3d");
     },
     setSelected(id) {
       for (const item of lotMeshes) {
         const material = item.mesh.material as MeshStandardMaterial;
         const active = item.id === id;
         material.emissive.setHex(active ? 0xe07a2f : 0x000000);
-        material.emissiveIntensity = active ? 0.45 : 0;
+        material.emissiveIntensity = active ? 0.55 : 0;
       }
-      if (!id || mode !== "loteo") return;
+      if (!id) return;
       const mesh = lotMeshes.find((item) => item.id === id)?.mesh;
       if (!mesh) return;
       const center = new THREE.Box3().setFromObject(mesh).getCenter(new THREE.Vector3());
       controls.target.copy(center);
-      camera.position.set(center.x + 80, center.y + 70, center.z + 80);
+      camera.position.set(center.x + 70, center.y + 55, center.z + 70);
       camera.lookAt(center);
     },
     dispose() {
