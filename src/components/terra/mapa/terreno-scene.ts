@@ -105,6 +105,14 @@ export async function mountTerrain(
   scene.add(boundary);
   const road = new THREE.Group();
   scene.add(road);
+  const markers = new THREE.Group();
+  scene.add(markers);
+  const markerDefs: { east: number; north: number; title: string; color: number }[] = [
+    { east: 540, north: 1040, title: "Vereda Santa Rosa", color: 0x2f7d4a },
+    { east: 1560, north: 1140, title: "Complejo deportivo", color: 0xe07a2f },
+    { east: 1600, north: 640, title: "Popayán", color: 0x0e2a47 },
+  ];
+  for (const marker of markerDefs) markers.add(placeMarker(THREE, marker.title, marker.color));
 
   const lotRoot = new THREE.Group();
   scene.add(lotRoot);
@@ -149,6 +157,12 @@ export async function mountTerrain(
     boundary = next;
     scene.add(boundary);
     replaceRoad(THREE, road, terrain, exaggeration);
+    markerDefs.forEach((marker, index) => {
+      const pin = markers.children[index];
+      if (!pin) return;
+      const y = (sampleHeight(terrain, marker.east, marker.north) - terrain.elevMin) * exaggeration;
+      pin.position.copy(toScene(marker.east, y, marker.north));
+    });
     const logoHeight =
       (sampleHeight(terrain, logoEast, logoNorth) - terrain.elevMin) * exaggeration + 6;
     logo.position.copy(toScene(logoEast, logoHeight, logoNorth));
@@ -336,6 +350,14 @@ export async function mountTerrain(
       logo.geometry.dispose();
       (logo.material as Material).dispose();
       logoTexture.dispose();
+      markers.traverse((child) => {
+        const mesh = child as Mesh;
+        mesh.geometry?.dispose();
+        const material = mesh.material as
+          (Material & { map?: { dispose: () => void } | null }) | undefined;
+        material?.map?.dispose();
+        material?.dispose();
+      });
       road.traverse((child) => {
         const mesh = child as Mesh;
         mesh.geometry?.dispose();
@@ -560,6 +582,52 @@ function flatRibbon(
   );
   mesh.renderOrder = 6;
   return mesh;
+}
+
+function placeMarker(THREE: typeof import("three"), title: string, color: number) {
+  const group = new THREE.Group();
+  const pole = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.1, 1.1, 26, 10),
+    new THREE.MeshStandardMaterial({ color, roughness: 0.45, metalness: 0.05 }),
+  );
+  pole.position.y = 13;
+  group.add(pole);
+  const head = new THREE.Mesh(
+    new THREE.SphereGeometry(3.2, 18, 14),
+    new THREE.MeshStandardMaterial({ color, roughness: 0.35, metalness: 0.08 }),
+  );
+  head.position.y = 28;
+  group.add(head);
+  const canvas = document.createElement("canvas");
+  canvas.width = 640;
+  canvas.height = 160;
+  const context = canvas.getContext("2d");
+  if (context) {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.font = "700 72px Inter, sans-serif";
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.lineWidth = 12;
+    context.strokeStyle = "rgba(255,255,255,0.94)";
+    context.strokeText(title, 320, 80);
+    context.fillStyle = "#102033";
+    context.fillText(title, 320, 80);
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const label = new THREE.Sprite(
+    new THREE.SpriteMaterial({
+      map: texture,
+      transparent: true,
+      depthTest: false,
+      depthWrite: false,
+    }),
+  );
+  label.position.y = 40;
+  label.scale.set(78, 19.5, 1);
+  label.renderOrder = 25;
+  group.add(label);
+  return group;
 }
 
 function lotLabel(THREE: typeof import("three"), name: string, points: import("three").Vector3[]) {
