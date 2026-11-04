@@ -15,21 +15,26 @@ export function LotPreview() {
           </div>
           <TerraPrimaryLink href={TERRA_PROJECT.explorerPath}>Ver plano</TerraPrimaryLink>
         </div>
-        <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(280px,380px)]">
-          <ul className="grid gap-4 sm:grid-cols-2">
-          {TERRA_LOT_TYPES.map((type) => (
-            <li key={type.area} className="rounded-2xl bg-white px-5 py-6 shadow-sm">
-              <p className="text-sm font-medium text-brand-dark/70">Lotes de {type.label}</p>
-              <p className="mt-3 font-display text-3xl font-bold leading-none text-brand-orange">
-                {formatCop(type.fromCop)}
-              </p>
-              <p className="mt-2 text-xs font-semibold uppercase tracking-[0.14em] text-brand-navy">
-                Desde
-              </p>
-            </li>
-          ))}
+        <div className="mt-8 grid items-start gap-6 lg:grid-cols-2">
+          <ul className="flex flex-col gap-3">
+            {TERRA_LOT_TYPES.map((type) => (
+              <li
+                key={type.area}
+                className="flex items-center justify-between gap-4 rounded-2xl bg-white px-5 py-4 shadow-sm"
+              >
+                <p className="text-sm font-medium text-brand-dark/70">Lotes de {type.label}</p>
+                <div className="text-right">
+                  <p className="font-display text-2xl font-bold leading-none text-brand-orange sm:text-3xl">
+                    {formatCop(type.fromCop)}
+                  </p>
+                  <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-brand-navy">
+                    Desde
+                  </p>
+                </div>
+              </li>
+            ))}
           </ul>
-          <div id="contacto" className="scroll-mt-28">
+          <div id="contacto" className="scroll-mt-28 lg:sticky lg:top-24">
             <TerraLeadForm compact />
           </div>
         </div>
