@@ -85,23 +85,21 @@ export async function mountTerrain(
 
   const logoTexture = await new THREE.TextureLoader().loadAsync("/terra/mapa/logo-terra.png");
   logoTexture.colorSpace = THREE.SRGBColorSpace;
-  const logoWidth = 220;
+  const logoWidth = 400;
   const logo = new THREE.Mesh(
     new THREE.PlaneGeometry(logoWidth, logoWidth * (1086 / 1448)),
     new THREE.MeshBasicMaterial({
       map: logoTexture,
       transparent: true,
+      depthTest: false,
       depthWrite: false,
-      polygonOffset: true,
-      polygonOffsetFactor: -6,
-      polygonOffsetUnits: -6,
     }),
   );
   logo.rotation.x = -Math.PI / 2;
-  logo.renderOrder = 2;
+  logo.renderOrder = 30;
   scene.add(logo);
-  const logoEast = 575;
-  const logoNorth = 1046;
+  const logoEast = 840;
+  const logoNorth = 1000;
 
   let boundary = perimeterRibbon(THREE, []);
   scene.add(boundary);
@@ -145,7 +143,7 @@ export async function mountTerrain(
     boundary = next;
     scene.add(boundary);
     const logoHeight =
-      (sampleHeight(terrain, logoEast, logoNorth) - terrain.elevMin) * exaggeration + 2;
+      (sampleHeight(terrain, logoEast, logoNorth) - terrain.elevMin) * exaggeration + 6;
     logo.position.copy(toScene(logoEast, logoHeight, logoNorth));
     rebuildLots();
   }
