@@ -83,6 +83,26 @@ export async function mountTerrain(
   );
   scene.add(ground);
 
+  const logoTexture = await new THREE.TextureLoader().loadAsync("/terra/mapa/logo-terra.png");
+  logoTexture.colorSpace = THREE.SRGBColorSpace;
+  const logoWidth = 220;
+  const logo = new THREE.Mesh(
+    new THREE.PlaneGeometry(logoWidth, logoWidth * (1086 / 1448)),
+    new THREE.MeshBasicMaterial({
+      map: logoTexture,
+      transparent: true,
+      depthWrite: false,
+      polygonOffset: true,
+      polygonOffsetFactor: -6,
+      polygonOffsetUnits: -6,
+    }),
+  );
+  logo.rotation.x = -Math.PI / 2;
+  logo.renderOrder = 2;
+  scene.add(logo);
+  const logoEast = 575;
+  const logoNorth = 1046;
+
   let boundary = perimeterRibbon(THREE, []);
   scene.add(boundary);
 
@@ -124,6 +144,9 @@ export async function mountTerrain(
     (boundary.material as Material).dispose();
     boundary = next;
     scene.add(boundary);
+    const logoHeight =
+      (sampleHeight(terrain, logoEast, logoNorth) - terrain.elevMin) * exaggeration + 2;
+    logo.position.copy(toScene(logoEast, logoHeight, logoNorth));
     rebuildLots();
   }
 
@@ -305,6 +328,9 @@ export async function mountTerrain(
       controls.dispose();
       geometry.dispose();
       texture.dispose();
+      logo.geometry.dispose();
+      (logo.material as Material).dispose();
+      logoTexture.dispose();
       boundary.geometry.dispose();
       renderer.dispose();
     },
@@ -435,7 +461,12 @@ function lotLabel(THREE: typeof import("three"), name: string, points: import("t
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   const sprite = new THREE.Sprite(
-    new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: true }),
+    new THREE.SpriteMaterial({
+      map: texture,
+      transparent: true,
+      depthTest: false,
+      depthWrite: false,
+    }),
   );
   const center = points
     .reduce((sum, point) => sum.add(point), new THREE.Vector3())
@@ -443,7 +474,7 @@ function lotLabel(THREE: typeof import("three"), name: string, points: import("t
   sprite.position.copy(center);
   sprite.position.y += 0.35;
   sprite.scale.set(10.5, 5.25, 1);
-  sprite.renderOrder = 5;
+  sprite.renderOrder = 20;
   return sprite;
 }
 
