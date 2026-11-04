@@ -25,7 +25,7 @@ export function TerraHero() {
 
   return (
     <section id="proyecto" className="relative scroll-mt-24">
-      <div className="relative flex min-h-[100svh] flex-col overflow-hidden">
+      <div className="relative overflow-hidden">
         <img
           src={aerialImg}
           alt="Render aéreo ilustrativo de TERRA Etapa I, con los lotes, las vías proyectadas y el entorno de Popayán"
@@ -37,7 +37,7 @@ export function TerraHero() {
         <div className="absolute inset-0 bg-gradient-to-r from-[#0e2a47]/88 via-[#0e2a47]/42 to-[#0e2a47]/5" />
         <div className="absolute inset-y-0 left-0 w-full bg-gradient-to-t from-[#0e2a47]/55 via-transparent to-[#0e2a47]/25 sm:w-3/5 sm:bg-gradient-to-r" />
 
-        <div className="terra-hero__copy relative container-tf flex flex-1 flex-col justify-end pb-16 pt-24 text-white sm:justify-center sm:pb-20 sm:pt-28">
+        <div className="terra-hero__copy relative container-tf flex flex-col pb-10 pt-24 text-white sm:pb-12 sm:pt-28">
           <p className="terra-hero__item text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-orange">
             TERRA · Etapa I · Popayán
           </p>
@@ -84,16 +84,6 @@ export function TerraHero() {
             Render ilustrativo
           </p>
         </div>
-
-        <a
-          href="#lotes"
-          className="absolute bottom-4 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-1 text-[10px] font-medium uppercase tracking-[0.18em] text-white/75 sm:flex"
-        >
-          Continuar
-          <span aria-hidden className="text-base leading-none">
-            ↓
-          </span>
-        </a>
       </div>
     </section>
   );
