@@ -51,7 +51,11 @@ export async function mountTerrain(
   const controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
-  controls.maxPolarAngle = Math.PI / 2.05;
+  controls.enableRotate = true;
+  controls.mouseButtons.LEFT = THREE.MOUSE.ROTATE;
+  controls.mouseButtons.RIGHT = THREE.MOUSE.PAN;
+  controls.touches.ONE = THREE.TOUCH.ROTATE;
+  controls.touches.TWO = THREE.TOUCH.DOLLY_PAN;
   controls.minDistance = 40;
   controls.maxDistance = 4000;
 
@@ -146,6 +150,15 @@ export async function mountTerrain(
     }
     camera.lookAt(terrainTarget);
     controls.update();
+    lockHeading();
+  }
+
+  function lockHeading() {
+    const heading = controls.getAzimuthalAngle();
+    controls.minAzimuthAngle = heading;
+    controls.maxAzimuthAngle = heading;
+    controls.minPolarAngle = 0.02;
+    controls.maxPolarAngle = Math.PI / 2.15;
   }
 
   function applyHeights() {
@@ -246,27 +259,36 @@ export async function mountTerrain(
 
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
-  let moved = false;
-  const onPointerDown = () => {
-    moved = false;
+  let downX = 0;
+  let downY = 0;
+  let dragged = false;
+  const onPointerDown = (event: PointerEvent) => {
+    downX = event.clientX;
+    downY = event.clientY;
+    dragged = false;
   };
   const onPointerMove = (event: PointerEvent) => {
-    if (event.buttons) moved = true;
+    if (!event.buttons) return;
+    if (Math.hypot(event.clientX - downX, event.clientY - downY) > 6) dragged = true;
   };
-  const onClick = (event: MouseEvent) => {
-    if (moved) return;
+  const onPointerUp = (event: PointerEvent) => {
+    if (event.button !== 0) return;
+    if (dragged || Math.hypot(event.clientX - downX, event.clientY - downY) > 6) return;
     const rect = canvas.getBoundingClientRect();
     pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
     raycaster.setFromCamera(pointer, camera);
-    const hits = raycaster.intersectObjects(lotMeshes.map((item) => item.mesh));
-    const hit = hits[0]?.object;
-    const found = lotMeshes.find((item) => item.mesh === hit);
+    lotRoot.updateMatrixWorld(true);
+    const hits = raycaster.intersectObjects(
+      lotMeshes.filter((item) => item.mesh.visible).map((item) => item.mesh),
+      false,
+    );
+    const found = lotMeshes.find((item) => item.mesh === hits[0]?.object);
     if (found) onPick(found.id);
   };
   canvas.addEventListener("pointerdown", onPointerDown);
   canvas.addEventListener("pointermove", onPointerMove);
-  canvas.addEventListener("click", onClick);
+  canvas.addEventListener("pointerup", onPointerUp);
 
   let running = true;
   const resize = () => {
@@ -303,6 +325,7 @@ export async function mountTerrain(
         flight.active = false;
         controls.enabled = true;
         controls.update();
+        lockHeading();
       }
     } else {
       controls.update();
@@ -338,8 +361,10 @@ export async function mountTerrain(
       const center = new THREE.Box3().setFromObject(mesh).getCenter(new THREE.Vector3());
       flight.fromPos.copy(camera.position);
       flight.fromTarget.copy(controls.target);
+      const offset = camera.position.clone().sub(controls.target);
+      offset.setLength(Math.max(90, Math.min(offset.length() * 0.35, 220)));
       flight.toTarget.copy(center);
-      flight.toPos.set(center.x + 70, center.y + 55, center.z + 70);
+      flight.toPos.copy(center).add(offset);
       flight.start = performance.now();
       flight.active = true;
       controls.enabled = false;
@@ -349,7 +374,7 @@ export async function mountTerrain(
       observer.disconnect();
       canvas.removeEventListener("pointerdown", onPointerDown);
       canvas.removeEventListener("pointermove", onPointerMove);
-      canvas.removeEventListener("click", onClick);
+      canvas.removeEventListener("pointerup", onPointerUp);
       controls.dispose();
       geometry.dispose();
       texture.dispose();
@@ -661,7 +686,7 @@ function lotLabel(THREE: typeof import("three"), name: string, points: import("t
     .multiplyScalar(1 / Math.max(points.length, 1));
   sprite.position.copy(center);
   sprite.position.y += 0.35;
-  sprite.scale.set(14.7, 7.35, 1);
+  sprite.scale.set(29.4, 14.7, 1);
   sprite.renderOrder = 20;
   return sprite;
 }
