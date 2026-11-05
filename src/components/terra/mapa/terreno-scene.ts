@@ -51,10 +51,10 @@ export async function mountTerrain(
   const controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
-  controls.enableRotate = false;
-  controls.mouseButtons.LEFT = THREE.MOUSE.PAN;
+  controls.enableRotate = true;
+  controls.mouseButtons.LEFT = THREE.MOUSE.ROTATE;
   controls.mouseButtons.RIGHT = THREE.MOUSE.PAN;
-  controls.touches.ONE = THREE.TOUCH.PAN;
+  controls.touches.ONE = THREE.TOUCH.ROTATE;
   controls.touches.TWO = THREE.TOUCH.DOLLY_PAN;
   controls.minDistance = 40;
   controls.maxDistance = 4000;
@@ -150,6 +150,13 @@ export async function mountTerrain(
     }
     camera.lookAt(terrainTarget);
     controls.update();
+    lockVerticalAxis();
+  }
+
+  function lockVerticalAxis() {
+    const polar = controls.getPolarAngle();
+    controls.minPolarAngle = polar;
+    controls.maxPolarAngle = polar;
   }
 
   function applyHeights() {
@@ -307,6 +314,7 @@ export async function mountTerrain(
         flight.active = false;
         controls.enabled = true;
         controls.update();
+        lockVerticalAxis();
       }
     } else {
       controls.update();
@@ -342,8 +350,10 @@ export async function mountTerrain(
       const center = new THREE.Box3().setFromObject(mesh).getCenter(new THREE.Vector3());
       flight.fromPos.copy(camera.position);
       flight.fromTarget.copy(controls.target);
+      const offset = camera.position.clone().sub(controls.target);
+      offset.setLength(Math.max(90, Math.min(offset.length() * 0.35, 220)));
       flight.toTarget.copy(center);
-      flight.toPos.set(center.x, center.y + 90, center.z + 6);
+      flight.toPos.copy(center).add(offset);
       flight.start = performance.now();
       flight.active = true;
       controls.enabled = false;
