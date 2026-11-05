@@ -259,27 +259,36 @@ export async function mountTerrain(
 
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
-  let moved = false;
-  const onPointerDown = () => {
-    moved = false;
+  let downX = 0;
+  let downY = 0;
+  let dragged = false;
+  const onPointerDown = (event: PointerEvent) => {
+    downX = event.clientX;
+    downY = event.clientY;
+    dragged = false;
   };
   const onPointerMove = (event: PointerEvent) => {
-    if (event.buttons) moved = true;
+    if (!event.buttons) return;
+    if (Math.hypot(event.clientX - downX, event.clientY - downY) > 6) dragged = true;
   };
-  const onClick = (event: MouseEvent) => {
-    if (moved) return;
+  const onPointerUp = (event: PointerEvent) => {
+    if (event.button !== 0) return;
+    if (dragged || Math.hypot(event.clientX - downX, event.clientY - downY) > 6) return;
     const rect = canvas.getBoundingClientRect();
     pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
     raycaster.setFromCamera(pointer, camera);
-    const hits = raycaster.intersectObjects(lotMeshes.map((item) => item.mesh));
-    const hit = hits[0]?.object;
-    const found = lotMeshes.find((item) => item.mesh === hit);
+    lotRoot.updateMatrixWorld(true);
+    const hits = raycaster.intersectObjects(
+      lotMeshes.filter((item) => item.mesh.visible).map((item) => item.mesh),
+      false,
+    );
+    const found = lotMeshes.find((item) => item.mesh === hits[0]?.object);
     if (found) onPick(found.id);
   };
   canvas.addEventListener("pointerdown", onPointerDown);
   canvas.addEventListener("pointermove", onPointerMove);
-  canvas.addEventListener("click", onClick);
+  canvas.addEventListener("pointerup", onPointerUp);
 
   let running = true;
   const resize = () => {
@@ -365,7 +374,7 @@ export async function mountTerrain(
       observer.disconnect();
       canvas.removeEventListener("pointerdown", onPointerDown);
       canvas.removeEventListener("pointermove", onPointerMove);
-      canvas.removeEventListener("click", onClick);
+      canvas.removeEventListener("pointerup", onPointerUp);
       controls.dispose();
       geometry.dispose();
       texture.dispose();
