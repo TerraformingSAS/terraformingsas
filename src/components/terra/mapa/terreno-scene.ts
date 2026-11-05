@@ -51,7 +51,11 @@ export async function mountTerrain(
   const controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
-  controls.maxPolarAngle = Math.PI / 2.05;
+  controls.enableRotate = false;
+  controls.mouseButtons.LEFT = THREE.MOUSE.PAN;
+  controls.mouseButtons.RIGHT = THREE.MOUSE.PAN;
+  controls.touches.ONE = THREE.TOUCH.PAN;
+  controls.touches.TWO = THREE.TOUCH.DOLLY_PAN;
   controls.minDistance = 40;
   controls.maxDistance = 4000;
 
@@ -339,7 +343,7 @@ export async function mountTerrain(
       flight.fromPos.copy(camera.position);
       flight.fromTarget.copy(controls.target);
       flight.toTarget.copy(center);
-      flight.toPos.set(center.x + 70, center.y + 55, center.z + 70);
+      flight.toPos.set(center.x, center.y + 90, center.z + 6);
       flight.start = performance.now();
       flight.active = true;
       controls.enabled = false;
@@ -661,7 +665,7 @@ function lotLabel(THREE: typeof import("three"), name: string, points: import("t
     .multiplyScalar(1 / Math.max(points.length, 1));
   sprite.position.copy(center);
   sprite.position.y += 0.35;
-  sprite.scale.set(14.7, 7.35, 1);
+  sprite.scale.set(29.4, 14.7, 1);
   sprite.renderOrder = 20;
   return sprite;
 }
