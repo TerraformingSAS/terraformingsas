@@ -150,13 +150,15 @@ export async function mountTerrain(
     }
     camera.lookAt(terrainTarget);
     controls.update();
-    lockVerticalAxis();
+    lockHeading();
   }
 
-  function lockVerticalAxis() {
-    const polar = controls.getPolarAngle();
-    controls.minPolarAngle = polar;
-    controls.maxPolarAngle = polar;
+  function lockHeading() {
+    const heading = controls.getAzimuthalAngle();
+    controls.minAzimuthAngle = heading;
+    controls.maxAzimuthAngle = heading;
+    controls.minPolarAngle = 0.02;
+    controls.maxPolarAngle = Math.PI / 2.15;
   }
 
   function applyHeights() {
@@ -314,7 +316,7 @@ export async function mountTerrain(
         flight.active = false;
         controls.enabled = true;
         controls.update();
-        lockVerticalAxis();
+        lockHeading();
       }
     } else {
       controls.update();
