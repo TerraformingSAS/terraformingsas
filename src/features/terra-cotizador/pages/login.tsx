@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { marcarActividad } from "@/features/terra-cotizador/lib/actividad";
+import { ADMIN_INICIO_KEY } from "@/features/terra-cotizador/components/cotizador-app";
 import { ArrowLeft, Info, Loader2, Mail, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,6 +34,10 @@ export function LoginPage() {
   const [error, setError] = useState("");
   const [espera, setEspera] = useState(0);
   const refs = useRef<(HTMLInputElement | null)[]>([]);
+
+  useEffect(() => {
+    sessionStorage.removeItem(ADMIN_INICIO_KEY);
+  }, []);
 
   useEffect(() => {
     if (espera <= 0) return;

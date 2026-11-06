@@ -154,6 +154,12 @@ export function CotizadorShell({ children }: { children: ReactNode }) {
               aria-label="Administración cotizador"
               className="hidden min-w-0 items-center gap-1 sm:flex"
             >
+              <AdminNavLink
+                to="/terra/cotizador/estadisticas"
+                active={pathname.startsWith("/terra/cotizador/estadisticas")}
+              >
+                Estadísticas
+              </AdminNavLink>
               <AdminNavLink to="/terra/cotizador" active={pathname === "/terra/cotizador"}>
                 Cotizador
               </AdminNavLink>
@@ -162,12 +168,6 @@ export function CotizadorShell({ children }: { children: ReactNode }) {
                 active={pathname.startsWith("/terra/cotizador/parametros")}
               >
                 Parámetros
-              </AdminNavLink>
-              <AdminNavLink
-                to="/terra/cotizador/estadisticas"
-                active={pathname.startsWith("/terra/cotizador/estadisticas")}
-              >
-                Estadísticas
               </AdminNavLink>
             </nav>
           ) : (
@@ -186,6 +186,13 @@ export function CotizadorShell({ children }: { children: ReactNode }) {
             )}
             {admin && (
               <div className="flex items-center gap-0.5 sm:hidden">
+                <AdminNavLink
+                  to="/terra/cotizador/estadisticas"
+                  active={pathname.startsWith("/terra/cotizador/estadisticas")}
+                  compact
+                >
+                  Stats
+                </AdminNavLink>
                 <AdminNavLink to="/terra/cotizador" active={pathname === "/terra/cotizador"} compact>
                   Cotiz.
                 </AdminNavLink>
@@ -195,13 +202,6 @@ export function CotizadorShell({ children }: { children: ReactNode }) {
                   compact
                 >
                   Params
-                </AdminNavLink>
-                <AdminNavLink
-                  to="/terra/cotizador/estadisticas"
-                  active={pathname.startsWith("/terra/cotizador/estadisticas")}
-                  compact
-                >
-                  Stats
                 </AdminNavLink>
               </div>
             )}
