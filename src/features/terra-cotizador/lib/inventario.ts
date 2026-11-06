@@ -67,6 +67,57 @@ export function inventarioPorManzana(lotes: Lote[]): FilaManzana[] {
   return [...map.values()].sort((a, b) => a.manzana.localeCompare(b.manzana, "es"));
 }
 
+function sumaCampo(lotes: Lote[], campo: "area" | "valorPreventa"): Record<Estado, number> {
+  const c: Record<Estado, number> = {
+    disponible: 0,
+    reservado: 0,
+    negociacion: 0,
+    vendido: 0,
+    no_disponible: 0,
+  };
+  for (const l of lotes) {
+    const n = l[campo];
+    if (Number.isFinite(n)) c[l.estado] += n;
+  }
+  return c;
+}
+
+export function valorPreventaPorEstado(lotes: Lote[]): Record<Estado, number> {
+  return sumaCampo(lotes, "valorPreventa");
+}
+
+export function areaPorManzana(lotes: Lote[]): FilaManzana[] {
+  const map = new Map<string, FilaManzana>();
+  for (const l of lotes) {
+    const key = l.manzana || "—";
+    let fila = map.get(key);
+    if (!fila) {
+      fila = {
+        manzana: key,
+        disponible: 0,
+        reservado: 0,
+        negociacion: 0,
+        vendido: 0,
+        no_disponible: 0,
+      };
+      map.set(key, fila);
+    }
+    if (Number.isFinite(l.area)) fila[l.estado] += l.area;
+  }
+  return [...map.values()].sort((a, b) => a.manzana.localeCompare(b.manzana, "es"));
+}
+
+/** Pasos del cierre. «No disponible» no es etapa comercial. */
+export const PASOS_EMBUDO: Estado[] = ["disponible", "reservado", "negociacion", "vendido"];
+
+export function avanceComercial(lotes: Lote[]): {
+  pasos: Record<Estado, number>;
+  noDisponible: number;
+} {
+  const conteo = contarEstados(lotes);
+  return { pasos: conteo, noDisponible: conteo.no_disponible };
+}
+
 export function manzanasDe(lotes: Lote[]): string[] {
   return [...new Set(lotes.map((l) => l.manzana).filter(Boolean))].sort((a, b) =>
     a.localeCompare(b, "es"),

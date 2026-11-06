@@ -22,13 +22,24 @@ import { LoadingState } from "@/features/terra-cotizador/components/states";
 import {
   ESTADOS_REPORTE,
   FILTRO_INVENTARIO_VACIO,
+  PASOS_EMBUDO,
+  areaPorManzana,
   areaRegistrada,
+  avanceComercial,
   contarEstados,
   filtrarLotes,
   inventarioPorManzana,
   manzanasDe,
+  valorPreventaPorEstado,
   type FiltroInventario,
 } from "@/features/terra-cotizador/lib/inventario";
+
+function compactCop(n: number): string {
+  if (!Number.isFinite(n)) return "—";
+  if (Math.abs(n) >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(1)} mil M`;
+  if (Math.abs(n) >= 1_000_000) return `${Math.round(n / 1_000_000)} M`;
+  return fmtCOP(n);
+}
 
 const areaFmt = new Intl.NumberFormat("es-CO", {
   minimumFractionDigits: 2,
@@ -58,6 +69,27 @@ export function AdminEstadisticasPage() {
   const conteo = useMemo(() => contarEstados(filtrados), [filtrados]);
   const area = useMemo(() => areaRegistrada(filtrados), [filtrados]);
   const porManzana = useMemo(() => inventarioPorManzana(filtrados), [filtrados]);
+  const valorEstado = useMemo(() => valorPreventaPorEstado(filtrados), [filtrados]);
+  const areaManzana = useMemo(() => areaPorManzana(filtrados), [filtrados]);
+  const avance = useMemo(() => avanceComercial(filtrados), [filtrados]);
+  const barrasValor = useMemo(
+    () =>
+      ESTADOS_REPORTE.map((e) => ({
+        name: e.label,
+        key: e.key,
+        valor: valorEstado[e.key],
+        color: e.color,
+      })).filter((d) => d.valor > 0),
+    [valorEstado],
+  );
+  const embudo = useMemo(
+    () =>
+      PASOS_EMBUDO.map((key) => {
+        const meta = ESTADOS_REPORTE.find((e) => e.key === key)!;
+        return { name: meta.label, key, lotes: avance.pasos[key], color: meta.color };
+      }),
+    [avance],
+  );
   const dona = useMemo(
     () =>
       ESTADOS_REPORTE.map((e) => ({
@@ -89,10 +121,6 @@ export function AdminEstadisticasPage() {
             <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
               Control comercial de lotes
             </h1>
-            <p className="mt-2 max-w-xl text-sm text-white/85">
-              Dashboard de inventario conectado al Excel. Vuelve a consultar el archivo al abrirlo;
-              también puedes actualizar los datos desde aquí.
-            </p>
           </div>
           <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide">
             <span className="size-2 rounded-full bg-[#7dffa8]" aria-hidden="true" />
@@ -279,6 +307,115 @@ export function AdminEstadisticasPage() {
                 )}
               </article>
             </div>
+
+            <div className="grid gap-3 lg:grid-cols-2">
+              <article className="rounded-xl border border-border bg-card p-4">
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <h3 className="text-sm font-semibold">Valor de preventa por estado</h3>
+                  <span className="text-[11px] text-muted-foreground">Según filtros</span>
+                </div>
+                {barrasValor.length === 0 ? (
+                  <p className="py-16 text-center text-sm text-muted-foreground">
+                    Ningún lote coincide con los filtros.
+                  </p>
+                ) : (
+                  <div className="h-72">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={barrasValor}
+                        layout="vertical"
+                        margin={{ top: 8, right: 12, left: 8, bottom: 0 }}
+                      >
+                        <XAxis
+                          type="number"
+                          tick={{ fontSize: 11 }}
+                          tickFormatter={(n: number) => compactCop(n)}
+                        />
+                        <YAxis type="category" dataKey="name" width={108} tick={{ fontSize: 11 }} />
+                        <Tooltip formatter={(value) => [fmtCOP(Number(value ?? 0)), "Preventa"]} />
+                        <Bar dataKey="valor" name="Preventa" barSize={16} radius={[0, 4, 4, 0]}>
+                          {barrasValor.map((d) => (
+                            <Cell key={d.key} fill={d.color} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+              </article>
+
+              <article className="rounded-xl border border-border bg-card p-4">
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <h3 className="text-sm font-semibold">Área por manzana</h3>
+                  <span className="text-[11px] text-muted-foreground">m² por estado</span>
+                </div>
+                {areaManzana.length === 0 ? (
+                  <p className="py-16 text-center text-sm text-muted-foreground">
+                    Ningún lote coincide con los filtros.
+                  </p>
+                ) : (
+                  <div className="h-72">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={areaManzana}
+                        layout="vertical"
+                        margin={{ top: 8, right: 12, left: 0, bottom: 0 }}
+                      >
+                        <XAxis
+                          type="number"
+                          tick={{ fontSize: 11 }}
+                          tickFormatter={(n: number) => areaFmt.format(n)}
+                        />
+                        <YAxis
+                          type="category"
+                          dataKey="manzana"
+                          width={28}
+                          tick={{ fontSize: 12 }}
+                        />
+                        <Tooltip
+                          formatter={(value, name) => [areaFmt.format(Number(value ?? 0)), name]}
+                        />
+                        <Legend iconType="square" iconSize={10} wrapperStyle={{ fontSize: 12 }} />
+                        {ESTADOS_REPORTE.map((e) => (
+                          <Bar
+                            key={e.key}
+                            dataKey={e.key}
+                            name={e.label}
+                            stackId="area"
+                            fill={e.color}
+                            barSize={16}
+                          />
+                        ))}
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+              </article>
+            </div>
+
+            <article className="rounded-xl border border-border bg-card p-4">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <h3 className="text-sm font-semibold">Avance comercial</h3>
+                <span className="text-[11px] text-muted-foreground">
+                  {avance.noDisponible} no disponible{avance.noDisponible === 1 ? "" : "s"} fuera
+                  del cierre
+                </span>
+              </div>
+              <div className="h-56">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={embudo} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
+                    <XAxis dataKey="name" tick={{ fontSize: 11 }} interval={0} />
+                    <YAxis allowDecimals={false} tick={{ fontSize: 11 }} width={32} />
+                    <Tooltip formatter={(value) => [`${value ?? 0} lotes`, ""]} />
+                    <Bar dataKey="lotes" name="Lotes" barSize={36} radius={[4, 4, 0, 0]}>
+                      {embudo.map((d) => (
+                        <Cell key={d.key} fill={d.color} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </article>
           </>
         )}
       </section>
