@@ -16,7 +16,7 @@ export function LotPreview() {
           <TerraPrimaryLink href={TERRA_PROJECT.explorerPath}>Ver plano</TerraPrimaryLink>
         </div>
         <div className="mt-8 grid items-stretch gap-6 lg:grid-cols-2">
-          <ul className="flex flex-col gap-3 lg:h-full">
+          <ul className="order-2 flex flex-col gap-3 lg:order-1 lg:h-full">
             {TERRA_LOT_TYPES.map((type) => (
               <li
                 key={type.area}
@@ -34,7 +34,7 @@ export function LotPreview() {
               </li>
             ))}
           </ul>
-          <div id="contacto" className="scroll-mt-28 lg:sticky lg:top-24">
+          <div id="contacto" className="order-1 scroll-mt-28 lg:order-2 lg:sticky lg:top-24">
             <TerraLeadForm compact />
           </div>
         </div>
