@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Web3FormsCaptcha } from "./Web3FormsCaptcha";
 import { sendWeb3Forms } from "@/lib/web3forms";
+import { trackTerraEvent } from "@/lib/terra/analytics";
 import { Reveal } from "./Reveal";
 import { SectionHeader } from "./SectionHeader";
 
@@ -79,6 +80,11 @@ export function Contact() {
       await sendWeb3Forms(formData, captchaToken);
       setStatus("success");
       setResult("Formulario enviado correctamente");
+      trackTerraEvent(
+        "generate_lead",
+        { page: "/", method: "contact_form", content_category: form.type || "proyecto" },
+        { onceKey: `contact-${Date.now()}` },
+      );
       setForm(initial);
       setErrors({});
     } catch (error) {
@@ -109,12 +115,28 @@ export function Contact() {
             />
             <InfoRow
               label="Correo"
-              value={<a href="mailto:gerencia@terraformings.co" className="hover:text-brand-orange">gerencia@terraformings.co</a>}
+              value={
+                <a
+                  href="mailto:gerencia@terraformings.co"
+                  className="hover:text-brand-orange"
+                  onClick={() => trackTerraEvent("contact_click", { channel: "email", location: "contacto" })}
+                >
+                  gerencia@terraformings.co
+                </a>
+              }
               icon={<path d="M4 6h16v12H4z M4 6l8 7 8-7" />}
             />
             <InfoRow
               label="Teléfono"
-              value={<a href="tel:+573214230090" className="hover:text-brand-orange">321 423 0090</a>}
+              value={
+                <a
+                  href="tel:+573214230090"
+                  className="hover:text-brand-orange"
+                  onClick={() => trackTerraEvent("contact_click", { channel: "phone", location: "contacto" })}
+                >
+                  321 423 0090
+                </a>
+              }
               icon={<path d="M5 4h4l2 5-3 2a12 12 0 006 6l2-3 5 2v4a2 2 0 01-2 2A17 17 0 013 6a2 2 0 012-2z" />}
             />
           </div>

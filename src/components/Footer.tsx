@@ -1,4 +1,5 @@
 import logo from "@/assets/logo_blanco.png";
+import { trackTerraEvent } from "@/lib/terra/analytics";
 import { Link } from "@tanstack/react-router";
 
 export function Footer() {
@@ -51,13 +52,13 @@ export function Footer() {
               </address>
             </li>
             <li>
-              <a href="mailto:gerencia@terraformings.co" className="hover:text-white transition-colors break-all">gerencia@terraformings.co</a>
+              <a href="mailto:gerencia@terraformings.co" className="hover:text-white transition-colors break-all" onClick={() => trackTerraEvent("contact_click", { channel: "email", location: "footer" })}>gerencia@terraformings.co</a>
             </li>
             <li>
-              <a href="mailto:mercadeo@terraformings.co" className="hover:text-white transition-colors break-all">mercadeo@terraformings.co</a>
+              <a href="mailto:mercadeo@terraformings.co" className="hover:text-white transition-colors break-all" onClick={() => trackTerraEvent("contact_click", { channel: "email", location: "footer" })}>mercadeo@terraformings.co</a>
             </li>
             <li>
-              <a href="tel:+573214230090" className="hover:text-white">321 423 0090</a>
+              <a href="tel:+573214230090" className="hover:text-white" onClick={() => trackTerraEvent("contact_click", { channel: "phone", location: "footer" })}>321 423 0090</a>
             </li>
           </ul>
         </div>

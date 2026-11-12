@@ -90,6 +90,15 @@ export function HomePage() {
   const lote = lotes.find((l) => l.id === seleccion) ?? null;
 
   useEffect(() => {
+    const query = busqueda.trim();
+    if (query.length < 2) return;
+    const timer = window.setTimeout(() => {
+      trackTerraEvent("search", { search_string: query, location: "cotizador" });
+    }, 600);
+    return () => window.clearTimeout(timer);
+  }, [busqueda]);
+
+  useEffect(() => {
     if (!lotes.length || seleccion) return;
     const params = new URLSearchParams(window.location.search);
     const raw = params.get("lote") || readSelectedLot(window.sessionStorage);
@@ -168,7 +177,11 @@ export function HomePage() {
       codigo,
       fecha,
     });
-    trackTerraEvent("view_quote", { lot_id: lote.idLote, location: "cotizador" });
+    trackTerraEvent("view_quote", {
+      lot_id: lote.idLote,
+      location: "cotizador",
+      value: lote.valorPreventa,
+    });
     void registrarCotizacionGenerada({
       codigo,
       loteId: lote.id,

@@ -3,6 +3,7 @@ import { joinLots, type GeomLot } from "@/lib/terra/mapa/join";
 import { terraWhatsAppUrl } from "@/lib/terra/contact";
 import { fetchPublicLots, isAvailableLot } from "@/lib/terra/lots";
 import { TerraHeader } from "@/components/terra/TerraHeader";
+import { trackTerraEvent } from "@/lib/terra/analytics";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { TerrainHandle, TerrainPayload } from "./terreno-scene";
 
@@ -162,6 +163,22 @@ export function TerraMapa() {
   const canQuote = selected ? isAvailableLot(selected.estado ?? "") : false;
   const medidas = selected?.medidas;
 
+  useEffect(() => {
+    if (!selected) return;
+    trackTerraEvent("select_lot", {
+      lot_id: selected.id,
+      manzana: selected.manzana,
+      status: selected.estado ?? "",
+      location: "mapa",
+    });
+  }, [selected]);
+
+  useEffect(() => {
+    const parts = [manzana ? `manzana ${manzana}` : "", estado].filter(Boolean);
+    if (!parts.length) return;
+    trackTerraEvent("search", { search_string: parts.join(" "), location: "mapa" });
+  }, [manzana, estado]);
+
   return (
     <div className="min-h-screen bg-[#e7eef2] text-[#0e2a47]">
       <TerraHeader solid />
@@ -287,6 +304,10 @@ export function TerraMapa() {
                 <a
                   className="mapa-quote-whatsapp"
                   href={canQuote ? terraWhatsAppUrl(selected.id) : undefined}
+                  onClick={() => {
+                    if (!canQuote || !selected) return;
+                    trackTerraEvent("whatsapp_click", { location: "mapa", lot_id: selected.id });
+                  }}
                   aria-disabled={canQuote ? undefined : true}
                   tabIndex={canQuote ? 0 : -1}
                   target="_blank"

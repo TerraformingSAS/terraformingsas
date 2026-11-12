@@ -4,6 +4,7 @@ import {
   TERRA_TIMELINE,
   TERRA_TIMELINE_HORIZON_MONTHS,
 } from "@/lib/terra/commercial";
+import { trackTerraEvent } from "@/lib/terra/analytics";
 
 export function ProjectTrust() {
   return (
@@ -21,11 +22,19 @@ export function ProjectTrust() {
             La escrituración individual está prevista cuando existan las autorizaciones aplicables.
           </p>
           <p className="mt-4 text-sm text-brand-navy">
-            <a className="hover:text-brand-orange" href={`mailto:${TERRA_PROJECT.emailMercadeo}`}>
+            <a
+              className="hover:text-brand-orange"
+              href={`mailto:${TERRA_PROJECT.emailMercadeo}`}
+              onClick={() => trackTerraEvent("contact_click", { channel: "email", location: "terra" })}
+            >
               {TERRA_PROJECT.emailMercadeo}
             </a>
             <span className="mx-2 text-brand-dark/40">·</span>
-            <a className="hover:text-brand-orange" href={`tel:+${TERRA_PROJECT.phoneE164}`}>
+            <a
+              className="hover:text-brand-orange"
+              href={`tel:+${TERRA_PROJECT.phoneE164}`}
+              onClick={() => trackTerraEvent("contact_click", { channel: "phone", location: "terra" })}
+            >
               {TERRA_PROJECT.phoneDisplay}
             </a>
           </p>
