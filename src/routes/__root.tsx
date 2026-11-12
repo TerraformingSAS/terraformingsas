@@ -15,7 +15,7 @@ import appCss from "../styles.css?url";
 
 const GA_MEASUREMENT_ID = "G-T419MSNEWJ";
 const CLARITY_PROJECT_ID = "yvum2tlvam";
-const META_PIXEL_ID = "2986286885067417";
+const META_PIXEL_IDS = ["2986286885067417", "2278679232865207"] as const;
 
 function NotFoundComponent() {
   return (
@@ -157,7 +157,7 @@ n.queue=[];t=b.createElement(e);t.async=!0;
 t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window, document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '${META_PIXEL_ID}');
+${META_PIXEL_IDS.map((id) => `fbq('init', '${id}');`).join("\n")}
 fbq('track', 'PageView');`,
       },
     ],
@@ -173,15 +173,17 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="es">
       <head>
         <HeadContent />
-        <noscript>
-          <img
-            height="1"
-            width="1"
-            style={{ display: "none" }}
-            alt=""
-            src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`}
-          />
-        </noscript>
+        {META_PIXEL_IDS.map((id) => (
+          <noscript key={id}>
+            <img
+              height="1"
+              width="1"
+              style={{ display: "none" }}
+              alt=""
+              src={`https://www.facebook.com/tr?id=${id}&ev=PageView&noscript=1`}
+            />
+          </noscript>
+        ))}
       </head>
       <body>
         {children}
