@@ -56,9 +56,13 @@ try {
   await assertStatus("/api/terra-estado", 405, { method: "POST" });
   const viewerHtmlResponse = await assertStatus("/terra/estado/index.html", 200);
   const viewerHtml = await viewerHtmlResponse.text();
-  if (!viewerHtml.includes('https://www.clarity.ms/tag/') ||
-      !viewerHtml.includes('yvum2tlvam')) {
-    throw Error("La página de lotes no incluye el código de Clarity.");
+  const consentResponse = await assertStatus("/consent.js", 200);
+  const consentJs = await consentResponse.text();
+  if (!viewerHtml.includes('src="/consent.js"') ||
+      !viewerHtml.includes('id="cookie-notice"') ||
+      !consentJs.includes("https://www.clarity.ms/tag/") ||
+      !consentJs.includes("yvum2tlvam")) {
+    throw Error("La página de lotes debe pedir autorización antes de cargar Clarity.");
   }
   await assertStatus("/terra/estado/estilos.css", 200);
   await assertStatus("/terra/estado/app.js", 200);
