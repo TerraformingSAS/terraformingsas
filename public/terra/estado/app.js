@@ -148,7 +148,7 @@ function trackLotInteraction(lot){
   window.clarity('set','terra_manzana',lot.manzana);
   window.clarity('set','terra_lote',lot.id);
  }
- trackAnalytics('select_lot',{lot_id:lot.id,manzana:lot.manzana,status:lot.estado,location:'visor'});
+ if(typeof trackAnalytics==='function')trackAnalytics('select_lot',{lot_id:lot.id,manzana:lot.manzana,status:lot.estado,location:'visor'});
 }
 function draw(data){
  if(!Array.isArray(data.lotes)||data.lotes.length!==104)throw Error('Datos inválidos');

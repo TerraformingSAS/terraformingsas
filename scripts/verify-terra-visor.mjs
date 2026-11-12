@@ -7,10 +7,10 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const folder = join(root, "public", "terra", "estado");
 const files = {
-  "index.html": "cd032a8a3d33b7ccc4680cf2085fa9f1c6d0b8e18a1faf111b4ac5ee821beca7",
-  "estilos.css": "55d6112bde9e2fc255a217e22146eb1765b893746b7310551e51a0176fd378a0",
+  "index.html": "2edfcf6ee628243b914d48cc92257e5637d490fd202274a96f6a2403ae5926b9",
+  "estilos.css": "e5d355fa10bdd4086c545be5d50601a269b9fc820eaf559d8d3d3c00a51a346a",
   "header.js": "633deb77c2e2356dc4942eb4c023574fd843becc4c91c9ad4f5c9c832e646001",
-  "app.js": "6237699bef4fc7e77d7026d33ee8cc36d164fe95e11b34eba3fc4711a25c8501",
+  "app.js": "e4f33e37836958814304d4a85f9c97842e068247004704ea4b0e7cd409845bf2",
   "logo-terraforming.png": "6ec6eab54659f8d5c89291f7ed2d0c15842adedb69047e9435a3012f9dc681d5",
   "ubicacion-etapa-i.webp": "bfefef7ed5d4910b9c0b2bcccb98fb852b4302c1cf35e84b33fa83fe82923fa5"
 };
@@ -115,11 +115,11 @@ for (const required of [
   }
 }
 const terraPage = await readFile(join(root, "src", "routes", "terra.tsx"), "utf8");
-const terraLocation = await readFile(join(root, "src", "components", "terra", "LocationSection.tsx"), "utf8");
+const lotPreview = await readFile(join(root, "src", "components", "terra", "LotPreview.tsx"), "utf8");
 if (!terraPage.includes("TerraHero") ||
     !terraPage.includes("LotPreview") ||
     !terraPage.includes("LocationSection") ||
-    !terraLocation.includes("TerraLeadForm") ||
+    !lotPreview.includes("TerraLeadForm") ||
     terraPage.includes("Alta valorización")) {
   throw new Error("La landing /terra debe usar la experiencia inmobiliaria de TERRA, sin promesas de valorización.");
 }
