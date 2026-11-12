@@ -10,13 +10,10 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, useRef, type ReactNode } from "react";
 
+import { CookieNotice } from "@/components/CookieNotice";
 import { trackMetaPageContent } from "@/lib/terra/analytics";
 import { absoluteUrl } from "@/lib/seo";
 import appCss from "../styles.css?url";
-
-const GA_MEASUREMENT_ID = "G-T419MSNEWJ";
-const CLARITY_PROJECT_ID = "yvum2tlvam";
-const META_PIXEL_IDS = ["2986286885067417", "2278679232865207"] as const;
 
 function NotFoundComponent() {
   return (
@@ -104,16 +101,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     scripts: [
       {
-        src: `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`,
-        async: true,
-      },
-      {
-        children: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_MEASUREMENT_ID}');`,
-      },
-      {
-        children: `(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","${CLARITY_PROJECT_ID}");`,
-      },
-      {
         type: "application/ld+json",
         children: JSON.stringify({
           "@context": "https://schema.org",
@@ -149,19 +136,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           ],
         }),
       },
-      {
-        children: `!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq.disablePushState=true;
-${META_PIXEL_IDS.map((id) => `fbq('init', '${id}');`).join("\n")}
-fbq('track', 'PageView');`,
-      },
     ],
   }),
   shellComponent: RootShell,
@@ -175,17 +149,7 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="es">
       <head>
         <HeadContent />
-        {META_PIXEL_IDS.map((id) => (
-          <noscript key={id}>
-            <img
-              height="1"
-              width="1"
-              style={{ display: "none" }}
-              alt=""
-              src={`https://www.facebook.com/tr?id=${id}&ev=PageView&noscript=1`}
-            />
-          </noscript>
-        ))}
+        <script src="/consent.js" />
       </head>
       <body>
         {children}
@@ -214,6 +178,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <MetaPixelPageViews />
+      <CookieNotice />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>

@@ -136,6 +136,17 @@ footer.corporate-footer{display:block;width:100%;max-width:none;margin:0;padding
 .corporate-footer a:hover{color:var(--orange)}
 .corporate-footer__bottom{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:56px;padding-top:24px;border-top:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.60);font-size:12px}
 .corporate-footer__legal{display:flex;flex-wrap:wrap;column-gap:20px;row-gap:8px}
+.corporate-footer__legal button{padding:0;border:0;background:transparent;color:inherit;font:inherit;cursor:pointer}
+.corporate-footer__legal button:hover{color:var(--orange)}
+.cookie-notice{position:fixed;z-index:120;left:16px;bottom:16px;width:min(420px,calc(100% - 32px));padding:16px;border-radius:16px;background:#fff;color:var(--ink);box-shadow:0 16px 50px rgba(14,42,71,.22)}
+.cookie-notice[hidden]{display:none}
+.cookie-notice h2{margin:0 0 8px;font-size:16px}
+.cookie-notice p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+.cookie-notice a{color:var(--ink);text-decoration:underline}
+.cookie-notice__actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+.cookie-notice__actions button{border-radius:6px;padding:8px 14px;font-weight:700;cursor:pointer}
+#cookie-reject{background:#fff;border:1px solid var(--line);color:var(--ink)}
+#cookie-accept{background:var(--orange);border:0;color:#fff}
 
 @media (min-width:1024px){
   .selection{top:16px;right:16px;left:auto;bottom:auto;transform:none;width:320px;max-height:calc(100% - 32px);overflow:auto}

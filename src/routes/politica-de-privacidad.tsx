@@ -28,7 +28,7 @@ function PrivacyPolicyPage() {
               Política de tratamiento de datos personales y privacidad
             </h1>
             <p className="mt-4 text-sm text-brand-dark/70">
-              TERRA FORMING S.A.S. · Última actualización: 3 de noviembre de 2026
+              TERRA FORMING S.A.S. · Última actualización: 12 de noviembre de 2026
             </p>
             <p className={paragraph}>
               Para TERRA FORMING S.A.S. es importante respetar la privacidad de quienes visitan
@@ -127,7 +127,9 @@ function PrivacyPolicyPage() {
               analítica, como Google Analytics y Microsoft Clarity, y el píxel de Meta,
               que pueden utilizar identificadores o tecnologías similares para comprender
               la navegación, medir visitas y la efectividad de la publicidad, y mejorar
-              el sitio. Puedes gestionar las cookies desde la configuración de tu
+              el sitio. Esas herramientas solo se cargan si autorizas las cookies de
+              medición en el aviso del sitio. Puedes cambiar de decisión desde el
+              enlace Cookies del pie de página o desde la configuración de tu
               navegador, aunque algunas funciones pueden verse afectadas.
             </p>
             <p className={paragraph}>
