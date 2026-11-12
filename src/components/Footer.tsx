@@ -70,6 +70,13 @@ export function Footer() {
           <a href="/politica-de-privacidad" className="hover:text-white">Política de privacidad</a>
           <a href="/politica-de-privacidad" className="hover:text-white">Tratamiento de datos</a>
           <a href="/terra/avisolegal" className="hover:text-white">Información importante</a>
+          <button
+            type="button"
+            className="hover:text-white"
+            onClick={() => window.dispatchEvent(new Event("terra-cookie-open"))}
+          >
+            Cookies
+          </button>
         </div>
       </div>
     </footer>

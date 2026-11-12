@@ -7,8 +7,8 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const folder = join(root, "public", "terra", "estado");
 const files = {
-  "index.html": "2edfcf6ee628243b914d48cc92257e5637d490fd202274a96f6a2403ae5926b9",
-  "estilos.css": "e5d355fa10bdd4086c545be5d50601a269b9fc820eaf559d8d3d3c00a51a346a",
+  "index.html": "3f2d69ac8a4264f6eac6a5066fb2099e906ac013315d5fac91599a4cfa062d30",
+  "estilos.css": "ef1f45eb77b491d942c5b12f9e53c32de34781408e562984a61ed3f18f0a3264",
   "header.js": "633deb77c2e2356dc4942eb4c023574fd843becc4c91c9ad4f5c9c832e646001",
   "app.js": "e4f33e37836958814304d4a85f9c97842e068247004704ea4b0e7cd409845bf2",
   "logo-terraforming.png": "6ec6eab54659f8d5c89291f7ed2d0c15842adedb69047e9435a3012f9dc681d5",
@@ -34,13 +34,16 @@ for (const name of Object.keys(files).filter(n => n !== "index.html")) {
 const js = await readFile(join(folder, "app.js"), "utf8");
 const headerJs = await readFile(join(folder, "header.js"), "utf8");
 const rootApp = await readFile(join(root, "src", "routes", "__root.tsx"), "utf8");
-const projectId = rootApp.match(/const CLARITY_PROJECT_ID = "([^"]+)"/)?.[1];
-const clarityTracking = html.match(/https:\/\/www\.clarity\.ms\/tag\//g) ?? [];
+const consentJs = await readFile(join(root, "public", "consent.js"), "utf8");
+const projectId = consentJs.match(/var CLARITY = "([^"]+)"/)?.[1];
 if (!projectId || projectId !== "yvum2tlvam" ||
-    !html.includes('(window,document,"clarity","script","' + projectId + '")') ||
-    clarityTracking.length !== 1 ||
-    html.indexOf('https://www.clarity.ms/tag/') > html.indexOf("</head>")) {
-  throw new Error("El visor debe instalar Clarity en el head usando el mismo proyecto que el sitio.");
+    !consentJs.includes('t.src = "https://www.clarity.ms/tag/" + i') ||
+    !html.includes('src="/consent.js"') ||
+    !html.includes('id="cookie-notice"') ||
+    html.includes("https://www.clarity.ms/tag/") ||
+    html.includes("fbevents.js") ||
+    !rootApp.includes('src="/consent.js"')) {
+  throw new Error("La medición solo puede cargarse desde consent.js, después de la autorización de cookies.");
 }
 if (!js.includes("window.clarity('event','terra_lote_seleccionado')") ||
     !js.includes("window.clarity('set','terra_lote',lot.id)") ||
