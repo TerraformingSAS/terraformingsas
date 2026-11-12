@@ -16,6 +16,7 @@ function highlight(lot){chosen=lot.id;document.querySelectorAll('#formas polygon
 function setBlock(value){
  block=value;
  applyFilters(false);
+ if(value)trackAnalytics('search',{search_string:'manzana '+value,location:'visor'});
 }
 function matches(lot){
  if(block&&lot.manzana!==block)return false;
@@ -73,6 +74,13 @@ function syncLotUrl(lot){
 function trackAnalytics(event,params){
  const payload=Object.assign({event_source:'terra_estado'},params||{});
  if(typeof window.gtag==='function')window.gtag('event',event,payload);
+ if(typeof window.fbq!=='function')return;
+ const ids=payload.lot_id?[String(payload.lot_id)]:undefined;
+ const category=payload.location||'visor';
+ if(event==='select_lot')window.fbq('track','ViewContent',{content_name:String(payload.lot_id||'Lote TERRA'),content_category:category,content_type:'product',content_ids:ids});
+ else if(event==='search')window.fbq('track','Search',{search_string:String(payload.search_string||''),content_category:category,content_ids:ids});
+ else if(event==='whatsapp_click')window.fbq('track','Contact',{content_name:'WhatsApp',content_category:category});
+ window.fbq('trackCustom',event,payload);
 }
 $('#mas').addEventListener('click',()=>zoom(.8));
 $('#menos').addEventListener('click',()=>zoom(1.25));
@@ -82,13 +90,13 @@ document.querySelectorAll('[data-block]').forEach(b=>b.addEventListener('click',
 $('#buscar').addEventListener('input',e=>{
  const query=e.target.value.trim().toUpperCase().replace(/\s/g,'');
  const found=lots.find(p=>p.id===query||p.id===query.replace(/^([A-F])-?(\d)$/,'$1-0$2'));
- if(found){block=found.manzana;estado='';areaKey='';const st=$('#filtro-estado'),ar=$('#filtro-area');if(st)st.value='';if(ar)ar.value='';applyFilters(true);highlight(found);syncLotUrl(found);}
+ if(found){block=found.manzana;estado='';areaKey='';const st=$('#filtro-estado'),ar=$('#filtro-area');if(st)st.value='';if(ar)ar.value='';applyFilters(true);highlight(found);syncLotUrl(found);trackAnalytics('search',{search_string:found.id,lot_id:found.id,location:'visor'});trackLotInteraction(found);}
  else if(!query)setBlock('');
 });
 const estadoSel=$('#filtro-estado');
-if(estadoSel)estadoSel.addEventListener('change',e=>{estado=e.target.value;applyFilters(false);});
+if(estadoSel)estadoSel.addEventListener('change',e=>{estado=e.target.value;applyFilters(false);if(estado)trackAnalytics('search',{search_string:estado,location:'visor'});});
 const areaSel=$('#filtro-area');
-if(areaSel)areaSel.addEventListener('change',e=>{areaKey=e.target.value;applyFilters(false);});
+if(areaSel)areaSel.addEventListener('change',e=>{areaKey=e.target.value;applyFilters(false);if(areaKey)trackAnalytics('search',{search_string:areaKey+' m2',location:'visor'});});
 const clearBtn=$('#limpiar-filtros');
 if(clearBtn)clearBtn.addEventListener('click',()=>{block='';estado='';areaKey='';const st=$('#filtro-estado'),ar=$('#filtro-area'),search=$('#buscar');if(st)st.value='';if(ar)ar.value='';if(search)search.value='';applyFilters(false);});
 const quoteLink=$('#cotizar-lote');
@@ -140,7 +148,7 @@ function trackLotInteraction(lot){
   window.clarity('set','terra_manzana',lot.manzana);
   window.clarity('set','terra_lote',lot.id);
  }
- if(typeof window.gtag==='function')window.gtag('event','select_lot',{lot_id:lot.id,manzana:lot.manzana,item_status:lot.estado});
+ if(typeof trackAnalytics==='function')trackAnalytics('select_lot',{lot_id:lot.id,manzana:lot.manzana,status:lot.estado,location:'visor'});
 }
 function draw(data){
  if(!Array.isArray(data.lotes)||data.lotes.length!==104)throw Error('Datos inválidos');

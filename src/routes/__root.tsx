@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, useRef, type ReactNode } from "react";
 
+import { trackMetaPageContent } from "@/lib/terra/analytics";
 import { absoluteUrl } from "@/lib/seo";
 import appCss from "../styles.css?url";
 
@@ -157,6 +158,7 @@ n.queue=[];t=b.createElement(e);t.async=!0;
 t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window, document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
+fbq.disablePushState=true;
 ${META_PIXEL_IDS.map((id) => `fbq('init', '${id}');`).join("\n")}
 fbq('track', 'PageView');`,
       },
@@ -198,11 +200,9 @@ function MetaPixelPageViews() {
   const isFirstView = useRef(true);
 
   useEffect(() => {
-    if (isFirstView.current) {
-      isFirstView.current = false;
-      return;
-    }
-    window.fbq?.("track", "PageView");
+    if (!isFirstView.current) window.fbq?.("track", "PageView");
+    isFirstView.current = false;
+    trackMetaPageContent(pathname);
   }, [pathname]);
 
   return null;
