@@ -1,5 +1,6 @@
 (function () {
   var KEY = "terraforming.cookie-consent";
+  var ENTRY_KEY = "terraforming.entry-counted";
   var GA = "G-T419MSNEWJ";
   var CLARITY = "yvum2tlvam";
   var PIXELS = ["2986286885067417", "2278679232865207"];
@@ -34,8 +35,33 @@
     return window.location.href || window.location.pathname || "/";
   }
 
+  function entryCounted() {
+    try {
+      return sessionStorage.getItem(ENTRY_KEY) === "1";
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function markEntry() {
+    try {
+      sessionStorage.setItem(ENTRY_KEY, "1");
+    } catch (e) {}
+  }
+
+  function signalClarity() {
+    if (typeof window.clarity !== "function") return;
+    var granted = read() === "granted";
+    window.clarity("consentv2", {
+      ad_Storage: granted ? "granted" : "denied",
+      analytics_Storage: granted ? "granted" : "denied",
+    });
+  }
+
   function trackPage() {
-    if (!loaded || read() !== "granted") return;
+    if (!loaded) return;
+    var granted = read() === "granted";
+    if (!granted && entryCounted()) return;
     var url = currentUrl();
     if (url === trackedUrl) return;
     trackedUrl = url;
@@ -57,10 +83,12 @@
         content_type: "product_group",
       });
     }
+    if (!granted) markEntry();
   }
 
   function enableTracking() {
-    if (loaded || read() !== "granted") return;
+    if (loaded) return;
+    if (read() !== "granted" && entryCounted()) return;
     loaded = true;
     window.dataLayer = window.dataLayer || [];
     window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
@@ -76,7 +104,7 @@
       if (y && y.parentNode) y.parentNode.insertBefore(t, y);
       else document.head.appendChild(t);
     })(window, document, "clarity", "script", CLARITY);
-    window.clarity("consentv2", { ad_Storage: "granted", analytics_Storage: "granted" });
+    signalClarity();
     if (!window.fbq) {
       (function (f, b, e, v, n, t, s) {
         n = f.fbq = function () {
@@ -104,7 +132,11 @@
     read: read,
     grant: function () {
       write("granted");
-      enableTracking();
+      if (!loaded) enableTracking();
+      else {
+        signalClarity();
+        trackPage();
+      }
     },
     deny: function () {
       var previous = read();
@@ -112,11 +144,11 @@
         window.clarity("consent", false);
       }
       write("denied");
-      trackedUrl = "";
+      markEntry();
       if (previous === "granted") window.location.reload();
     },
     trackPage: trackPage,
   };
 
-  if (read() === "granted") enableTracking();
+  enableTracking();
 })();
