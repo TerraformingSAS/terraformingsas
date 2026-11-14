@@ -18,6 +18,7 @@ import { Route as ApiParametrosRouteImport } from './routes/api.parametros'
 import { Route as ApiTerraEstadoRouteImport } from './routes/api.terra-estado'
 import { Route as TerraAvisolegalRouteImport } from './routes/terra_.avisolegal'
 import { Route as TerraCotizadorRouteImport } from './routes/terra_.cotizador'
+import { Route as TerraCotizadorDinamicoRouteImport } from './routes/terra_.cotizador-dinamico'
 import { Route as TerraMapaRouteImport } from './routes/terra_.mapa'
 import { Route as ApiAdminAccesosRouteImport } from './routes/api.admin.accesos'
 import { Route as ApiAdminEstadisticasRouteImport } from './routes/api.admin.estadisticas'
@@ -29,6 +30,10 @@ import { Route as ApiAuthYoRouteImport } from './routes/api.auth.yo'
 import { Route as ApiCotizacionesAlertaRouteImport } from './routes/api.cotizaciones.alerta'
 import { Route as ApiCotizacionesEnviarRouteImport } from './routes/api.cotizaciones.enviar'
 import { Route as ApiCotizacionesRegistrarRouteImport } from './routes/api.cotizaciones.registrar'
+import { Route as ApiCotizadorDinamicoCotizacionesRouteImport } from './routes/api.cotizador-dinamico.cotizaciones'
+import { Route as ApiCotizadorDinamicoEnviarRouteImport } from './routes/api.cotizador-dinamico.enviar'
+import { Route as ApiCotizadorDinamicoParametrosRouteImport } from './routes/api.cotizador-dinamico.parametros'
+import { Route as TerraCotizadorDinamicoParametrosRouteImport } from './routes/terra_.cotizador-dinamico_.parametros'
 import { Route as TerraCotizadorEstadisticasRouteImport } from './routes/terra_.cotizador_.estadisticas'
 import { Route as TerraCotizadorLoginRouteImport } from './routes/terra_.cotizador_.login'
 import { Route as TerraCotizadorParametrosRouteImport } from './routes/terra_.cotizador_.parametros'
@@ -77,6 +82,11 @@ const TerraAvisolegalRoute = TerraAvisolegalRouteImport.update({
 const TerraCotizadorRoute = TerraCotizadorRouteImport.update({
   id: '/terra_/cotizador',
   path: '/terra/cotizador',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TerraCotizadorDinamicoRoute = TerraCotizadorDinamicoRouteImport.update({
+  id: '/terra_/cotizador-dinamico',
+  path: '/terra/cotizador-dinamico',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TerraMapaRoute = TerraMapaRouteImport.update({
@@ -135,6 +145,30 @@ const ApiCotizacionesRegistrarRoute =
     path: '/api/cotizaciones/registrar',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiCotizadorDinamicoCotizacionesRoute =
+  ApiCotizadorDinamicoCotizacionesRouteImport.update({
+    id: '/api/cotizador-dinamico/cotizaciones',
+    path: '/api/cotizador-dinamico/cotizaciones',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiCotizadorDinamicoEnviarRoute =
+  ApiCotizadorDinamicoEnviarRouteImport.update({
+    id: '/api/cotizador-dinamico/enviar',
+    path: '/api/cotizador-dinamico/enviar',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiCotizadorDinamicoParametrosRoute =
+  ApiCotizadorDinamicoParametrosRouteImport.update({
+    id: '/api/cotizador-dinamico/parametros',
+    path: '/api/cotizador-dinamico/parametros',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const TerraCotizadorDinamicoParametrosRoute =
+  TerraCotizadorDinamicoParametrosRouteImport.update({
+    id: '/terra_/cotizador-dinamico_/parametros',
+    path: '/terra/cotizador-dinamico/parametros',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const TerraCotizadorEstadisticasRoute =
   TerraCotizadorEstadisticasRouteImport.update({
     id: '/terra_/cotizador_/estadisticas',
@@ -168,6 +202,7 @@ export interface FileRoutesByFullPath {
   '/api/terra-estado': typeof ApiTerraEstadoRoute
   '/terra/avisolegal': typeof TerraAvisolegalRoute
   '/terra/cotizador': typeof TerraCotizadorRoute
+  '/terra/cotizador-dinamico': typeof TerraCotizadorDinamicoRoute
   '/terra/mapa': typeof TerraMapaRoute
   '/api/admin/accesos': typeof ApiAdminAccesosRoute
   '/api/admin/estadisticas': typeof ApiAdminEstadisticasRoute
@@ -179,6 +214,10 @@ export interface FileRoutesByFullPath {
   '/api/cotizaciones/alerta': typeof ApiCotizacionesAlertaRoute
   '/api/cotizaciones/enviar': typeof ApiCotizacionesEnviarRoute
   '/api/cotizaciones/registrar': typeof ApiCotizacionesRegistrarRoute
+  '/api/cotizador-dinamico/cotizaciones': typeof ApiCotizadorDinamicoCotizacionesRoute
+  '/api/cotizador-dinamico/enviar': typeof ApiCotizadorDinamicoEnviarRoute
+  '/api/cotizador-dinamico/parametros': typeof ApiCotizadorDinamicoParametrosRoute
+  '/terra/cotizador-dinamico/parametros': typeof TerraCotizadorDinamicoParametrosRoute
   '/terra/cotizador/estadisticas': typeof TerraCotizadorEstadisticasRoute
   '/terra/cotizador/login': typeof TerraCotizadorLoginRoute
   '/terra/cotizador/parametros': typeof TerraCotizadorParametrosRoute
@@ -194,6 +233,7 @@ export interface FileRoutesByTo {
   '/api/terra-estado': typeof ApiTerraEstadoRoute
   '/terra/avisolegal': typeof TerraAvisolegalRoute
   '/terra/cotizador': typeof TerraCotizadorRoute
+  '/terra/cotizador-dinamico': typeof TerraCotizadorDinamicoRoute
   '/terra/mapa': typeof TerraMapaRoute
   '/api/admin/accesos': typeof ApiAdminAccesosRoute
   '/api/admin/estadisticas': typeof ApiAdminEstadisticasRoute
@@ -205,6 +245,10 @@ export interface FileRoutesByTo {
   '/api/cotizaciones/alerta': typeof ApiCotizacionesAlertaRoute
   '/api/cotizaciones/enviar': typeof ApiCotizacionesEnviarRoute
   '/api/cotizaciones/registrar': typeof ApiCotizacionesRegistrarRoute
+  '/api/cotizador-dinamico/cotizaciones': typeof ApiCotizadorDinamicoCotizacionesRoute
+  '/api/cotizador-dinamico/enviar': typeof ApiCotizadorDinamicoEnviarRoute
+  '/api/cotizador-dinamico/parametros': typeof ApiCotizadorDinamicoParametrosRoute
+  '/terra/cotizador-dinamico/parametros': typeof TerraCotizadorDinamicoParametrosRoute
   '/terra/cotizador/estadisticas': typeof TerraCotizadorEstadisticasRoute
   '/terra/cotizador/login': typeof TerraCotizadorLoginRoute
   '/terra/cotizador/parametros': typeof TerraCotizadorParametrosRoute
@@ -221,6 +265,7 @@ export interface FileRoutesById {
   '/api/terra-estado': typeof ApiTerraEstadoRoute
   '/terra_/avisolegal': typeof TerraAvisolegalRoute
   '/terra_/cotizador': typeof TerraCotizadorRoute
+  '/terra_/cotizador-dinamico': typeof TerraCotizadorDinamicoRoute
   '/terra_/mapa': typeof TerraMapaRoute
   '/api/admin/accesos': typeof ApiAdminAccesosRoute
   '/api/admin/estadisticas': typeof ApiAdminEstadisticasRoute
@@ -232,6 +277,10 @@ export interface FileRoutesById {
   '/api/cotizaciones/alerta': typeof ApiCotizacionesAlertaRoute
   '/api/cotizaciones/enviar': typeof ApiCotizacionesEnviarRoute
   '/api/cotizaciones/registrar': typeof ApiCotizacionesRegistrarRoute
+  '/api/cotizador-dinamico/cotizaciones': typeof ApiCotizadorDinamicoCotizacionesRoute
+  '/api/cotizador-dinamico/enviar': typeof ApiCotizadorDinamicoEnviarRoute
+  '/api/cotizador-dinamico/parametros': typeof ApiCotizadorDinamicoParametrosRoute
+  '/terra_/cotizador-dinamico_/parametros': typeof TerraCotizadorDinamicoParametrosRoute
   '/terra_/cotizador_/estadisticas': typeof TerraCotizadorEstadisticasRoute
   '/terra_/cotizador_/login': typeof TerraCotizadorLoginRoute
   '/terra_/cotizador_/parametros': typeof TerraCotizadorParametrosRoute
@@ -249,6 +298,7 @@ export interface FileRouteTypes {
     | '/api/terra-estado'
     | '/terra/avisolegal'
     | '/terra/cotizador'
+    | '/terra/cotizador-dinamico'
     | '/terra/mapa'
     | '/api/admin/accesos'
     | '/api/admin/estadisticas'
@@ -260,6 +310,10 @@ export interface FileRouteTypes {
     | '/api/cotizaciones/alerta'
     | '/api/cotizaciones/enviar'
     | '/api/cotizaciones/registrar'
+    | '/api/cotizador-dinamico/cotizaciones'
+    | '/api/cotizador-dinamico/enviar'
+    | '/api/cotizador-dinamico/parametros'
+    | '/terra/cotizador-dinamico/parametros'
     | '/terra/cotizador/estadisticas'
     | '/terra/cotizador/login'
     | '/terra/cotizador/parametros'
@@ -275,6 +329,7 @@ export interface FileRouteTypes {
     | '/api/terra-estado'
     | '/terra/avisolegal'
     | '/terra/cotizador'
+    | '/terra/cotizador-dinamico'
     | '/terra/mapa'
     | '/api/admin/accesos'
     | '/api/admin/estadisticas'
@@ -286,6 +341,10 @@ export interface FileRouteTypes {
     | '/api/cotizaciones/alerta'
     | '/api/cotizaciones/enviar'
     | '/api/cotizaciones/registrar'
+    | '/api/cotizador-dinamico/cotizaciones'
+    | '/api/cotizador-dinamico/enviar'
+    | '/api/cotizador-dinamico/parametros'
+    | '/terra/cotizador-dinamico/parametros'
     | '/terra/cotizador/estadisticas'
     | '/terra/cotizador/login'
     | '/terra/cotizador/parametros'
@@ -301,6 +360,7 @@ export interface FileRouteTypes {
     | '/api/terra-estado'
     | '/terra_/avisolegal'
     | '/terra_/cotizador'
+    | '/terra_/cotizador-dinamico'
     | '/terra_/mapa'
     | '/api/admin/accesos'
     | '/api/admin/estadisticas'
@@ -312,6 +372,10 @@ export interface FileRouteTypes {
     | '/api/cotizaciones/alerta'
     | '/api/cotizaciones/enviar'
     | '/api/cotizaciones/registrar'
+    | '/api/cotizador-dinamico/cotizaciones'
+    | '/api/cotizador-dinamico/enviar'
+    | '/api/cotizador-dinamico/parametros'
+    | '/terra_/cotizador-dinamico_/parametros'
     | '/terra_/cotizador_/estadisticas'
     | '/terra_/cotizador_/login'
     | '/terra_/cotizador_/parametros'
@@ -328,6 +392,7 @@ export interface RootRouteChildren {
   ApiTerraEstadoRoute: typeof ApiTerraEstadoRoute
   TerraAvisolegalRoute: typeof TerraAvisolegalRoute
   TerraCotizadorRoute: typeof TerraCotizadorRoute
+  TerraCotizadorDinamicoRoute: typeof TerraCotizadorDinamicoRoute
   TerraMapaRoute: typeof TerraMapaRoute
   ApiAdminAccesosRoute: typeof ApiAdminAccesosRoute
   ApiAdminEstadisticasRoute: typeof ApiAdminEstadisticasRoute
@@ -339,6 +404,10 @@ export interface RootRouteChildren {
   ApiCotizacionesAlertaRoute: typeof ApiCotizacionesAlertaRoute
   ApiCotizacionesEnviarRoute: typeof ApiCotizacionesEnviarRoute
   ApiCotizacionesRegistrarRoute: typeof ApiCotizacionesRegistrarRoute
+  ApiCotizadorDinamicoCotizacionesRoute: typeof ApiCotizadorDinamicoCotizacionesRoute
+  ApiCotizadorDinamicoEnviarRoute: typeof ApiCotizadorDinamicoEnviarRoute
+  ApiCotizadorDinamicoParametrosRoute: typeof ApiCotizadorDinamicoParametrosRoute
+  TerraCotizadorDinamicoParametrosRoute: typeof TerraCotizadorDinamicoParametrosRoute
   TerraCotizadorEstadisticasRoute: typeof TerraCotizadorEstadisticasRoute
   TerraCotizadorLoginRoute: typeof TerraCotizadorLoginRoute
   TerraCotizadorParametrosRoute: typeof TerraCotizadorParametrosRoute
@@ -407,6 +476,13 @@ declare module '@tanstack/react-router' {
       path: '/terra/cotizador'
       fullPath: '/terra/cotizador'
       preLoaderRoute: typeof TerraCotizadorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terra_/cotizador-dinamico': {
+      id: '/terra_/cotizador-dinamico'
+      path: '/terra/cotizador-dinamico'
+      fullPath: '/terra/cotizador-dinamico'
+      preLoaderRoute: typeof TerraCotizadorDinamicoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terra_/mapa': {
@@ -486,6 +562,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCotizacionesRegistrarRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/cotizador-dinamico/cotizaciones': {
+      id: '/api/cotizador-dinamico/cotizaciones'
+      path: '/api/cotizador-dinamico/cotizaciones'
+      fullPath: '/api/cotizador-dinamico/cotizaciones'
+      preLoaderRoute: typeof ApiCotizadorDinamicoCotizacionesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cotizador-dinamico/enviar': {
+      id: '/api/cotizador-dinamico/enviar'
+      path: '/api/cotizador-dinamico/enviar'
+      fullPath: '/api/cotizador-dinamico/enviar'
+      preLoaderRoute: typeof ApiCotizadorDinamicoEnviarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cotizador-dinamico/parametros': {
+      id: '/api/cotizador-dinamico/parametros'
+      path: '/api/cotizador-dinamico/parametros'
+      fullPath: '/api/cotizador-dinamico/parametros'
+      preLoaderRoute: typeof ApiCotizadorDinamicoParametrosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terra_/cotizador-dinamico_/parametros': {
+      id: '/terra_/cotizador-dinamico_/parametros'
+      path: '/terra/cotizador-dinamico/parametros'
+      fullPath: '/terra/cotizador-dinamico/parametros'
+      preLoaderRoute: typeof TerraCotizadorDinamicoParametrosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terra_/cotizador_/estadisticas': {
       id: '/terra_/cotizador_/estadisticas'
       path: '/terra/cotizador/estadisticas'
@@ -538,6 +642,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiTerraEstadoRoute: ApiTerraEstadoRoute,
   TerraAvisolegalRoute: TerraAvisolegalRoute,
   TerraCotizadorRoute: TerraCotizadorRoute,
+  TerraCotizadorDinamicoRoute: TerraCotizadorDinamicoRoute,
   TerraMapaRoute: TerraMapaRoute,
   ApiAdminAccesosRoute: ApiAdminAccesosRoute,
   ApiAdminEstadisticasRoute: ApiAdminEstadisticasRoute,
@@ -549,6 +654,10 @@ const rootRouteChildren: RootRouteChildren = {
   ApiCotizacionesAlertaRoute: ApiCotizacionesAlertaRoute,
   ApiCotizacionesEnviarRoute: ApiCotizacionesEnviarRoute,
   ApiCotizacionesRegistrarRoute: ApiCotizacionesRegistrarRoute,
+  ApiCotizadorDinamicoCotizacionesRoute: ApiCotizadorDinamicoCotizacionesRoute,
+  ApiCotizadorDinamicoEnviarRoute: ApiCotizadorDinamicoEnviarRoute,
+  ApiCotizadorDinamicoParametrosRoute: ApiCotizadorDinamicoParametrosRoute,
+  TerraCotizadorDinamicoParametrosRoute: TerraCotizadorDinamicoParametrosRoute,
   TerraCotizadorEstadisticasRoute: TerraCotizadorEstadisticasRoute,
   TerraCotizadorLoginRoute: TerraCotizadorLoginRoute,
   TerraCotizadorParametrosRoute: TerraCotizadorParametrosRoute,

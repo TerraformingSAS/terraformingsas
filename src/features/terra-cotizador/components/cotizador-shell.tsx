@@ -133,6 +133,7 @@ export function CotizadorShell({ children }: { children: ReactNode }) {
   const salir = useCerrarSesion();
   const admin = esAdminRol(sesion.data?.rol);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const dinamico = pathname.startsWith("/terra/cotizador-dinamico");
 
   return (
     <div
@@ -146,8 +147,18 @@ export function CotizadorShell({ children }: { children: ReactNode }) {
       </a>
       <header className="sticky top-0 z-30 border-b border-border bg-card/95 text-card-foreground shadow-sm backdrop-blur">
         <div className="container-tf flex h-18 items-center justify-between gap-3 py-3">
-          <Link to="/" className="flex shrink-0 items-center gap-3" aria-label="TERRA FORMING inicio">
-            <img src={logoColor} alt="TERRA FORMING" className="h-11 w-auto" width={300} height={83} />
+          <Link
+            to="/"
+            className="flex shrink-0 items-center gap-3"
+            aria-label="TERRA FORMING inicio"
+          >
+            <img
+              src={logoColor}
+              alt="TERRA FORMING"
+              className="h-11 w-auto"
+              width={300}
+              height={83}
+            />
           </Link>
           {admin ? (
             <nav
@@ -184,7 +195,7 @@ export function CotizadorShell({ children }: { children: ReactNode }) {
                 Admin
               </span>
             )}
-            {admin && (
+            {admin && !dinamico && (
               <div className="flex items-center gap-0.5 sm:hidden">
                 <AdminNavLink
                   to="/terra/cotizador/estadisticas"
@@ -193,7 +204,11 @@ export function CotizadorShell({ children }: { children: ReactNode }) {
                 >
                   Stats
                 </AdminNavLink>
-                <AdminNavLink to="/terra/cotizador" active={pathname === "/terra/cotizador"} compact>
+                <AdminNavLink
+                  to="/terra/cotizador"
+                  active={pathname === "/terra/cotizador"}
+                  compact
+                >
                   Cotiz.
                 </AdminNavLink>
                 <AdminNavLink
@@ -229,6 +244,35 @@ export function CotizadorShell({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
+      <nav
+        aria-label="Modalidad de cotización"
+        className="border-b border-border bg-card px-3 py-2"
+      >
+        <div className="container-tf flex flex-wrap gap-2">
+          <Link
+            to="/terra/cotizador"
+            aria-current={!dinamico ? "page" : undefined}
+            className={cn(
+              "rounded-md px-3 py-2 text-sm font-medium focus-visible:outline-2",
+              !dinamico
+                ? "bg-muted text-foreground"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            Cotizador de cuotas fijas
+          </Link>
+          <Link
+            to="/terra/cotizador-dinamico"
+            aria-current={dinamico ? "page" : undefined}
+            className={cn(
+              "rounded-md px-3 py-2 text-sm font-medium focus-visible:outline-2",
+              dinamico ? "bg-[#0e2a47] text-white" : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            Cotizador dinámico
+          </Link>
+        </div>
+      </nav>
       <main className="flex flex-1 flex-col">{children}</main>
       <div className="pb-36 lg:pb-0">
         <FuenteFooter />
