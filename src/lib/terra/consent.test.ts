@@ -16,13 +16,14 @@ async function boot(stored: string | null = null) {
     },
   };
   const document = {
+    title: "TERRA",
     head: { appendChild(node: { src?: string }) { if (node.src) scripts.push(node.src); } },
     createElement: () => ({ async: false, src: "" }),
     getElementsByTagName: () => [scriptNode],
   };
   const window = {
     document,
-    location: { pathname: "/", reload() {} },
+    location: { pathname: "/", search: "", href: "https://www.terraformings.co/", reload() {} },
     dispatchEvent() {},
   };
   const localStorage = {
@@ -31,25 +32,49 @@ async function boot(stored: string | null = null) {
   };
   const context = { window, document, localStorage, Event };
   runInNewContext(code, context);
-  return { scripts, store, consent: (context.window as { TerraConsent: { read: () => string | null; grant: () => void; deny: () => void } }).TerraConsent };
+  return {
+    scripts,
+    store,
+    window: context.window as {
+      dataLayer?: ArrayLike<unknown>[];
+      clarity?: { q?: unknown[][] };
+      TerraConsent: { read: () => string | null; grant: () => void; deny: () => void; trackPage: () => void };
+    },
+  };
+}
+
+function queued(dataLayer: ArrayLike<unknown>[] | undefined, name: string) {
+  return (dataLayer ?? []).filter((entry) => entry[0] === "event" && entry[1] === name);
 }
 
 test("no carga medición sin autorización", async () => {
   const pending = await boot();
-  assert.equal(pending.consent.read(), null);
+  assert.equal(pending.window.TerraConsent.read(), null);
   assert.equal(pending.scripts.length, 0);
-  pending.consent.deny();
-  assert.equal(pending.consent.read(), "denied");
+  pending.window.TerraConsent.trackPage();
+  assert.equal(pending.scripts.length, 0);
+  pending.window.TerraConsent.deny();
+  assert.equal(pending.window.TerraConsent.read(), "denied");
   assert.equal(pending.scripts.length, 0);
 });
 
-test("al aceptar carga Analytics, Clarity y los dos píxeles", async () => {
+test("al aceptar carga Analytics, Clarity y los dos píxeles una sola vez por página", async () => {
   const accepted = await boot();
-  accepted.consent.grant();
-  assert.equal(accepted.consent.read(), "granted");
+  accepted.window.TerraConsent.grant();
+  assert.equal(accepted.window.TerraConsent.read(), "granted");
   assert.ok(accepted.scripts.some((src) => src.includes("googletagmanager.com/gtag/js?id=G-T419MSNEWJ")));
   assert.ok(accepted.scripts.some((src) => src.includes("clarity.ms/tag/yvum2tlvam")));
   assert.ok(accepted.scripts.some((src) => src.includes("fbevents.js")));
+  const clarityConsent = accepted.window.clarity?.q?.some((entry) => entry[0] === "consentv2");
+  assert.equal(clarityConsent, true);
+  assert.equal(queued(accepted.window.dataLayer, "page_view").length, 1);
+  accepted.window.TerraConsent.trackPage();
+  assert.equal(queued(accepted.window.dataLayer, "page_view").length, 1);
+  accepted.window.location.href = "https://www.terraformings.co/terra";
+  accepted.window.location.pathname = "/terra";
+  accepted.window.TerraConsent.trackPage();
+  assert.equal(queued(accepted.window.dataLayer, "page_view").length, 2);
   const again = await boot("granted");
   assert.ok(again.scripts.some((src) => src.includes("fbevents.js")));
+  assert.equal(queued(again.window.dataLayer, "page_view").length, 1);
 });
