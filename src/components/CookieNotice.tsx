@@ -43,8 +43,8 @@ export function CookieNotice() {
           Cookies de medición
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-brand-dark/80">
-          Google Analytics, Microsoft Clarity y el píxel de Meta miden las visitas y la
-          publicidad. Solo se activan si lo autorizas.{" "}
+          Registramos la primera visita con Google Analytics, Microsoft Clarity y el píxel
+          de Meta. Si autorizas, también medimos las páginas siguientes.{" "}
           <a className="underline underline-offset-4 hover:text-brand-orange" href="/politica-de-privacidad">
             Política de privacidad
           </a>
