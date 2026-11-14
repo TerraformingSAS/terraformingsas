@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLotes } from "../../terra-cotizador/lib/datos";
-import { fmtCOP, fmtNum, type Lote } from "../../terra-cotizador/lib/lotes";
+import { codigoCotizacion, fmtCOP, fmtNum, type Lote } from "../../terra-cotizador/lib/lotes";
 import { PdfExportButton } from "../../terra-cotizador/components/pdf-export-button";
 import { generarCotizacionDinamica, peticionDinamica, useParametrosDinamicos } from "../lib/api";
 import {
@@ -722,6 +722,7 @@ function CotizacionEmitida({
   onEdit: () => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const fileName = `${codigoCotizacion(c.cliente.nombre, new Date(c.fecha), c.lote.idLote, c.condiciones.periodos)}-DIN.pdf`;
   const [sending, setSending] = useState(false),
     [sent, setSent] = useState(false),
     [error, setError] = useState("");
@@ -760,7 +761,7 @@ function CotizacionEmitida({
         <Button variant="outline" onClick={onEdit}>
           Editar como nueva
         </Button>
-        <PdfExportButton targetRef={ref} fileName={`${c.codigo}.pdf`}>
+        <PdfExportButton targetRef={ref} fileName={fileName}>
           Imprimir / guardar PDF
         </PdfExportButton>
         <Button variant="outline" disabled={sending || sent} onClick={() => void enviar()}>
