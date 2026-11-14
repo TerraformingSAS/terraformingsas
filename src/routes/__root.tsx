@@ -8,7 +8,7 @@ import {
     useRouter,
     useRouterState,
 } from "@tanstack/react-router";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 
 import { CookieNotice } from "@/components/CookieNotice";
 import { trackMetaPageContent } from "@/lib/terra/analytics";
@@ -161,11 +161,9 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function MetaPixelPageViews() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const isFirstView = useRef(true);
 
   useEffect(() => {
-    if (!isFirstView.current) window.fbq?.("track", "PageView");
-    isFirstView.current = false;
+    window.TerraConsent?.trackPage();
     trackMetaPageContent(pathname);
   }, [pathname]);
 

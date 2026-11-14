@@ -4,6 +4,7 @@
   var CLARITY = "yvum2tlvam";
   var PIXELS = ["2986286885067417", "2278679232865207"];
   var loaded = false;
+  var trackedUrl = "";
 
   function read() {
     try {
@@ -29,13 +30,42 @@
     else document.head.appendChild(script);
   }
 
+  function currentUrl() {
+    return window.location.href || window.location.pathname || "/";
+  }
+
+  function trackPage() {
+    if (!loaded || read() !== "granted") return;
+    var url = currentUrl();
+    if (url === trackedUrl) return;
+    trackedUrl = url;
+    var path = (window.location.pathname || "/") + (window.location.search || "");
+    window.gtag("event", "page_view", {
+      page_title: document.title || "",
+      page_location: url,
+      page_path: path,
+      send_to: GA,
+    });
+    if (typeof window.clarity === "function") {
+      window.clarity("set", "ruta", path);
+    }
+    window.fbq("track", "PageView");
+    if ((window.location.pathname || "").indexOf("/terra/estado") === 0) {
+      window.fbq("track", "ViewContent", {
+        content_name: "Disponibilidad de lotes TERRA",
+        content_category: "inventory",
+        content_type: "product_group",
+      });
+    }
+  }
+
   function enableTracking() {
     if (loaded || read() !== "granted") return;
     loaded = true;
     window.dataLayer = window.dataLayer || [];
     window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
     window.gtag("js", new Date());
-    window.gtag("config", GA);
+    window.gtag("config", GA, { send_page_view: false });
     insert("https://www.googletagmanager.com/gtag/js?id=" + GA);
     (function (c, l, a, r, i, t, y) {
       c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments); };
@@ -43,8 +73,10 @@
       t.async = 1;
       t.src = "https://www.clarity.ms/tag/" + i;
       y = l.getElementsByTagName(r)[0];
-      y.parentNode.insertBefore(t, y);
+      if (y && y.parentNode) y.parentNode.insertBefore(t, y);
+      else document.head.appendChild(t);
     })(window, document, "clarity", "script", CLARITY);
+    window.clarity("consentv2", { ad_Storage: "granted", analytics_Storage: "granted" });
     if (!window.fbq) {
       (function (f, b, e, v, n, t, s) {
         n = f.fbq = function () {
@@ -59,19 +91,13 @@
         t.async = !0;
         t.src = v;
         s = b.getElementsByTagName(e)[0];
-        s.parentNode.insertBefore(t, s);
+        if (s && s.parentNode) s.parentNode.insertBefore(t, s);
+        else document.head.appendChild(t);
       })(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
       window.fbq.disablePushState = true;
       PIXELS.forEach(function (id) { window.fbq("init", id); });
     }
-    window.fbq("track", "PageView");
-    if (window.location.pathname.indexOf("/terra/estado") === 0) {
-      window.fbq("track", "ViewContent", {
-        content_name: "Disponibilidad de lotes TERRA",
-        content_category: "inventory",
-        content_type: "product_group",
-      });
-    }
+    trackPage();
   }
 
   window.TerraConsent = {
@@ -82,9 +108,14 @@
     },
     deny: function () {
       var previous = read();
+      if (previous === "granted" && typeof window.clarity === "function") {
+        window.clarity("consent", false);
+      }
       write("denied");
+      trackedUrl = "";
       if (previous === "granted") window.location.reload();
     },
+    trackPage: trackPage,
   };
 
   if (read() === "granted") enableTracking();

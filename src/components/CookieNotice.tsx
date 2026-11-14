@@ -6,6 +6,7 @@ type ConsentApi = {
   read: () => string | null;
   grant: () => void;
   deny: () => void;
+  trackPage: () => void;
 };
 
 function consentApi(): ConsentApi | null {
