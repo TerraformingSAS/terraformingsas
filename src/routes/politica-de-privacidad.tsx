@@ -127,10 +127,8 @@ function PrivacyPolicyPage() {
               analítica, como Google Analytics y Microsoft Clarity, y el píxel de Meta,
               que pueden utilizar identificadores o tecnologías similares para comprender
               la navegación, medir visitas y la efectividad de la publicidad, y mejorar
-              el sitio. La primera página de cada visita se mide aunque no autorices las
-              cookies. La medición de las páginas siguientes solo continúa si autorizas
-              las cookies de medición en el aviso del sitio. Puedes cambiar de decisión desde el
-              enlace Cookies del pie de página o desde la configuración de tu
+              el sitio. Al visitarlo aceptas el uso de esas cookies. Puedes cerrar el aviso
+              sin detener la medición, o limitar las cookies desde la configuración de tu
               navegador, aunque algunas funciones pueden verse afectadas.
             </p>
             <p className={paragraph}>

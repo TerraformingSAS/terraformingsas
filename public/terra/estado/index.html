@@ -247,21 +247,16 @@
   } catch (e) {}
 })();
 </script>
-<div id="cookie-notice" class="cookie-notice" hidden role="dialog" aria-labelledby="cookie-notice-title">
-  <h2 id="cookie-notice-title">Cookies de medición</h2>
-  <p>Registramos la primera visita con Google Analytics, Microsoft Clarity y el píxel de Meta. Si autorizas, también medimos las páginas siguientes. <a href="/politica-de-privacidad">Política de privacidad</a></p>
-  <div class="cookie-notice__actions">
-    <button type="button" id="cookie-reject">Rechazar</button>
-    <button type="button" id="cookie-accept">Aceptar</button>
-  </div>
-</div>
+<p id="cookie-notice" class="cookie-notice" hidden>
+  <span>Al visitar este sitio aceptas el uso de cookies.</span>
+  <button type="button" id="cookie-close" aria-label="Cerrar">×</button>
+</p>
 <script src="/consent.js"></script>
 <script>
 (function () {
   var notice = document.getElementById("cookie-notice");
-  function sync() { notice.hidden = window.TerraConsent.read() !== null; }
-  document.getElementById("cookie-accept").addEventListener("click", function () { window.TerraConsent.grant(); sync(); });
-  document.getElementById("cookie-reject").addEventListener("click", function () { window.TerraConsent.deny(); sync(); });
+  function sync() { notice.hidden = window.TerraConsent.noticeDismissed(); }
+  document.getElementById("cookie-close").addEventListener("click", function () { window.TerraConsent.dismissNotice(); sync(); });
   document.getElementById("cookie-manage").addEventListener("click", function () { notice.hidden = false; });
   sync();
 })();

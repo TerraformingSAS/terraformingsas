@@ -1,25 +1,24 @@
 (function () {
-  var KEY = "terraforming.cookie-consent";
-  var ENTRY_KEY = "terraforming.entry-counted";
+  var NOTICE_KEY = "terraforming.cookie-notice";
   var GA = "G-T419MSNEWJ";
   var CLARITY = "yvum2tlvam";
   var PIXELS = ["2986286885067417", "2278679232865207"];
   var loaded = false;
   var trackedUrl = "";
 
-  function read() {
+  function noticeDismissed() {
     try {
-      return localStorage.getItem(KEY);
+      return localStorage.getItem(NOTICE_KEY) === "1";
     } catch (e) {
-      return null;
+      return false;
     }
   }
 
-  function write(value) {
+  function dismissNotice() {
     try {
-      localStorage.setItem(KEY, value);
+      localStorage.setItem(NOTICE_KEY, "1");
     } catch (e) {}
-    window.dispatchEvent(new Event("terra-consent"));
+    window.dispatchEvent(new Event("terra-cookie-dismiss"));
   }
 
   function insert(src) {
@@ -35,33 +34,8 @@
     return window.location.href || window.location.pathname || "/";
   }
 
-  function entryCounted() {
-    try {
-      return sessionStorage.getItem(ENTRY_KEY) === "1";
-    } catch (e) {
-      return false;
-    }
-  }
-
-  function markEntry() {
-    try {
-      sessionStorage.setItem(ENTRY_KEY, "1");
-    } catch (e) {}
-  }
-
-  function signalClarity() {
-    if (typeof window.clarity !== "function") return;
-    var granted = read() === "granted";
-    window.clarity("consentv2", {
-      ad_Storage: granted ? "granted" : "denied",
-      analytics_Storage: granted ? "granted" : "denied",
-    });
-  }
-
   function trackPage() {
     if (!loaded) return;
-    var granted = read() === "granted";
-    if (!granted && entryCounted()) return;
     var url = currentUrl();
     if (url === trackedUrl) return;
     trackedUrl = url;
@@ -72,9 +46,7 @@
       page_path: path,
       send_to: GA,
     });
-    if (typeof window.clarity === "function") {
-      window.clarity("set", "ruta", path);
-    }
+    if (typeof window.clarity === "function") window.clarity("set", "ruta", path);
     window.fbq("track", "PageView");
     if ((window.location.pathname || "").indexOf("/terra/estado") === 0) {
       window.fbq("track", "ViewContent", {
@@ -83,12 +55,10 @@
         content_type: "product_group",
       });
     }
-    if (!granted) markEntry();
   }
 
   function enableTracking() {
     if (loaded) return;
-    if (read() !== "granted" && entryCounted()) return;
     loaded = true;
     window.dataLayer = window.dataLayer || [];
     window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
@@ -104,7 +74,7 @@
       if (y && y.parentNode) y.parentNode.insertBefore(t, y);
       else document.head.appendChild(t);
     })(window, document, "clarity", "script", CLARITY);
-    signalClarity();
+    window.clarity("consentv2", { ad_Storage: "granted", analytics_Storage: "granted" });
     if (!window.fbq) {
       (function (f, b, e, v, n, t, s) {
         n = f.fbq = function () {
@@ -129,24 +99,8 @@
   }
 
   window.TerraConsent = {
-    read: read,
-    grant: function () {
-      write("granted");
-      if (!loaded) enableTracking();
-      else {
-        signalClarity();
-        trackPage();
-      }
-    },
-    deny: function () {
-      var previous = read();
-      if (previous === "granted" && typeof window.clarity === "function") {
-        window.clarity("consent", false);
-      }
-      write("denied");
-      markEntry();
-      if (previous === "granted") window.location.reload();
-    },
+    noticeDismissed: noticeDismissed,
+    dismissNotice: dismissNotice,
     trackPage: trackPage,
   };
 
