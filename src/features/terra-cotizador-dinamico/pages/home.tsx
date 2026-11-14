@@ -138,7 +138,8 @@ function FormularioDinamico({
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const errorRef = useRef<HTMLParagraphElement>(null);
-  const lote = lotes.find((l) => l.id === loteId);
+  const lotesDisponibles = lotes.filter((l) => l.estado === "disponible");
+  const lote = lotesDisponibles.find((l) => l.id === loteId);
   const n = Number(periodos);
   const ultimaFecha =
     fechaValida(fecha) && Number.isInteger(n) && n > 0 && n <= 360 ? fechaPeriodo(fecha, n) : "";
@@ -269,20 +270,19 @@ function FormularioDinamico({
                 <select
                   id="lote-dinamico"
                   className="h-11 w-full rounded-md border border-input bg-background px-3 text-base"
-                  value={loteId}
+                  value={lote?.id ?? ""}
                   onChange={(e) => setLoteId(e.target.value)}
                 >
                   <option value="">Selecciona un lote</option>
-                  {lotes
+                  {lotesDisponibles
                     .filter(
                       (l) =>
                         l.id === loteId ||
                         `${l.id} ${l.idLote}`.toLowerCase().includes(search.toLowerCase()),
                     )
                     .map((l) => (
-                      <option key={l.id} value={l.id} disabled={l.estado !== "disponible"}>
+                      <option key={l.id} value={l.id}>
                         {l.idLote} · {fmtNum(l.area)} m² · {fmtCOP(l.valorPreventa)}
-                        {l.estado !== "disponible" ? ` · ${l.estado}` : ""}
                       </option>
                     ))}
                 </select>
@@ -293,9 +293,9 @@ function FormularioDinamico({
                   <strong>{fmtCOP(lote.valorPreventa)}</strong>
                 </p>
               )}
-              {!lotes.length && (
+              {!lotesDisponibles.length && (
                 <p role="status" className="text-sm">
-                  No hay lotes en el inventario.
+                  No hay lotes disponibles para cotizar.
                 </p>
               )}
               <div className="grid gap-4 sm:grid-cols-2">
