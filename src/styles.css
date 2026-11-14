@@ -276,13 +276,9 @@
 }
 
 .terra-print-root {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: -1;
   width: 190mm;
-  pointer-events: none;
-  opacity: 0;
+  min-width: 190mm;
+  background: #fff;
 }
 
 @media print {
@@ -296,7 +292,7 @@
     margin: 0 !important;
     padding: 0 !important;
     height: auto !important;
-    overflow: hidden !important;
+    overflow: visible !important;
     background: #fff !important;
   }
 
@@ -306,14 +302,19 @@
 
   .terra-print-root {
     position: static !important;
-    z-index: auto !important;
     display: block !important;
-    width: auto !important;
+    width: 190mm !important;
+    min-width: 190mm !important;
     opacity: 1 !important;
-    pointer-events: auto !important;
   }
 
   .terra-print-page {
-    overflow: hidden !important;
+    overflow: visible !important;
+    width: 190mm;
+  }
+
+  .terra-print-page > * > * {
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 }
