@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { test } from "node:test";
 import { runInNewContext } from "node:vm";
 
-async function boot(dismissed = false) {
+async function boot(dismissed = false, pathname = "/") {
   const code = await readFile(new URL("../../../public/consent.js", import.meta.url), "utf8");
   const scripts: string[] = [];
   const store = new Map<string, string>();
@@ -23,7 +23,7 @@ async function boot(dismissed = false) {
   };
   const window = {
     document,
-    location: { pathname: "/", search: "", href: "https://www.terraformings.co/", reload() {} },
+    location: { pathname, search: "", href: "https://www.terraformings.co" + pathname, reload() {} },
     dispatchEvent() {},
   };
   const localStorage = {
@@ -66,4 +66,39 @@ test("mide la visita y las páginas siguientes aunque se cierre el aviso", async
   assert.equal(queued(visit.window.dataLayer, "page_view").length, 2);
   visit.window.TerraConsent.trackPage();
   assert.equal(queued(visit.window.dataLayer, "page_view").length, 2);
+});
+
+test("el cotizador y sus páginas derivadas no cargan medición externa", async () => {
+  const quote = await boot(false, "/terra/cotizador");
+  assert.equal(quote.scripts.length, 0);
+  assert.equal(queued(quote.window.dataLayer, "page_view").length, 0);
+  for (const path of ["/terra/cotizador/login", "/terra/cotizador/estadisticas", "/terra/cotizador/parametros"]) {
+    quote.window.location.pathname = path;
+    quote.window.location.href = "https://www.terraformings.co" + path;
+    quote.window.TerraConsent.trackPage();
+    assert.equal(quote.scripts.length, 0);
+    assert.equal(queued(quote.window.dataLayer, "page_view").length, 0);
+  }
+  quote.window.location.pathname = "/terra";
+  quote.window.location.href = "https://www.terraformings.co/terra";
+  quote.window.TerraConsent.trackPage();
+  assert.equal(queued(quote.window.dataLayer, "page_view").length, 1);
+  assert.ok(quote.scripts.some((src) => src.includes("clarity.ms/tag/yvum2tlvam")));
+  assert.ok(quote.scripts.some((src) => src.includes("fbevents.js")));
+});
+
+test("entrar al cotizador detiene la medición que ya estaba activa", async () => {
+  const visit = await boot();
+  visit.window.location.pathname = "/terra/cotizador";
+  visit.window.location.search = "?lote=A-1";
+  visit.window.location.href = "https://www.terraformings.co/terra/cotizador?lote=A-1";
+  visit.window.TerraConsent.trackPage();
+  assert.equal(queued(visit.window.dataLayer, "page_view").length, 1);
+  const stopped = visit.window.clarity?.q?.some((entry) => entry[0] === "stop");
+  assert.equal(stopped, true);
+  visit.window.location.pathname = "/terra/cotizador/parametros";
+  visit.window.location.search = "";
+  visit.window.location.href = "https://www.terraformings.co/terra/cotizador/parametros";
+  visit.window.TerraConsent.trackPage();
+  assert.equal(queued(visit.window.dataLayer, "page_view").length, 1);
 });

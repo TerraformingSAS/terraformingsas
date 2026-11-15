@@ -30,12 +30,60 @@
     else document.head.appendChild(script);
   }
 
+  var paused = false;
+
   function currentUrl() {
     return window.location.href || window.location.pathname || "/";
   }
 
+  function isCotizador() {
+    var path = window.location.pathname || "/";
+    return path === "/terra/cotizador" || path.indexOf("/terra/cotizador/") === 0;
+  }
+
+  function pauseExternal() {
+    window["ga-disable-" + GA] = true;
+    trackedUrl = "";
+    if (loaded && typeof window.clarity === "function") {
+      window.clarity("stop");
+      paused = true;
+    }
+  }
+
+  function watchRoutes() {
+    if (!window.history || !window.history.pushState) return;
+    var push = window.history.pushState;
+    var replace = window.history.replaceState;
+    function check() {
+      if (isCotizador()) pauseExternal();
+    }
+    window.history.pushState = function () {
+      var result = push.apply(this, arguments);
+      check();
+      return result;
+    };
+    window.history.replaceState = function () {
+      var result = replace.apply(this, arguments);
+      check();
+      return result;
+    };
+    window.addEventListener("popstate", check);
+  }
+
   function trackPage() {
-    if (!loaded) return;
+    if (isCotizador()) {
+      pauseExternal();
+      return;
+    }
+    window["ga-disable-" + GA] = false;
+    if (!loaded) {
+      enableTracking();
+      return;
+    }
+    if (paused && typeof window.clarity === "function") {
+      window.clarity("start");
+      paused = false;
+    }
     var url = currentUrl();
     if (url === trackedUrl) return;
     trackedUrl = url;
@@ -58,7 +106,7 @@
   }
 
   function enableTracking() {
-    if (loaded) return;
+    if (loaded || isCotizador()) return;
     loaded = true;
     window.dataLayer = window.dataLayer || [];
     window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
@@ -104,5 +152,7 @@
     trackPage: trackPage,
   };
 
-  enableTracking();
+  watchRoutes();
+  if (isCotizador()) window["ga-disable-" + GA] = true;
+  else enableTracking();
 })();

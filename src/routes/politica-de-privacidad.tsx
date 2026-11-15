@@ -129,7 +129,11 @@ function PrivacyPolicyPage() {
               la navegación, medir visitas y la efectividad de la publicidad, y mejorar
               el sitio. Al visitarlo aceptas el uso de esas cookies. Puedes cerrar el aviso
               sin detener la medición, o limitar las cookies desde la configuración de tu
-              navegador, aunque algunas funciones pueden verse afectadas.
+              navegador, aunque algunas funciones pueden verse afectadas. El cotizador
+              (/terra/cotizador) y sus páginas derivadas, como el ingreso, las estadísticas
+              y los parámetros, quedan fuera de esa medición: allí no se cargan ni registran
+              Google Analytics, Microsoft Clarity, el píxel de Meta ni otras herramientas
+              externas de monitoreo.
             </p>
             <p className={paragraph}>
               Cuando terceros presten servicios tecnológicos que impliquen acceso o tratamiento
