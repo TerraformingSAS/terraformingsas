@@ -30,12 +30,69 @@
     else document.head.appendChild(script);
   }
 
+  var paused = false;
+
   function currentUrl() {
     return window.location.href || window.location.pathname || "/";
   }
 
+  function isCotizador() {
+    var path = window.location.pathname || "/";
+    return path === "/terra/cotizador" || path.indexOf("/terra/cotizador/") === 0;
+  }
+
+  function isPreview() {
+    var url = (window.location.href || "") + " " + (window.location.hostname || "");
+    return url.toLowerCase().indexOf("vercel") !== -1;
+  }
+
+  function isExcluded() {
+    return isCotizador() || isPreview();
+  }
+
+  function pauseExternal() {
+    window["ga-disable-" + GA] = true;
+    trackedUrl = "";
+    if (loaded && typeof window.clarity === "function") {
+      window.clarity("stop");
+      paused = true;
+    }
+  }
+
+  function watchRoutes() {
+    if (!window.history || !window.history.pushState) return;
+    var push = window.history.pushState;
+    var replace = window.history.replaceState;
+    function check() {
+      if (isExcluded()) pauseExternal();
+    }
+    window.history.pushState = function () {
+      var result = push.apply(this, arguments);
+      check();
+      return result;
+    };
+    window.history.replaceState = function () {
+      var result = replace.apply(this, arguments);
+      check();
+      return result;
+    };
+    window.addEventListener("popstate", check);
+  }
+
   function trackPage() {
-    if (!loaded) return;
+    if (isExcluded()) {
+      pauseExternal();
+      return;
+    }
+    window["ga-disable-" + GA] = false;
+    if (!loaded) {
+      enableTracking();
+      return;
+    }
+    if (paused && typeof window.clarity === "function") {
+      window.clarity("start");
+      paused = false;
+    }
     var url = currentUrl();
     if (url === trackedUrl) return;
     trackedUrl = url;
@@ -58,7 +115,7 @@
   }
 
   function enableTracking() {
-    if (loaded) return;
+    if (loaded || isExcluded()) return;
     loaded = true;
     window.dataLayer = window.dataLayer || [];
     window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
@@ -104,5 +161,7 @@
     trackPage: trackPage,
   };
 
-  enableTracking();
+  watchRoutes();
+  if (isExcluded()) window["ga-disable-" + GA] = true;
+  else enableTracking();
 })();

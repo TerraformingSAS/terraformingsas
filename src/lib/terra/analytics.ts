@@ -126,12 +126,21 @@ export function metaPixelCalls(
   return calls;
 }
 
+export function isCotizadorPath(pathname: string) {
+  return pathname === "/terra/cotizador" || pathname.startsWith("/terra/cotizador/");
+}
+
+export function isExternalMonitoringExcluded(href: string, pathname = "") {
+  return isCotizadorPath(pathname) || href.toLowerCase().includes("vercel");
+}
+
 export function trackTerraEvent(
   event: TerraWebEvent,
   params: AnalyticsParams = {},
   options: { onceKey?: string } = {},
 ) {
   if (typeof window === "undefined") return;
+  if (isExternalMonitoringExcluded(window.location?.href || "", window.location?.pathname || "")) return;
   if (options.onceKey) {
     if (once.has(options.onceKey)) return;
     once.add(options.onceKey);
@@ -153,11 +162,16 @@ const PAGE_CONTENT: Record<string, { name: string; category: string; findLocatio
   "/terra": { name: "TERRA Etapa I", category: "project" },
   "/terra/mapa": { name: "Mapa de lotes TERRA", category: "location", findLocation: true },
   "/terra/estado": { name: "Disponibilidad de lotes TERRA", category: "inventory" },
-  "/terra/cotizador": { name: "Cotizador TERRA", category: "quote" },
 };
 
 export function trackMetaPageContent(pathname: string) {
-  if (typeof window === "undefined" || typeof window.fbq !== "function") return;
+  if (
+    typeof window === "undefined" ||
+    typeof window.fbq !== "function" ||
+    isExternalMonitoringExcluded(window.location?.href || "", pathname)
+  ) {
+    return;
+  }
   const page = PAGE_CONTENT[pathname];
   if (!page) return;
   window.fbq("track", "ViewContent", {

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { metaPixelCalls, resetAnalyticsOnceKeys, trackTerraEvent } from "./analytics.ts";
+import { isCotizadorPath, isExternalMonitoringExcluded, metaPixelCalls, resetAnalyticsOnceKeys, trackMetaPageContent, trackTerraEvent } from "./analytics.ts";
 
 test("no envía PII y dispara Lead una sola vez por clave", () => {
   const events: unknown[][] = [];
@@ -60,4 +60,28 @@ test("mapea las acciones del sitio a eventos estándar sin Purchase", () => {
     [view, search, contact, plan, quote, start].some((calls) => calls.some((call) => call.name === "Purchase")),
     false,
   );
+});
+
+test("no envía eventos externos desde el cotizador ni sus páginas derivadas", () => {
+  const events: unknown[][] = [];
+  const pixel: unknown[][] = [];
+  (globalThis as { window?: unknown }).window = {
+    gtag: (...args: unknown[]) => events.push(args),
+    fbq: (...args: unknown[]) => pixel.push(args),
+    location: { pathname: "/terra/cotizador" },
+  };
+  trackTerraEvent("view_quote", { lot_id: "C-12", value: 250000000, location: "cotizador" });
+  trackTerraEvent("search", { search_string: "A-1", location: "cotizador" });
+  trackMetaPageContent("/terra/cotizador/login");
+  assert.equal(events.length, 0);
+  assert.equal(pixel.length, 0);
+  assert.equal(isCotizadorPath("/terra/cotizador/estadisticas"), true);
+  assert.equal(isCotizadorPath("/terra/estado"), false);
+  assert.equal(isExternalMonitoringExcluded("https://proyecto.vercel.app/terra", "/terra"), true);
+  (globalThis as { window?: { location: { href: string; pathname: string } } }).window.location = {
+    href: "https://proyecto.vercel.app/",
+    pathname: "/",
+  };
+  trackMetaPageContent("/");
+  assert.equal(pixel.length, 0);
 });
