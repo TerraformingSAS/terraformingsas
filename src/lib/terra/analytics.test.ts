@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { isCotizadorPath, metaPixelCalls, resetAnalyticsOnceKeys, trackMetaPageContent, trackTerraEvent } from "./analytics.ts";
+import { isCotizadorPath, isExternalMonitoringExcluded, metaPixelCalls, resetAnalyticsOnceKeys, trackMetaPageContent, trackTerraEvent } from "./analytics.ts";
 
 test("no envía PII y dispara Lead una sola vez por clave", () => {
   const events: unknown[][] = [];
@@ -77,4 +77,11 @@ test("no envía eventos externos desde el cotizador ni sus páginas derivadas", 
   assert.equal(pixel.length, 0);
   assert.equal(isCotizadorPath("/terra/cotizador/estadisticas"), true);
   assert.equal(isCotizadorPath("/terra/estado"), false);
+  assert.equal(isExternalMonitoringExcluded("https://proyecto.vercel.app/terra", "/terra"), true);
+  (globalThis as { window?: { location: { href: string; pathname: string } } }).window.location = {
+    href: "https://proyecto.vercel.app/",
+    pathname: "/",
+  };
+  trackMetaPageContent("/");
+  assert.equal(pixel.length, 0);
 });

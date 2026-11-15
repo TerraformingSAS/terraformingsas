@@ -130,13 +130,17 @@ export function isCotizadorPath(pathname: string) {
   return pathname === "/terra/cotizador" || pathname.startsWith("/terra/cotizador/");
 }
 
+export function isExternalMonitoringExcluded(href: string, pathname = "") {
+  return isCotizadorPath(pathname) || href.toLowerCase().includes("vercel");
+}
+
 export function trackTerraEvent(
   event: TerraWebEvent,
   params: AnalyticsParams = {},
   options: { onceKey?: string } = {},
 ) {
   if (typeof window === "undefined") return;
-  if (isCotizadorPath(window.location?.pathname || "")) return;
+  if (isExternalMonitoringExcluded(window.location?.href || "", window.location?.pathname || "")) return;
   if (options.onceKey) {
     if (once.has(options.onceKey)) return;
     once.add(options.onceKey);
@@ -161,7 +165,13 @@ const PAGE_CONTENT: Record<string, { name: string; category: string; findLocatio
 };
 
 export function trackMetaPageContent(pathname: string) {
-  if (typeof window === "undefined" || typeof window.fbq !== "function" || isCotizadorPath(pathname)) return;
+  if (
+    typeof window === "undefined" ||
+    typeof window.fbq !== "function" ||
+    isExternalMonitoringExcluded(window.location?.href || "", pathname)
+  ) {
+    return;
+  }
   const page = PAGE_CONTENT[pathname];
   if (!page) return;
   window.fbq("track", "ViewContent", {

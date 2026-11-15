@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { test } from "node:test";
 import { runInNewContext } from "node:vm";
 
-async function boot(dismissed = false, pathname = "/") {
+async function boot(dismissed = false, pathname = "/", href = "") {
   const code = await readFile(new URL("../../../public/consent.js", import.meta.url), "utf8");
   const scripts: string[] = [];
   const store = new Map<string, string>();
@@ -23,7 +23,13 @@ async function boot(dismissed = false, pathname = "/") {
   };
   const window = {
     document,
-    location: { pathname, search: "", href: "https://www.terraformings.co" + pathname, reload() {} },
+    location: {
+      pathname,
+      search: "",
+      hostname: "",
+      href: href || "https://www.terraformings.co" + pathname,
+      reload() {},
+    },
     dispatchEvent() {},
   };
   const localStorage = {
@@ -101,4 +107,15 @@ test("entrar al cotizador detiene la medición que ya estaba activa", async () =
   visit.window.location.href = "https://www.terraformings.co/terra/cotizador/parametros";
   visit.window.TerraConsent.trackPage();
   assert.equal(queued(visit.window.dataLayer, "page_view").length, 1);
+});
+
+test("una url de vista previa con vercel no carga medición externa", async () => {
+  const preview = await boot(false, "/", "https://terraformingsas-git-cursor.vercel.app/");
+  assert.equal(preview.scripts.length, 0);
+  assert.equal(queued(preview.window.dataLayer, "page_view").length, 0);
+  preview.window.location.pathname = "/terra";
+  preview.window.location.href = "https://terraformingsas-git-cursor.vercel.app/terra";
+  preview.window.TerraConsent.trackPage();
+  assert.equal(preview.scripts.length, 0);
+  assert.equal(queued(preview.window.dataLayer, "page_view").length, 0);
 });

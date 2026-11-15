@@ -133,7 +133,8 @@ function PrivacyPolicyPage() {
               (/terra/cotizador) y sus páginas derivadas, como el ingreso, las estadísticas
               y los parámetros, quedan fuera de esa medición: allí no se cargan ni registran
               Google Analytics, Microsoft Clarity, el píxel de Meta ni otras herramientas
-              externas de monitoreo.
+              externas de monitoreo. Tampoco se cargan en las direcciones de vista previa
+              que contienen «vercel».
             </p>
             <p className={paragraph}>
               Cuando terceros presten servicios tecnológicos que impliquen acceso o tratamiento

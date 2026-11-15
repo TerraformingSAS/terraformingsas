@@ -41,6 +41,15 @@
     return path === "/terra/cotizador" || path.indexOf("/terra/cotizador/") === 0;
   }
 
+  function isPreview() {
+    var url = (window.location.href || "") + " " + (window.location.hostname || "");
+    return url.toLowerCase().indexOf("vercel") !== -1;
+  }
+
+  function isExcluded() {
+    return isCotizador() || isPreview();
+  }
+
   function pauseExternal() {
     window["ga-disable-" + GA] = true;
     trackedUrl = "";
@@ -55,7 +64,7 @@
     var push = window.history.pushState;
     var replace = window.history.replaceState;
     function check() {
-      if (isCotizador()) pauseExternal();
+      if (isExcluded()) pauseExternal();
     }
     window.history.pushState = function () {
       var result = push.apply(this, arguments);
@@ -71,7 +80,7 @@
   }
 
   function trackPage() {
-    if (isCotizador()) {
+    if (isExcluded()) {
       pauseExternal();
       return;
     }
@@ -106,7 +115,7 @@
   }
 
   function enableTracking() {
-    if (loaded || isCotizador()) return;
+    if (loaded || isExcluded()) return;
     loaded = true;
     window.dataLayer = window.dataLayer || [];
     window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
@@ -153,6 +162,6 @@
   };
 
   watchRoutes();
-  if (isCotizador()) window["ga-disable-" + GA] = true;
+  if (isExcluded()) window["ga-disable-" + GA] = true;
   else enableTracking();
 })();
