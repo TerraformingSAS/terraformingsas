@@ -97,10 +97,18 @@ export function PublicSimulator() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackTerraEvent("whatsapp_click", { location: "simulador" })}
-                className="rounded-full bg-white px-3 py-2 text-xs font-semibold text-brand-navy"
+                className="ml-auto rounded-full bg-white px-3 py-2 text-xs font-semibold text-brand-navy"
               >
                 Hablar con un asesor
               </a>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                aria-label="Cerrar simulador"
+                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-2xl leading-none text-white transition hover:bg-white/15"
+              >
+                ×
+              </button>
             </header>
 
             <div className="space-y-4 px-5 py-5">
