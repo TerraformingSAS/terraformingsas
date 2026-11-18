@@ -1,4 +1,4 @@
-import { cotizadorHref, rememberLot } from "@/components/terra/landing/links";
+import { openPublicSimulator, rememberLot } from "@/components/terra/landing/links";
 import { trackTerraEvent } from "@/lib/terra/analytics";
 import { persistFinancingPlan, readFinancingPlan, readSelectedLot } from "@/lib/terra/campaign";
 import {
@@ -127,8 +127,8 @@ export function LandingFinance() {
             {lotId ? ` · lote ${lotId}` : ""}. La cuota no se estima aquí.
           </p>
           <div className="mt-6 grid gap-3 sm:grid-cols-3">
-            <a
-              href={cotizadorHref(lotId)}
+            <button
+              type="button"
               onClick={() => {
                 rememberLot(lotId);
                 trackTerraEvent("view_quote", {
@@ -136,13 +136,14 @@ export function LandingFinance() {
                   plan: `${months}_meses`,
                   lot_id: lotId || undefined,
                 });
+                openPublicSimulator();
               }}
               className="inline-flex min-h-12 items-center justify-center rounded-full bg-white px-3 text-center text-sm font-semibold text-brand-navy transition hover:bg-brand-cream"
             >
               Calcula tu cuota
-            </a>
+            </button>
             <a
-              href={cotizadorHref(lotId)}
+              href="#contacto"
               onClick={() => {
                 rememberLot(lotId);
                 trackTerraEvent("view_quote", {
@@ -154,8 +155,8 @@ export function LandingFinance() {
             >
               Cotiza tu lote
             </a>
-            <a
-              href={cotizadorHref(lotId)}
+            <button
+              type="button"
               onClick={() => {
                 rememberLot(lotId);
                 trackTerraEvent("view_quote", {
@@ -163,11 +164,12 @@ export function LandingFinance() {
                   plan: `${months}_meses`,
                   lot_id: lotId || undefined,
                 });
+                openPublicSimulator();
               }}
               className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/30 px-3 text-center text-sm font-semibold transition hover:bg-white/10"
             >
               Conoce tu financiación
-            </a>
+            </button>
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { LandingFinance } from "@/components/terra/landing/LandingFinance";
 import { LandingLots } from "@/components/terra/landing/LandingLots";
-import { cotizadorHref } from "@/components/terra/landing/links";
+import { openPublicSimulator } from "@/components/terra/landing/links";
 import { TerraLeadForm } from "@/components/terra/TerraLeadForm";
 import { trackTerraEvent } from "@/lib/terra/analytics";
 import { terraWhatsAppUrl } from "@/lib/terra/contact";
@@ -22,13 +22,16 @@ export function LotPreview() {
               conserva esa selección.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <a
-                href={cotizadorHref()}
-                onClick={() => trackTerraEvent("view_quote", { location: "cierre" })}
+              <button
+                type="button"
+                onClick={() => {
+                  trackTerraEvent("view_quote", { location: "cierre" });
+                  openPublicSimulator();
+                }}
                 className="inline-flex min-h-12 items-center justify-center rounded-full bg-brand-orange px-6 text-sm font-semibold text-white"
               >
                 Calcula tu cuota
-              </a>
+              </button>
               <a
                 href={terraWhatsAppUrl()}
                 target="_blank"

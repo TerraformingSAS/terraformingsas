@@ -3,6 +3,7 @@ import { InstagramButton } from "@/components/InstagramButton";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { CampaignCapture } from "@/components/terra/CampaignCapture";
 import { LandingHeader } from "@/components/terra/landing/LandingHeader";
+import { PublicSimulator } from "@/components/terra/landing/PublicSimulator";
 import { LocationSection } from "@/components/terra/LocationSection";
 import { LotPreview } from "@/components/terra/LotPreview";
 import { TerraFooter } from "@/components/terra/TerraFooter";
@@ -57,6 +58,7 @@ function TerraPage() {
         <LocationSection />
       </main>
       <TerraFooter />
+      <PublicSimulator />
       <InstagramButton />
       <WhatsAppButton href={terraWhatsAppUrl()} />
       <BackToTop className="bottom-[9.5rem]" />

@@ -1,4 +1,4 @@
-import { cotizadorHref, rememberLot } from "@/components/terra/landing/links";
+import { openPublicSimulator, rememberLot } from "@/components/terra/landing/links";
 import { trackTerraEvent } from "@/lib/terra/analytics";
 import { TERRA_LOT_TYPES, TERRA_PROJECT, formatCop } from "@/lib/terra/commercial";
 import { terraWhatsAppUrl } from "@/lib/terra/contact";
@@ -149,16 +149,17 @@ export function LandingLots() {
               </p>
             </div>
             <div className="mt-8 flex flex-col gap-3">
-              <a
-                href={cotizadorHref(active?.id)}
+              <button
+                type="button"
                 onClick={() => {
                   rememberLot(active?.id);
                   trackTerraEvent("view_quote", { location: "lotes", lot_id: active?.id });
+                  openPublicSimulator();
                 }}
                 className="inline-flex min-h-12 items-center justify-center rounded-full bg-brand-orange px-5 text-sm font-semibold text-white transition hover:brightness-110"
               >
-                Cotiza tu lote
-              </a>
+                Calcula tu cuota
+              </button>
               <a
                 href={active ? lotExplorerUrl(active.id) : TERRA_PROJECT.explorerPath}
                 className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/25 px-5 text-sm font-semibold transition hover:bg-white/10"

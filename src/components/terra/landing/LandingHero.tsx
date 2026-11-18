@@ -2,7 +2,7 @@ import aerialImg from "@/assets/terra/render-encabezado.webp";
 import { trackTerraEvent } from "@/lib/terra/analytics";
 import { TERRA_FINANCING, TERRA_PROJECT, formatCopMillions } from "@/lib/terra/commercial";
 import { terraWhatsAppUrl } from "@/lib/terra/contact";
-import { cotizadorHref } from "@/components/terra/landing/links";
+import { openPublicSimulator } from "@/components/terra/landing/links";
 
 export function LandingHero() {
   return (
@@ -60,15 +60,18 @@ export function LandingHero() {
         ) : null}
 
         <div className="motion-safe:animate-[terra-hero-rise_0.7s_ease_0.32s_both] mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-          <a
-            href={cotizadorHref()}
-            onClick={() => trackTerraEvent("view_quote", { location: "hero_cuota" })}
+          <button
+            type="button"
+            onClick={() => {
+              trackTerraEvent("view_quote", { location: "hero_cuota" });
+              openPublicSimulator();
+            }}
             className="inline-flex min-h-14 items-center justify-center rounded-full bg-brand-orange px-7 text-base font-semibold text-white shadow-[0_12px_30px_rgba(247,148,29,0.35)] transition hover:-translate-y-0.5 hover:brightness-110"
           >
             Calcula tu cuota
-          </a>
+          </button>
           <a
-            href={cotizadorHref()}
+            href="#contacto"
             onClick={() => trackTerraEvent("view_quote", { location: "hero_lote" })}
             className="inline-flex min-h-14 items-center justify-center rounded-full border border-white/40 bg-white/10 px-7 text-base font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
           >
