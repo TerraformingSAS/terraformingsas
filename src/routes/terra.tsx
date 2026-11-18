@@ -2,12 +2,11 @@ import { BackToTop } from "@/components/BackToTop";
 import { InstagramButton } from "@/components/InstagramButton";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { CampaignCapture } from "@/components/terra/CampaignCapture";
-import { LandingFinance } from "@/components/terra/landing/LandingFinance";
 import { LandingHeader } from "@/components/terra/landing/LandingHeader";
-import { LandingHero } from "@/components/terra/landing/LandingHero";
-import { LandingLots } from "@/components/terra/landing/LandingLots";
-import { LandingStory } from "@/components/terra/landing/LandingStory";
+import { LocationSection } from "@/components/terra/LocationSection";
+import { LotPreview } from "@/components/terra/LotPreview";
 import { TerraFooter } from "@/components/terra/TerraFooter";
+import { TerraHero } from "@/components/terra/TerraHero";
 import { terraWhatsAppUrl } from "@/lib/terra/contact";
 import { absoluteUrl, pageSeo } from "@/lib/seo";
 import { createFileRoute } from "@tanstack/react-router";
@@ -53,10 +52,9 @@ function TerraPage() {
       <CampaignCapture />
       <LandingHeader />
       <main id="contenido">
-        <LandingHero />
-        <LandingLots />
-        <LandingFinance />
-        <LandingStory />
+        <TerraHero />
+        <LotPreview />
+        <LocationSection />
       </main>
       <TerraFooter />
       <InstagramButton />
