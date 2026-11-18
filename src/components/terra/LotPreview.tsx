@@ -8,8 +8,6 @@ import { terraWhatsAppUrl } from "@/lib/terra/contact";
 export function LotPreview() {
   return (
     <>
-      <LandingLots />
-      <LandingFinance />
       <section id="contacto" className="scroll-mt-24 bg-brand-navy py-16 text-white sm:py-24">
         <div className="mx-auto grid max-w-[1240px] gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:items-start">
           <div>
@@ -18,8 +16,8 @@ export function LotPreview() {
               Cuéntanos qué lote estás mirando.
             </h2>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-white/75">
-              Deja tus datos o abre el cotizador. Si ya elegiste un lote en esta página, el enlace
-              conserva esa selección.
+              Deja tus datos o calcula una cuota. Si eliges un lote más adelante, la simulación
+              conserva esa referencia.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <button
@@ -48,6 +46,8 @@ export function LotPreview() {
           </div>
         </div>
       </section>
+      <LandingLots />
+      <LandingFinance />
     </>
   );
 }
