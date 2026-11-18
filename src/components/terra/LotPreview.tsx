@@ -1,44 +1,53 @@
+import { LandingFinance } from "@/components/terra/landing/LandingFinance";
+import { LandingLots } from "@/components/terra/landing/LandingLots";
+import { openPublicSimulator } from "@/components/terra/landing/links";
 import { TerraLeadForm } from "@/components/terra/TerraLeadForm";
-import { TerraPrimaryLink } from "@/components/terra/primitives";
-import { TERRA_LOT_TYPES, TERRA_PROJECT, formatCop } from "@/lib/terra/commercial";
+import { trackTerraEvent } from "@/lib/terra/analytics";
+import { terraWhatsAppUrl } from "@/lib/terra/contact";
 
 export function LotPreview() {
   return (
-    <section id="lotes" className="scroll-mt-24 bg-brand-cream py-14 sm:py-20">
-      <div className="container-tf">
-        <div className="flex flex-wrap items-end justify-between gap-4">
+    <>
+      <section id="contacto" className="scroll-mt-24 bg-brand-navy py-16 text-white sm:py-24">
+        <div className="mx-auto grid max-w-[1240px] gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:items-start">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-orange">
-              Etapa I
+            <p className="text-[11px] uppercase tracking-[0.22em] text-brand-orange">Contacto</p>
+            <h2 className="mt-3 font-display text-4xl font-bold sm:text-5xl">
+              Cuéntanos qué lote estás mirando.
+            </h2>
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-white/75">
+              Deja tus datos o calcula una cuota. Si eliges un lote más adelante, la simulación
+              conserva esa referencia.
             </p>
-            <h2 className="mt-3 font-display text-3xl font-bold text-brand-navy">Tipos de lote</h2>
-          </div>
-          <TerraPrimaryLink href={TERRA_PROJECT.explorerPath}>Ver plano</TerraPrimaryLink>
-        </div>
-        <div className="mt-8 grid items-stretch gap-6 lg:grid-cols-2">
-          <ul className="order-2 flex flex-col gap-3 lg:order-1 lg:h-full">
-            {TERRA_LOT_TYPES.map((type) => (
-              <li
-                key={type.area}
-                className="flex items-center justify-between gap-4 rounded-2xl bg-white px-5 py-4 shadow-sm lg:flex-1"
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <button
+                type="button"
+                onClick={() => {
+                  trackTerraEvent("view_quote", { location: "cierre" });
+                  openPublicSimulator();
+                }}
+                className="inline-flex min-h-12 items-center justify-center rounded-full bg-brand-orange px-6 text-sm font-semibold text-white"
               >
-                <p className="text-sm font-medium text-brand-dark/70">Lotes de {type.label}</p>
-                <div className="text-right">
-                  <p className="font-display text-2xl font-bold leading-none text-brand-orange sm:text-3xl">
-                    {formatCop(type.fromCop)}
-                  </p>
-                  <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-brand-navy">
-                    Desde
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
-          <div id="contacto" className="order-1 scroll-mt-28 lg:order-2 lg:sticky lg:top-24">
+                Calcula tu cuota
+              </button>
+              <a
+                href={terraWhatsAppUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackTerraEvent("whatsapp_click", { location: "cierre" })}
+                className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#25D366] px-6 text-sm font-semibold"
+              >
+                WhatsApp
+              </a>
+            </div>
+          </div>
+          <div className="rounded-[28px] bg-white p-2 text-brand-navy shadow-2xl">
             <TerraLeadForm compact />
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+      <LandingLots />
+      <LandingFinance />
+    </>
   );
 }

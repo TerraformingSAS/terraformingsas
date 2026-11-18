@@ -1,17 +1,13 @@
 import { BackToTop } from "@/components/BackToTop";
-import { CampaignCapture } from "@/components/terra/CampaignCapture";
-import { CommercialConditions } from "@/components/terra/CommercialConditions";
-import { LocationSection } from "@/components/terra/LocationSection";
-import { LotPreview } from "@/components/terra/LotPreview";
-import { ProjectGallery } from "@/components/terra/ProjectGallery";
-import { ProjectTrust } from "@/components/terra/ProjectTrust";
-import { TerraCta } from "@/components/terra/TerraCta";
-import { TerraFAQ } from "@/components/terra/TerraFAQ";
-import { TerraFooter } from "@/components/terra/TerraFooter";
-import { TerraHeader } from "@/components/terra/TerraHeader";
-import { TerraHero } from "@/components/terra/TerraHero";
 import { InstagramButton } from "@/components/InstagramButton";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { CampaignCapture } from "@/components/terra/CampaignCapture";
+import { LandingHeader } from "@/components/terra/landing/LandingHeader";
+import { PublicSimulator } from "@/components/terra/landing/PublicSimulator";
+import { LocationSection } from "@/components/terra/LocationSection";
+import { LotPreview } from "@/components/terra/LotPreview";
+import { TerraFooter } from "@/components/terra/TerraFooter";
+import { TerraHero } from "@/components/terra/TerraHero";
 import { terraWhatsAppUrl } from "@/lib/terra/contact";
 import { absoluteUrl, pageSeo } from "@/lib/seo";
 import { createFileRoute } from "@tanstack/react-router";
@@ -21,7 +17,7 @@ export const Route = createFileRoute("/terra")({
     ...pageSeo({
       title: "TERRA | Lotes residenciales en Popayán",
       description:
-        "TERRA Etapa I: lotes residenciales en el km 1 vía Popayán–Santa Rosa. Conoce el proyecto, explora el plano interactivo y solicita una cotización personalizada.",
+        "TERRA Etapa I: lotes residenciales en el km 1 vía Popayán–Santa Rosa. Explora precios, financiación y cotiza en el cotizador del proyecto.",
       path: "/terra",
       imagePath: "/terra/estado/ubicacion-etapa-i.webp",
     }),
@@ -53,20 +49,16 @@ export const Route = createFileRoute("/terra")({
 
 function TerraPage() {
   return (
-    <div className="min-h-screen bg-white text-brand-navy">
+    <div className="terra-landing min-h-screen bg-white text-brand-navy">
       <CampaignCapture />
-      <TerraHeader />
+      <LandingHeader />
       <main id="contenido">
         <TerraHero />
         <LotPreview />
         <LocationSection />
-        <CommercialConditions />
-        <ProjectGallery />
-        <ProjectTrust />
-        <TerraFAQ />
-        <TerraCta />
       </main>
       <TerraFooter />
+      <PublicSimulator />
       <InstagramButton />
       <WhatsAppButton href={terraWhatsAppUrl()} />
       <BackToTop className="bottom-[9.5rem]" />
