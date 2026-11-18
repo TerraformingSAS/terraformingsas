@@ -7,7 +7,7 @@ import { terraWhatsAppUrl } from "@/lib/terra/contact";
 import { useEffect, useMemo, useState } from "react";
 
 const MIN_MONTHS = 1;
-const MAX_MONTHS = 120;
+const MAX_MONTHS = 36;
 
 function clampSeparation(value: number, price: number): number {
   if (!Number.isFinite(value)) return 0;
@@ -219,9 +219,7 @@ export function PublicSimulator() {
                 Recalcular cuota
               </button>
               <p className="text-center text-[11px] leading-relaxed text-brand-dark/60">
-                La cuota se actualiza al cambiar el porcentaje, el valor de separación o el plazo.
-                Doce meses van sin interés; los demás plazos usan la tasa mensual de referencia. Es
-                una simulación y no reemplaza la cotización de un asesor.
+                Es una simulación y no reemplaza la cotización de un asesor.
               </p>
             </div>
           </section>
