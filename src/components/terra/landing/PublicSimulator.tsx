@@ -2,7 +2,7 @@ import { cuotaPublica } from "@/components/terra/landing/cuota-publica";
 import { TERRA_SIMULATOR_EVENT } from "@/components/terra/landing/links";
 import { trackTerraEvent } from "@/lib/terra/analytics";
 import { persistFinancingPlan } from "@/lib/terra/campaign";
-import { TERRA_FINANCING, TERRA_LOT_TYPES, formatCop } from "@/lib/terra/commercial";
+import { TERRA_FINANCING, TERRA_LOT_TYPES, TERRA_PROJECT, formatCop } from "@/lib/terra/commercial";
 import { terraWhatsAppUrl } from "@/lib/terra/contact";
 import { useEffect, useMemo, useState } from "react";
 
@@ -56,11 +56,25 @@ export function PublicSimulator() {
     setSeparacion(Math.round((price * pct) / 100));
   }
 
+  const type = TERRA_LOT_TYPES[typeIndex];
+  const whatsAppQuote = `https://wa.me/${TERRA_PROJECT.phoneE164}?text=${encodeURIComponent(
+    [
+      "Hola TERRA, quiero cotizar esta simulación de la Etapa I:",
+      `Lote: ${type.label}`,
+      `Valor del lote: ${formatCop(price)}`,
+      `Separación: ${percent.toLocaleString("es-CO", { maximumFractionDigits: 2 })}% (${formatCop(separation)})`,
+      `Saldo a financiar (${TERRA_FINANCING.financedPercent}%): ${formatCop(quote.financiado)}`,
+      `A la entrega (${TERRA_FINANCING.deliveryPercent}%): ${formatCop(quote.contraEntrega)}`,
+      `Plazo: ${months} meses`,
+      `Cuota estimada: ${formatCop(quote.cuota)}`,
+    ].join("\n"),
+  )}`;
+
   function confirmQuote() {
     persistFinancingPlan(`${months}_meses`, window.sessionStorage);
-    trackTerraEvent("select_financing_plan", {
+    trackTerraEvent("whatsapp_click", {
+      location: "simulador_cotizar",
       plan: `${months}_meses`,
-      location: "simulador_publico",
       value: quote.cuota,
     });
   }
@@ -219,13 +233,15 @@ export function PublicSimulator() {
                 </span>
               </p>
 
-              <button
-                type="button"
+              <a
+                href={whatsAppQuote}
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={confirmQuote}
-                className="w-full rounded-full bg-brand-orange py-3.5 text-base font-bold text-white transition hover:brightness-110"
+                className="inline-flex w-full items-center justify-center rounded-full bg-[#25D366] py-3.5 text-base font-bold text-white transition hover:brightness-110"
               >
-                Recalcular cuota
-              </button>
+                Cotizar
+              </a>
               <p className="text-center text-[11px] leading-relaxed text-brand-dark/60">
                 Es una simulación y no reemplaza la cotización de un asesor.
               </p>
