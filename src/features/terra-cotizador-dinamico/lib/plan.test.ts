@@ -71,8 +71,19 @@ test("70%: la reserva del 30% no causa intereses y se suma una sola vez al pago 
   close(p.totalPagar, p.valorPreventa + p.interesesTotales);
 });
 
-test("plazo libre de 18 meses; 12 meses también aplica la tasa dinámica", () => {
-  for (const n of [1, 12, 18, 37, 360]) {
+test("12 cuotas o menos no generan intereses; desde 13 meses aplica la tasa", () => {
+  for (const n of [1, 12]) {
+    const p = calcularPlanDinamico(126_626_500, {
+      ...EJEMPLO,
+      periodos: n,
+      fechaEntrega: fechaPeriodo(EJEMPLO.fechaSeparacion, n),
+    });
+    assert.equal(p.filas.length, n);
+    assert.equal(p.filas[0].interes, 0);
+    assert.equal(p.interesesTotales, 0);
+    assert.equal(p.tasaMensual, 0);
+  }
+  for (const n of [13, 18, 37, 360]) {
     const p = calcularPlanDinamico(126_626_500, {
       ...EJEMPLO,
       periodos: n,

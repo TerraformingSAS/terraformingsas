@@ -53,6 +53,7 @@ import {
 } from "@/features/terra-cotizador/lib/parametros";
 import { trackTerraEvent } from "@/lib/terra/analytics";
 import { persistSelectedLot, readSelectedLot } from "@/lib/terra/campaign";
+import { isQuoteBlocked, quoteStatusNote } from "@/lib/terra/quote-status";
 import { normalizeLotId } from "@/lib/terra/lots";
 
 type Cotizacion = {
@@ -133,8 +134,8 @@ export function HomePage() {
     vendedor: vendedor ? "" : "No se pudo identificar al vendedor con tu inicio de sesión.",
     lote: !lote
       ? "Selecciona un lote."
-      : lote.estado !== "disponible"
-        ? `El lote ${lote.idLote} está ${estadoInfo(lote.estado).label.toLowerCase()}; solo se pueden cotizar lotes disponibles.`
+      : isQuoteBlocked(lote.estado)
+        ? `El lote ${lote.idLote} está ${estadoInfo(lote.estado).label.toLowerCase()} y no admite cotización.`
         : "",
     nombre: nombre.trim().length >= 3 ? "" : "Escribe el nombre del comprador.",
     cc: cc.trim() && !isValidCC(cc) ? "La cédula debe tener solo números (5 a 11 dígitos)." : "",
@@ -294,11 +295,16 @@ export function HomePage() {
           )}
         </div>
 
-        {(showErr("lote") || (lote && lote.estado !== "disponible")) && (
+        {showErr("lote") && (
           <p className="mt-3 text-sm font-medium text-destructive" role="alert">
             {errores.lote}
           </p>
         )}
+        {lote && quoteStatusNote(lote.estado) ? (
+          <p className="mt-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-950" role="status">
+            {quoteStatusNote(lote.estado)}
+          </p>
+        ) : null}
       </section>
 
       {/* Formulario */}
@@ -460,7 +466,7 @@ export function HomePage() {
             size="lg"
             className="h-12 w-full text-base"
             onClick={generar}
-            disabled={!!lote && lote.estado !== "disponible"}
+            disabled={!!lote && isQuoteBlocked(lote.estado)}
           >
             <FileText /> Generar cotización
             {lote && <span className="hidden sm:inline"> · Lote {lote.idLote}</span>}

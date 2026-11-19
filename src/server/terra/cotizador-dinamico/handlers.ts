@@ -101,8 +101,10 @@ export function crearHandlersDinamicos(d: DependenciasDinamicas) {
             409,
           );
         const contexto = await d.lote(body.loteId as string);
-        if (!contexto || contexto.lote.estado !== "disponible")
-          return error("El lote ya no está disponible. Actualiza el inventario.", 409);
+        if (!contexto) return error("El lote ya no está disponible. Actualiza el inventario.", 409);
+        const estado = contexto.lote.estado;
+        if (estado === "vendido" || estado === "no_disponible")
+          return error("El lote está vendido o no disponible y no admite cotización.", 409);
         if (contexto.errores.length) return error(contexto.errores.join(" "), 422);
         if (body.valorPreventa !== contexto.lote.valorPreventa)
           return error("El precio del lote cambió. Actualiza el inventario y revisa el plan.", 409);

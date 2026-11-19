@@ -155,6 +155,20 @@ test("rechaza precio manipulado, cambio de parámetros, lote no disponible y com
   );
   const unavailable = setup({ lote: async () => null });
   assert.equal((await unavailable.h.cotizaciones(req("POST", body))).status, 409);
+  const sold = setup({
+    lote: async () => {
+      const ctx = await t.d.lote("ET01-E-02");
+      return ctx ? { ...ctx, lote: { ...ctx.lote, estado: "vendido" } } : null;
+    },
+  });
+  assert.equal((await sold.h.cotizaciones(req("POST", body))).status, 409);
+  const reserved = setup({
+    lote: async () => {
+      const ctx = await t.d.lote("ET01-E-02");
+      return ctx ? { ...ctx, lote: { ...ctx.lote, estado: "reservado" } } : null;
+    },
+  });
+  assert.equal((await reserved.h.cotizaciones(req("POST", body))).status, 201);
   assert.equal(t.stored.size, 0);
 });
 
