@@ -17,6 +17,7 @@ import {
   esPlanMeses,
   esPorcentaje,
 } from "../../../features/terra-cotizador/lib/financiacion.js";
+import { isQuoteBlocked } from "../../../lib/terra/quote-status.js";
 import { leerParametros } from "./parametros.js";
 
 type Body = {
@@ -31,7 +32,10 @@ type Body = {
 };
 
 const esc = (s: string) =>
-  s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+  s.replace(
+    /[&<>"']/g,
+    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!,
+  );
 
 const fechaLarga = (d: Date) =>
   new Intl.DateTimeFormat("es-CO", {
@@ -66,9 +70,9 @@ export async function POST(req: Request): Promise<Response> {
     const { parametros } = await leerParametros();
     const { lotes } = await filasDePrecios();
     const lote = lotes.map(toLote).find((l) => l?.id === id) ?? null;
-    if (!lote || lote.estado !== "disponible") {
+    if (!lote || isQuoteBlocked(lote.estado)) {
       return Response.json(
-        { ok: false, error: "El lote ya no está disponible en el Excel." },
+        { ok: false, error: "El lote está vendido o no disponible y no admite cotización." },
         { status: 409 },
       );
     }

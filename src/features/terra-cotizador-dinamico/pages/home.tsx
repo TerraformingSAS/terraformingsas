@@ -21,6 +21,8 @@ import type { ParametrosDinamicos } from "../lib/parametros.ts";
 import { validarCliente, type ClienteDinamico, type CotizacionDinamica } from "../lib/types.ts";
 import { PlanDocument } from "../components/plan-document";
 import { fechaCorta } from "../lib/formato";
+import { milesInputValue, parseMiles } from "@/lib/terra/miles";
+import { isQuoteBlocked, quoteStatusNote } from "@/lib/terra/quote-status";
 
 type AbonoEditable = { id: string; periodo: number; valor: string; concepto: string };
 function hoyBogota() {
@@ -138,8 +140,8 @@ function FormularioDinamico({
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const errorRef = useRef<HTMLParagraphElement>(null);
-  const lotesDisponibles = lotes.filter((l) => l.estado === "disponible");
-  const lote = lotesDisponibles.find((l) => l.id === loteId);
+  const lotesCotizables = lotes.filter((l) => !isQuoteBlocked(l.estado) || l.id === loteId);
+  const lote = lotes.find((l) => l.id === loteId);
   const n = Number(periodos);
   const ultimaFecha =
     fechaValida(fecha) && Number.isInteger(n) && n > 0 && n <= 360 ? fechaPeriodo(fecha, n) : "";
@@ -191,7 +193,9 @@ function FormularioDinamico({
   async function generar() {
     setError("");
     try {
-      if (!lote || lote.estado !== "disponible") throw new Error("Selecciona un lote disponible.");
+      if (!lote) throw new Error("Selecciona un lote.");
+      if (isQuoteBlocked(lote.estado))
+        throw new Error("El lote está vendido o no disponible y no admite cotización.");
       validarCliente(cliente);
       if (abonosInvalidos)
         throw new Error(
@@ -274,7 +278,7 @@ function FormularioDinamico({
                   onChange={(e) => setLoteId(e.target.value)}
                 >
                   <option value="">Selecciona un lote</option>
-                  {lotesDisponibles
+                  {lotesCotizables
                     .filter(
                       (l) =>
                         l.id === loteId ||
@@ -283,6 +287,7 @@ function FormularioDinamico({
                     .map((l) => (
                       <option key={l.id} value={l.id}>
                         {l.idLote} · {fmtNum(l.area)} m² · {fmtCOP(l.valorPreventa)}
+                        {l.estado !== "disponible" ? ` · ${l.estado}` : ""}
                       </option>
                     ))}
                 </select>
@@ -293,7 +298,12 @@ function FormularioDinamico({
                   <strong>{fmtCOP(lote.valorPreventa)}</strong>
                 </p>
               )}
-              {!lotesDisponibles.length && (
+              {lote && quoteStatusNote(lote.estado) ? (
+                <p role="status" className="rounded-lg bg-amber-50 p-3 text-sm text-amber-950">
+                  {quoteStatusNote(lote.estado)}
+                </p>
+              ) : null}
+              {!lotesCotizables.length && (
                 <p role="status" className="text-sm">
                   No hay lotes disponibles para cotizar.
                 </p>
@@ -329,14 +339,14 @@ function FormularioDinamico({
               <div className="grid gap-4 sm:grid-cols-2">
                 <Campo id="separacion-dinamica" label="Separación (COP)">
                   <Input
-                    className="text-base"
+                    className="text-base tabular-nums"
                     id="separacion-dinamica"
-                    type="number"
-                    min={p.separacionMinima}
-                    max={lote?.valorPreventa ?? 1e12}
-                    step="1"
-                    value={separacion}
-                    onChange={(e) => setSeparacion(e.target.value)}
+                    inputMode="numeric"
+                    value={milesInputValue(separacion)}
+                    onChange={(e) => {
+                      const parsed = parseMiles(e.target.value);
+                      setSeparacion(parsed === "" ? "" : String(parsed));
+                    }}
                   />
                   <p className="text-xs text-muted-foreground">
                     Mínimo: {fmtCOP(p.separacionMinima)}
@@ -355,14 +365,14 @@ function FormularioDinamico({
                 </Campo>
                 <Campo id="cuota-dinamica" label="Cuota mensual (COP)">
                   <Input
-                    className="text-base"
+                    className="text-base tabular-nums"
                     id="cuota-dinamica"
-                    type="number"
-                    min="0"
-                    max={1e12}
-                    step="1"
-                    value={cuota}
-                    onChange={(e) => setCuota(e.target.value)}
+                    inputMode="numeric"
+                    value={milesInputValue(cuota)}
+                    onChange={(e) => {
+                      const parsed = parseMiles(e.target.value);
+                      setCuota(parsed === "" ? "" : String(parsed));
+                    }}
                   />
                 </Campo>
                 <Campo id="periodos-dinamicos" label="Número de mensualidades">
@@ -408,7 +418,8 @@ function FormularioDinamico({
               </div>
               <p className="text-sm">
                 <strong>{fmtNum(p.tasaMensual * 100)}% mes vencido</strong> · configurable por el
-                administrador. Pagos al cierre del período mensual, desde la separación.
+                administrador. Hasta 12 mensualidades no generan intereses; desde 13 meses aplica
+                esa tasa. Pagos al cierre del período mensual, desde la separación.
               </p>
               {porcentaje === 70 && (
                 <p className="text-sm text-muted-foreground">
@@ -561,14 +572,18 @@ function FormularioDinamico({
                                   <Campo id={`abono-${a.id}`} label="Valor adicional (COP)">
                                     <Input
                                       id={`abono-${a.id}`}
-                                      className="w-44 text-base"
-                                      type="number"
-                                      min="1"
-                                      max={1e12}
-                                      step="1"
-                                      value={a.valor}
+                                      className="w-44 text-base tabular-nums"
+                                      inputMode="numeric"
+                                      value={milesInputValue(a.valor)}
                                       aria-invalid={!a.valor.trim() || Number(a.valor) <= 0}
-                                      onChange={(e) => editAbono(a.id, "valor", e.target.value)}
+                                      onChange={(e) => {
+                                        const parsed = parseMiles(e.target.value);
+                                        editAbono(
+                                          a.id,
+                                          "valor",
+                                          parsed === "" ? "" : String(parsed),
+                                        );
+                                      }}
                                     />
                                   </Campo>
                                   <Campo id={`concepto-${a.id}`} label="Concepto (opcional)">

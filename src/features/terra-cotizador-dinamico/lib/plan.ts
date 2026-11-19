@@ -144,7 +144,7 @@ export function calcularPlanDinamico(
   parametros: ParametrosDinamicos = PARAMETROS_DINAMICOS,
 ): PlanDinamico {
   const c = validarCondiciones(condiciones, valorPreventa, parametros);
-  const r = parametros.tasaMensual;
+  const r = c.periodos <= 12 ? 0 : parametros.tasaMensual;
   if (!Number.isFinite(r) || r < 0 || r > 0.1) throw new Error("Tasa mensual inválida.");
   const saldoInicial = valorPreventa - c.separacion;
   const financiado = (saldoInicial * c.porcentaje) / 100;

@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { milesInputValue, parseMiles } from "@/lib/terra/miles";
 import { peticionDinamica, useParametrosDinamicos } from "../lib/api";
 import { validarParametrosDinamicos, type ParametrosDinamicos } from "../lib/parametros.ts";
 
@@ -79,16 +80,27 @@ function ParametrosForm({ initial }: { initial: ParametrosDinamicos }) {
         <div key={key} className="space-y-2">
           <Label htmlFor={key}>{label}</Label>
           <Input
-            className="text-base"
+            className="text-base tabular-nums"
             id={key}
-            type="number"
+            inputMode="decimal"
             required
             min={key.includes("eriodos") ? 1 : 0}
             max={key === "tasaMensual" ? 10 : key.includes("eriodos") ? 360 : 1e12}
             step={step}
-            value={Number.isNaN(draft[key]) ? "" : draft[key]}
+            value={
+              Number.isNaN(draft[key])
+                ? ""
+                : key === "separacionMinima" || key === "cuotaMensual"
+                  ? milesInputValue(String(draft[key]))
+                  : draft[key]
+            }
             onChange={(e) => {
-              setDraft({ ...draft, [key]: e.target.value === "" ? NaN : Number(e.target.value) });
+              const money = key === "separacionMinima" || key === "cuotaMensual";
+              const parsed = money ? parseMiles(e.target.value) : Number(e.target.value);
+              setDraft({
+                ...draft,
+                [key]: parsed === "" || Number.isNaN(parsed) ? NaN : parsed,
+              });
               setSaved(false);
             }}
           />

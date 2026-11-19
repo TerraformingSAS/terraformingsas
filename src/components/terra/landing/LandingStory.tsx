@@ -2,12 +2,9 @@ import mapImg from "@/assets/terra/ubicacion-km1.webp";
 import aerialImg from "@/assets/terra/render-aereo.webp";
 import blocksImg from "@/assets/terra/render-manzanas.webp";
 import roadsImg from "@/assets/terra/render-vias.webp";
+import { LandingTimeline } from "@/components/terra/landing/LandingTimeline";
 import { trackTerraEvent } from "@/lib/terra/analytics";
-import {
-  TERRA_PROJECT,
-  TERRA_TIMELINE,
-  TERRA_TIMELINE_HORIZON_MONTHS,
-} from "@/lib/terra/commercial";
+import { TERRA_PROJECT } from "@/lib/terra/commercial";
 import {
   Accordion,
   AccordionContent,
@@ -55,7 +52,7 @@ const FAQ = [
   },
   {
     q: "¿En qué estado está el proyecto?",
-    a: "En estructuración, diseño y preventa preliminar. El horizonte estimado es de 36 meses y la etapa regulatoria inicial de 6 a 8 meses, sujeta a permisos.",
+    a: "El cronograma estimado es de 36 meses: planeación (M00–M10), comercialización (M05–M22), infraestructura (M10–M32) y entrega (M27–M36), sujeto a permisos.",
   },
 ] as const;
 
@@ -132,7 +129,7 @@ export function LandingStory() {
       </section>
 
       <section id="desarrollo" className="bg-brand-cream py-16">
-        <div className="mx-auto grid max-w-[1240px] gap-8 px-4 sm:px-6 lg:grid-cols-2">
+        <div className="mx-auto max-w-[1240px] px-4 sm:px-6">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-orange">
               Quién desarrolla
@@ -166,24 +163,9 @@ export function LandingStory() {
               </a>
             </p>
           </div>
-          <div>
-            <p className="text-sm text-brand-dark/70">
-              Horizonte estimado: {TERRA_TIMELINE_HORIZON_MONTHS} meses.
-            </p>
-            <ol className="mt-4 grid gap-2 sm:grid-cols-2">
-              {TERRA_TIMELINE.map((step, index) => (
-                <li key={step.id} className="rounded-2xl bg-white px-4 py-3 text-sm">
-                  <span className="text-[11px] font-semibold text-brand-orange">0{index + 1}</span>
-                  <p className="font-semibold text-brand-navy">{step.title}</p>
-                </li>
-              ))}
-            </ol>
-            <p className="mt-3 text-xs text-brand-dark/60">
-              Cronograma estimado, sujeto a permisos y condiciones técnicas.
-            </p>
-          </div>
         </div>
       </section>
+      <LandingTimeline />
 
       <section className="bg-white py-16" aria-label="Preguntas frecuentes">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
